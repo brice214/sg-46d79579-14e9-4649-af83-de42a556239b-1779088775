@@ -10,36 +10,43 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-adinkra opacity-5"></div>
+      {/* Hero Section avec background africain */}
+      <section className="relative py-32 md:py-48 overflow-hidden">
+        {/* Background image avec overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-background"></div>
+        </div>
+        
         <div className="container relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-sm font-medium">
-              <Sparkles className="h-4 w-4 text-gold" />
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gold/20 backdrop-blur-sm border border-gold/30 text-sm font-medium text-gold">
+              <Sparkles className="h-4 w-4" />
               <span>La bibliothèque numérique africaine</span>
             </div>
             
-            <h1 className="font-serif text-5xl md:text-7xl font-bold text-foreground leading-tight">
+            <h1 className="font-serif text-5xl md:text-7xl font-bold text-white leading-tight drop-shadow-lg">
               Publiez et monétisez
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-earth via-gold to-forest">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold via-earth to-gold">
                 votre savoir africain
               </span>
             </h1>
             
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-2xl mx-auto drop-shadow-md">
               AfriLitt est la première plateforme dédiée aux enseignants, chercheurs, écrivains et penseurs africains. 
               Partagez vos documents, construisez votre audience, générez des revenus.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white">
+              <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white shadow-2xl">
                 <Link href="/auth/register">
                   Commencer gratuitement
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild size="lg" variant="outline" className="backdrop-blur-sm bg-white/10 border-white/30 text-white hover:bg-white/20">
                 <Link href="/catalogue">
                   Explorer le catalogue
                 </Link>
@@ -47,25 +54,25 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">10K+</div>
-                <div className="text-sm text-muted-foreground">Documents</div>
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-lg p-4">
+                <div className="text-3xl font-bold text-gold drop-shadow-md">10K+</div>
+                <div className="text-sm text-gray-200">Documents</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">5K+</div>
-                <div className="text-sm text-muted-foreground">Auteurs</div>
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-lg p-4">
+                <div className="text-3xl font-bold text-gold drop-shadow-md">5K+</div>
+                <div className="text-sm text-gray-200">Auteurs</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-foreground">50K+</div>
-                <div className="text-sm text-muted-foreground">Lecteurs</div>
+              <div className="text-center backdrop-blur-sm bg-white/10 rounded-lg p-4">
+                <div className="text-3xl font-bold text-gold drop-shadow-md">50K+</div>
+                <div className="text-sm text-gray-200">Lecteurs</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-card/30">
+      {/* Features Section avec fond coloré */}
+      <section className="py-20 bg-gradient-to-b from-background via-earth/5 to-background">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-serif text-4xl font-bold mb-4">
@@ -77,9 +84,9 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 hover:shadow-lg transition-shadow border-border/40">
-              <div className="h-14 w-14 rounded-xl bg-earth/10 flex items-center justify-center mb-6">
-                <Upload className="h-7 w-7 text-earth" />
+            <Card className="p-8 hover:shadow-2xl transition-all border-border/40 bg-gradient-to-br from-card to-earth/5 hover:scale-105 duration-300">
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-earth to-earth/50 flex items-center justify-center mb-6 shadow-lg">
+                <Upload className="h-7 w-7 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Publication simplifiée</h3>
               <p className="text-muted-foreground">
@@ -88,9 +95,9 @@ export default function Home() {
               </p>
             </Card>
 
-            <Card className="p-8 hover:shadow-lg transition-shadow border-border/40">
-              <div className="h-14 w-14 rounded-xl bg-gold/10 flex items-center justify-center mb-6">
-                <TrendingUp className="h-7 w-7 text-gold" />
+            <Card className="p-8 hover:shadow-2xl transition-all border-border/40 bg-gradient-to-br from-card to-gold/5 hover:scale-105 duration-300">
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-gold to-gold/50 flex items-center justify-center mb-6 shadow-lg">
+                <TrendingUp className="h-7 w-7 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Monétisation équitable</h3>
               <p className="text-muted-foreground">
@@ -99,9 +106,9 @@ export default function Home() {
               </p>
             </Card>
 
-            <Card className="p-8 hover:shadow-lg transition-shadow border-border/40">
-              <div className="h-14 w-14 rounded-xl bg-forest/10 flex items-center justify-center mb-6">
-                <Shield className="h-7 w-7 text-forest" />
+            <Card className="p-8 hover:shadow-2xl transition-all border-border/40 bg-gradient-to-br from-card to-forest/5 hover:scale-105 duration-300">
+              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-forest to-forest/50 flex items-center justify-center mb-6 shadow-lg">
+                <Shield className="h-7 w-7 text-white" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Protection légale</h3>
               <p className="text-muted-foreground">
@@ -113,9 +120,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20">
-        <div className="container">
+      {/* How It Works avec motifs */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-adinkra opacity-5"></div>
+        <div className="container relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-serif text-4xl font-bold mb-4">
               Comment ça marche ?
@@ -126,8 +134,8 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-earth to-gold flex items-center justify-center text-white font-bold text-2xl mx-auto">
+            <div className="text-center space-y-4 group">
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-earth to-gold flex items-center justify-center text-white font-bold text-3xl mx-auto shadow-xl group-hover:scale-110 transition-transform duration-300">
                 1
               </div>
               <h3 className="text-xl font-semibold">Créez votre compte</h3>
@@ -136,8 +144,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-gold to-forest flex items-center justify-center text-white font-bold text-2xl mx-auto">
+            <div className="text-center space-y-4 group">
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-gold to-forest flex items-center justify-center text-white font-bold text-3xl mx-auto shadow-xl group-hover:scale-110 transition-transform duration-300">
                 2
               </div>
               <h3 className="text-xl font-semibold">Publiez vos documents</h3>
@@ -146,8 +154,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="text-center space-y-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-forest to-earth flex items-center justify-center text-white font-bold text-2xl mx-auto">
+            <div className="text-center space-y-4 group">
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-forest to-earth flex items-center justify-center text-white font-bold text-3xl mx-auto shadow-xl group-hover:scale-110 transition-transform duration-300">
                 3
               </div>
               <h3 className="text-xl font-semibold">Gagnez des revenus</h3>
@@ -159,8 +167,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Preview */}
-      <section className="py-20 bg-card/30">
+      {/* Categories avec fond dégradé */}
+      <section className="py-20 bg-gradient-to-b from-background via-gold/5 to-background">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h2 className="font-serif text-4xl font-bold mb-4">
@@ -173,21 +181,21 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             {[
-              { name: "Littérature", icon: "📚", count: "2.5K" },
-              { name: "Sciences", icon: "🔬", count: "1.8K" },
-              { name: "Histoire", icon: "📜", count: "1.2K" },
-              { name: "Philosophie", icon: "💭", count: "950" },
-              { name: "Économie", icon: "📊", count: "1.1K" },
-              { name: "Éducation", icon: "🎓", count: "2.2K" },
-              { name: "Arts", icon: "🎨", count: "850" },
-              { name: "Droit", icon: "⚖️", count: "720" }
+              { name: "Littérature", icon: "📚", count: "2.5K", color: "from-earth/20 to-gold/20" },
+              { name: "Sciences", icon: "🔬", count: "1.8K", color: "from-forest/20 to-earth/20" },
+              { name: "Histoire", icon: "📜", count: "1.2K", color: "from-gold/20 to-forest/20" },
+              { name: "Philosophie", icon: "💭", count: "950", color: "from-earth/20 to-forest/20" },
+              { name: "Économie", icon: "📊", count: "1.1K", color: "from-gold/20 to-earth/20" },
+              { name: "Éducation", icon: "🎓", count: "2.2K", color: "from-forest/20 to-gold/20" },
+              { name: "Arts", icon: "🎨", count: "850", color: "from-earth/20 to-gold/20" },
+              { name: "Droit", icon: "⚖️", count: "720", color: "from-gold/20 to-forest/20" }
             ].map((cat) => (
               <Link 
                 key={cat.name}
                 href={`/categories/${cat.name.toLowerCase()}`}
-                className="p-6 rounded-xl border border-border/40 hover:border-gold/40 hover:shadow-lg transition-all text-center group"
+                className={`p-6 rounded-xl border border-border/40 bg-gradient-to-br ${cat.color} backdrop-blur-sm hover:border-gold/40 hover:shadow-xl hover:scale-105 transition-all duration-300 text-center group`}
               >
-                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
+                <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300">
                   {cat.icon}
                 </div>
                 <div className="font-semibold mb-1">{cat.name}</div>
@@ -197,7 +205,7 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="outline" size="lg" className="border-gold/40 hover:bg-gold/10">
               <Link href="/categories">
                 Voir toutes les catégories
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -207,9 +215,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section avec background */}
       <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-earth/5 via-gold/5 to-forest/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-earth/10 via-gold/10 to-forest/10"></div>
+        <div className="absolute inset-0 bg-adinkra opacity-5"></div>
         <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-8">
             <h2 className="font-serif text-4xl md:text-5xl font-bold">
@@ -219,7 +228,7 @@ export default function Home() {
               Rejoignez des milliers d'auteurs africains qui ont choisi AfriLitt pour valoriser leur travail
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white">
+              <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white shadow-xl">
                 <Link href="/auth/register">
                   Créer mon compte auteur
                   <ArrowRight className="ml-2 h-5 w-5" />

@@ -49,18 +49,30 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 flex items-center justify-center p-4 py-12 relative overflow-hidden">
-        <div className="absolute inset-0 pattern-adinkra opacity-5"></div>
-        <Card className="w-full max-w-md relative z-10 border-border/50 shadow-xl">
-          <CardHeader className="space-y-2 text-center">
-            <CardTitle className="font-serif text-3xl">Connexion</CardTitle>
-            <CardDescription>
+        {/* Background image avec overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-earth/60 to-black/80 backdrop-blur-sm"></div>
+        </div>
+        
+        {/* Motifs décoratifs */}
+        <div className="absolute inset-0 bg-adinkra opacity-10"></div>
+        
+        <Card className="w-full max-w-md relative z-10 border-gold/30 shadow-2xl backdrop-blur-md bg-card/95">
+          <CardHeader className="space-y-2 text-center border-b border-gold/20 pb-6">
+            <CardTitle className="font-serif text-3xl text-transparent bg-clip-text bg-gradient-to-r from-earth via-gold to-forest">
+              Connexion
+            </CardTitle>
+            <CardDescription className="text-base">
               Accédez à votre compte AfriLitt
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -68,12 +80,13 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="border-border/50 focus:border-gold/50 transition-colors"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Link href="#" className="text-sm text-earth hover:text-gold transition-colors">
+                  <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                  <Link href="#" className="text-sm text-gold hover:text-gold/80 transition-colors font-medium">
                     Oublié ?
                   </Link>
                 </div>
@@ -83,17 +96,22 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="border-border/50 focus:border-gold/50 transition-colors"
                 />
               </div>
-              <Button type="submit" className="w-full bg-gradient-to-r from-earth to-gold text-white hover:opacity-90" disabled={loading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-earth via-gold to-forest text-white hover:opacity-90 shadow-lg hover:shadow-xl transition-all" 
+                disabled={loading}
+              >
                 {loading ? "Connexion..." : "Se connecter"}
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex justify-center border-t border-border/40 p-4 mt-4">
+          <CardFooter className="flex justify-center border-t border-gold/20 p-4 mt-4">
             <p className="text-sm text-muted-foreground">
               Pas encore de compte ?{" "}
-              <Link href="/auth/register" className="text-earth hover:text-gold font-medium transition-colors">
+              <Link href="/auth/register" className="text-gold hover:text-gold/80 font-medium transition-colors">
                 S'inscrire
               </Link>
             </p>
