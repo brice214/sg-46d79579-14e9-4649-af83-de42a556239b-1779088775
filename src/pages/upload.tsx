@@ -225,18 +225,26 @@ export default function Upload() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 py-12">
-        <div className="container max-w-4xl">
-          <div className="text-center mb-8">
-            <h1 className="font-serif text-4xl font-bold mb-3">
-              Publier un document
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Partagez votre savoir avec la communauté AfriLitt
-            </p>
-          </div>
+      <div className="relative pt-20 pb-16 border-b border-gold/20">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background"></div>
+        </div>
+        <div className="container max-w-4xl relative z-10 text-center">
+          <h1 className="font-serif text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
+            Publier un document
+          </h1>
+          <p className="text-lg text-gold/90 drop-shadow-md max-w-2xl mx-auto">
+            Partagez votre savoir avec la communauté AfriLitt. Contribuez à l'enrichissement de la bibliothèque numérique africaine.
+          </p>
+        </div>
+      </div>
 
-          <Card className="border-border/40">
+      <main className="flex-1 py-12 bg-gradient-to-b from-earth/5 via-background to-gold/5">
+        <div className="container max-w-4xl">
+          <Card className="border-gold/20 shadow-xl bg-card/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UploadIcon className="h-5 w-5" />

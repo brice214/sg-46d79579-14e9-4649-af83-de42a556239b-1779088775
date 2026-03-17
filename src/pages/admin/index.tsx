@@ -154,18 +154,30 @@ export default function AdminDashboard() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 py-12">
-        <div className="container max-w-6xl">
-          <div className="mb-8">
-            <h1 className="font-serif text-3xl font-bold flex items-center gap-3">
-              <ShieldAlert className="h-8 w-8 text-earth" />
-              Administration AfriLitt
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Gérez les publications en attente et les signalements de la communauté.
-            </p>
+      <div className="relative pt-16 pb-12 border-b border-gold/20">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background"></div>
+        </div>
+        <div className="container max-w-6xl relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="font-serif text-4xl font-bold text-white drop-shadow-lg mb-2 flex items-center gap-3">
+                <ShieldAlert className="h-8 w-8 text-gold" />
+                Administration AfriLitt
+              </h1>
+              <p className="text-gold/90 text-lg drop-shadow-md">
+                Gérez les publications en attente et les signalements de la communauté.
+              </p>
+            </div>
           </div>
+        </div>
+      </div>
 
+      <main className="flex-1 py-12 bg-gradient-to-b from-earth/5 via-background to-gold/5">
+        <div className="container max-w-6xl">
           <Tabs defaultValue="pending">
             <TabsList className="mb-6">
               <TabsTrigger value="pending">

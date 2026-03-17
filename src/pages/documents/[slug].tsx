@@ -1,363 +1,536 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
-import { 
-  Download, 
-  Eye, 
-  Calendar, 
-  FileText, 
-  Tag, 
-  AlertTriangle,
-  ShoppingCart,
-  CheckCircle
-} from "lucide-react";
 import { documentService } from "@/services/documentService";
 import { purchaseService } from "@/services/purchaseService";
+import { reportService } from "@/services/reportService";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles } from "lucide-react";
 
-type DocumentDetails = Database["public"]["Tables"]["documents"]["Row"] & {
-  profiles: { 
-    id: string; 
-    full_name: string | null; 
-    avatar_url: string | null;
-    bio: string | null;
-    country: string | null;
+type Document = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  author_id: string;
+  category_id: string | null;
+  keywords: string[];
+  document_type: string;
+  price: number;
+  currency: string;
+  page_count: number | null;
+  file_url: string;
+  cover_image_url: string | null;
+  is_certified: boolean;
+  is_published: boolean;
+  download_count: number;
+  view_count: number;
+  created_at: string;
+  profiles: {
+    full_name: string | null;
+  };
+  categories: {
+    name: string;
   } | null;
-  categories: { id: string; name: string; slug: string } | null;
 };
 
 export default function DocumentPage() {
   const router = useRouter();
   const { slug } = router.query;
   const { toast } = useToast();
-  
-  const [document, setDocument] = useState<DocumentDetails | null>(null);
+
+  const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [purchasing, setPurchasing] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Report modal state
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
+  const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
-    if (slug) {
-      loadDocument();
-      checkAuth();
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (slug && typeof slug === "string") {
+      loadDocument(slug);
     }
   }, [slug]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    setCurrentUser(session?.user?.id || null);
+    setCurrentUser(session?.user || null);
   };
 
-  const loadDocument = async () => {
-    if (!slug || typeof slug !== "string") return;
-
-    setLoading(true);
+  const loadDocument = async (documentSlug: string) => {
     try {
-      const doc = await documentService.getDocumentBySlug(slug);
-      setDocument(doc as DocumentDetails);
+      setLoading(true);
+      const doc = await documentService.getDocumentBySlug(documentSlug);
+      
+      if (!doc) {
+        toast({
+          title: "Document introuvable",
+          description: "Ce document n'existe pas ou a été supprimé.",
+          variant: "destructive",
+        });
+        router.push("/catalogue");
+        return;
+      }
 
-      // Incrémenter le compteur de vues
+      setDocument(doc as Document);
+
+      // Increment view count
       await documentService.incrementViewCount(doc.id);
 
-      // Vérifier l'accès utilisateur
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user && doc.price > 0) {
-        const access = await documentService.checkUserAccess(doc.id, session.user.id);
+      // Check if user has access
+      if (currentUser) {
+        const access = await documentService.checkUserAccess(doc.id, currentUser.id);
         setHasAccess(access);
-      } else if (doc.price === 0) {
-        setHasAccess(true);
       }
     } catch (error) {
       console.error("Error loading document:", error);
       toast({
-        variant: "destructive",
         title: "Erreur",
-        description: "Document introuvable"
+        description: "Impossible de charger le document.",
+        variant: "destructive",
       });
-      router.push("/catalogue");
     } finally {
       setLoading(false);
     }
   };
 
   const handlePurchase = async () => {
-    if (!document || !currentUser) {
+    if (!currentUser) {
       toast({
-        variant: "destructive",
         title: "Connexion requise",
-        description: "Veuillez vous connecter pour acheter ce document"
+        description: "Veuillez vous connecter pour acheter ce document.",
+        variant: "destructive",
       });
       router.push("/auth/login");
       return;
     }
 
-    setPurchasing(true);
+    if (!document) return;
+
     try {
-      // Simuler un paiement (à remplacer par une vraie intégration de paiement)
-      const platformFee = Number(document.price) * 0.15; // 15% de frais
-      const authorEarnings = Number(document.price) - platformFee;
-
-      const transaction = await purchaseService.createTransaction({
+      // Simulate payment process
+      const success = await purchaseService.createTransaction({
         document_id: document.id,
-        buyer_id: currentUser,
+        buyer_id: currentUser.id,
         author_id: document.author_id,
-        amount: Number(document.price),
-        currency: document.currency,
-        platform_fee: platformFee,
-        author_earnings: authorEarnings,
-        payment_method: "card",
-        status: "completed"
+        amount: document.price,
+        platform_fee: document.price * 0.15,
+        author_earnings: document.price * 0.85,
+        payment_method: 'card',
+        status: 'completed'
       });
 
-      await purchaseService.completeTransaction(transaction.id);
-      await purchaseService.grantAccess(document.id, currentUser, transaction.id);
-      await documentService.incrementDownloadCount(document.id);
-
-      setHasAccess(true);
-      toast({
-        title: "Achat réussi !",
-        description: "Vous pouvez maintenant télécharger le document"
-      });
+      if (success) {
+        toast({
+          title: "✅ Achat réussi !",
+          description: "Vous pouvez maintenant télécharger ce document.",
+        });
+        setHasAccess(true);
+      }
     } catch (error) {
       console.error("Purchase error:", error);
       toast({
-        variant: "destructive",
         title: "Erreur de paiement",
-        description: "Une erreur est survenue lors de l'achat"
+        description: "Une erreur est survenue lors du paiement.",
+        variant: "destructive",
       });
-    } finally {
-      setPurchasing(false);
     }
   };
 
   const handleDownload = async () => {
-    if (!document || !hasAccess) return;
+    if (!document) return;
 
-    // Télécharger le document
-    window.open(document.file_url, "_blank");
-    
-    toast({
-      title: "Téléchargement démarré",
-      description: "Votre document est en cours de téléchargement"
-    });
+    if (document.price > 0 && !hasAccess) {
+      toast({
+        title: "Accès refusé",
+        description: "Vous devez acheter ce document pour le télécharger.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await documentService.incrementDownloadCount(document.id);
+      
+      // Download file
+      const { data, error } = await supabase.storage
+        .from("documents")
+        .download(document.file_url);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = window.document.createElement("a");
+      a.href = url;
+      a.download = `${document.title}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Téléchargement démarré",
+        description: "Le document est en cours de téléchargement.",
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le document.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReport = async () => {
+    if (!currentUser) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour signaler ce document.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!document || !reportReason || !reportDetails) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez remplir tous les champs.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsReporting(true);
+      await reportService.createReport({
+        document_id: document.id,
+        reporter_id: currentUser.id,
+        reason: reportReason as any,
+        details: reportDetails
+      });
+
+      toast({
+        title: "Signalement envoyé",
+        description: "Votre signalement a été transmis à notre équipe de modération.",
+      });
+
+      setReportReason("");
+      setReportDetails("");
+    } catch (error) {
+      console.error("Report error:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer le signalement.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsReporting(false);
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-earth border-r-transparent"></div>
-            <p className="mt-4 text-muted-foreground">Chargement du document...</p>
+        <div className="container mx-auto px-4 py-24 text-center">
+          <div className="animate-pulse">
+            <BookOpen className="h-16 w-16 mx-auto mb-4 text-terre" />
+            <p className="text-xl text-noir/70">Chargement du document...</p>
           </div>
-        </main>
+        </div>
         <Footer />
       </div>
     );
   }
 
-  if (!document) return null;
-
-  const isAuthor = currentUser === document.author_id;
+  if (!document) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <Header />
+        <div className="container mx-auto px-4 py-24 text-center">
+          <FileText className="h-16 w-16 mx-auto mb-4 text-terre/50" />
+          <h1 className="text-2xl font-bold text-noir mb-2">Document introuvable</h1>
+          <p className="text-noir/60 mb-6">Ce document n'existe pas ou a été supprimé.</p>
+          <Button asChild>
+            <Link href="/catalogue">Retour au catalogue</Link>
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
       <Header />
 
-      <main className="flex-1 py-12">
-        <div className="container max-w-6xl">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Document Header */}
-              <div>
-                <div className="flex items-start gap-3 mb-4">
-                  <Badge variant={document.price === 0 ? "secondary" : "default"} className="text-sm">
-                    {document.price === 0 ? "Gratuit" : `${document.price} ${document.currency}`}
-                  </Badge>
-                  {document.categories && (
-                    <Badge variant="outline">{document.categories.name}</Badge>
-                  )}
-                  <Badge variant="outline">{document.document_type}</Badge>
-                </div>
-
-                <h1 className="font-serif text-4xl font-bold mb-4">{document.title}</h1>
-
-                <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    <span>{document.view_count} vues</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    <span>{document.download_count} téléchargements</span>
-                  </div>
-                  {document.page_count && (
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      <span>{document.page_count} pages</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>{new Date(document.created_at).toLocaleDateString("fr-FR")}</span>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="prose max-w-none">
-                  <h2 className="font-semibold text-xl mb-3">Résumé</h2>
-                  <p className="text-muted-foreground whitespace-pre-wrap">{document.description}</p>
-                </div>
-
-                {/* Keywords */}
-                {document.keywords && document.keywords.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <Tag className="h-5 w-5" />
-                      Mots-clés
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {document.keywords.map((keyword, idx) => (
-                        <Badge key={idx} variant="secondary">
-                          {keyword}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* PDF Preview */}
-              <Card className="border-border/40">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-4">Aperçu du document</h3>
-                  <div className="bg-muted/30 rounded-lg p-8 text-center">
-                    <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    {hasAccess ? (
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Vous avez accès à ce document complet
-                        </p>
-                        <Button onClick={handleDownload} className="bg-gradient-to-r from-earth to-gold text-white">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger le PDF
-                        </Button>
-                      </div>
-                    ) : document.price === 0 ? (
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Document gratuit - Connectez-vous pour télécharger
-                        </p>
-                        <Button asChild>
-                          <Link href="/auth/login">Se connecter</Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <div>
-                        <p className="text-muted-foreground mb-4">
-                          Achetez ce document pour y accéder en intégralité
-                        </p>
-                        <Button 
-                          onClick={handlePurchase} 
-                          disabled={purchasing || isAuthor}
-                          className="bg-gradient-to-r from-earth to-gold text-white"
-                        >
-                          {purchasing ? (
-                            <>Traitement...</>
-                          ) : isAuthor ? (
-                            <>Votre document</>
-                          ) : (
-                            <>
-                              <ShoppingCart className="h-4 w-4 mr-2" />
-                              Acheter pour {document.price} {document.currency}
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Author Card */}
-              <Card className="border-border/40">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-4">Auteur</h3>
-                  <div className="flex items-start gap-4">
-                    <div className="h-16 w-16 rounded-full bg-earth/10 flex items-center justify-center shrink-0">
-                      {document.profiles?.avatar_url ? (
-                        <img src={document.profiles.avatar_url} alt="" className="rounded-full w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-earth font-bold text-2xl">
-                          {document.profiles?.full_name?.charAt(0) || "?"}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold truncate">
-                        {document.profiles?.full_name || "Auteur anonyme"}
-                      </h4>
-                      {document.profiles?.country && (
-                        <p className="text-sm text-muted-foreground">{document.profiles.country}</p>
-                      )}
-                      {document.profiles?.bio && (
-                        <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
-                          {document.profiles.bio}
-                        </p>
-                      )}
-                      <Button asChild variant="outline" size="sm" className="mt-4 w-full">
-                        <Link href={`/authors/${document.author_id}`}>
-                          Voir le profil
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Certification */}
+      <main className="container mx-auto px-4 py-12">
+        {/* Hero Section with Document Info */}
+        <div className="relative mb-12 rounded-2xl overflow-hidden border border-gold/20 shadow-2xl">
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/afrilitt-background.jpg')" }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background/95"></div>
+          
+          <div className="relative p-8 md:p-12 z-10">
+            <div className="flex items-start gap-3 mb-4">
               {document.is_certified && (
-                <Card className="border-gold/40 bg-gold/5">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-gold shrink-0 mt-1" />
-                      <div>
-                        <h4 className="font-semibold mb-1">Document certifié</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Ce document a été vérifié et certifié par AfriLitt
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Badge className="bg-or text-noir border-or/30">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Certifié
+                </Badge>
               )}
+              {document.categories && (
+                <Badge variant="outline" className="bg-white/10 text-white border-white/30">
+                  {document.categories.name}
+                </Badge>
+              )}
+              <Badge variant="outline" className="bg-white/10 text-white border-white/30">
+                {document.document_type}
+              </Badge>
+            </div>
 
-              {/* Report */}
-              {!isAuthor && (
-                <Card className="border-border/40">
-                  <CardContent className="p-6">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      Signaler un abus
-                    </Button>
-                  </CardContent>
-                </Card>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 font-serif">
+              {document.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-6 text-white/90 mb-6">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                <span className="font-medium">{document.profiles.full_name || "Auteur anonyme"}</span>
+              </div>
+              {document.page_count && (
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  <span>{document.page_count} pages</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                <span>{document.view_count} vues</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Download className="h-5 w-5" />
+                <span>{document.download_count} téléchargements</span>
+              </div>
+            </div>
+
+            {document.keywords && document.keywords.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {document.keywords.map((keyword, index) => (
+                  <Badge key={index} variant="outline" className="bg-white/5 text-white border-white/20">
+                    <Tag className="h-3 w-3 mr-1" />
+                    {keyword}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-4">
+              {document.price > 0 ? (
+                <>
+                  <div className="text-3xl font-bold text-or flex items-center gap-2">
+                    <DollarSign className="h-8 w-8" />
+                    {document.price.toLocaleString()} {document.currency}
+                  </div>
+                  {hasAccess ? (
+                    <Badge className="bg-green-500 text-white text-lg px-4 py-2">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Vous possédez ce document
+                    </Badge>
+                  ) : (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size="lg" className="bg-or hover:bg-or/90 text-noir font-bold shadow-lg">
+                          <ShoppingCart className="h-5 w-5 mr-2" />
+                          Acheter & Télécharger
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-gradient-to-br from-amber-50 to-orange-50 border-or/20">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-2xl text-noir">Confirmer l'achat</AlertDialogTitle>
+                          <AlertDialogDescription className="text-noir/70">
+                            Vous êtes sur le point d'acheter <strong className="text-noir">{document.title}</strong> pour{" "}
+                            <strong className="text-or">{document.price.toLocaleString()} {document.currency}</strong>.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="border-noir/20">Annuler</AlertDialogCancel>
+                          <AlertDialogAction onClick={handlePurchase} className="bg-or hover:bg-or/90 text-noir">
+                            Confirmer le paiement
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </>
+              ) : (
+                <Badge className="bg-green-500 text-white text-lg px-4 py-2">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Document Gratuit
+                </Badge>
               )}
             </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Left Column: Description & Actions */}
+          <div className="md:col-span-2 space-y-6">
+            <Card className="border-terre/20 shadow-xl bg-white/80 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl text-noir">
+                  <BookOpen className="h-6 w-6 text-terre" />
+                  Description
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-noir/80 leading-relaxed whitespace-pre-wrap">
+                  {document.description}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* PDF Preview */}
+            <Card className="border-terre/20 shadow-xl bg-gradient-to-br from-amber-100 to-orange-100">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl text-noir">
+                  <FileText className="h-6 w-6 text-terre" />
+                  Aperçu du document
+                </CardTitle>
+                <CardDescription className="text-noir/60">
+                  {hasAccess || document.price === 0
+                    ? "Document complet disponible"
+                    : "Les 2 premières pages sont visibles. Achetez pour voir l'intégralité."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-white/50 backdrop-blur rounded-lg p-4 border-2 border-dashed border-terre/30">
+                  <p className="text-center text-noir/60 mb-4">
+                    [Aperçu PDF intégré ici - Utilisez PDF.js pour l'affichage]
+                  </p>
+                  {!hasAccess && document.price > 0 && (
+                    <div className="mt-4 p-4 bg-or/10 border border-or/30 rounded-lg text-center">
+                      <p className="text-noir/80 font-medium mb-2">
+                        🔒 Le reste du document est verrouillé
+                      </p>
+                      <p className="text-sm text-noir/60">
+                        Achetez le document pour accéder à l'intégralité
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  onClick={handleDownload}
+                  disabled={document.price > 0 && !hasAccess}
+                  className="w-full bg-foret hover:bg-foret/90 text-white font-bold shadow-lg"
+                  size="lg"
+                >
+                  <Download className="h-5 w-5 mr-2" />
+                  {document.price > 0 && !hasAccess ? "Acheter pour télécharger" : "Télécharger le PDF"}
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+
+          {/* Right Column: Metadata & Report */}
+          <div className="space-y-6">
+            <Card className="border-terre/20 shadow-xl bg-white/80 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="text-xl text-noir">Informations</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2 text-noir/70">
+                  <Calendar className="h-4 w-4 text-terre" />
+                  <span className="text-sm">
+                    Publié le {new Date(document.created_at).toLocaleDateString("fr-FR")}
+                  </span>
+                </div>
+                <Separator />
+                <div>
+                  <p className="text-sm font-medium text-noir mb-2">Auteur</p>
+                  <p className="text-noir/80">{document.profiles.full_name || "Auteur anonyme"}</p>
+                </div>
+                {document.categories && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium text-noir mb-2">Catégorie</p>
+                      <Badge className="bg-terre/10 text-terre border-terre/30">
+                        {document.categories.name}
+                      </Badge>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Report Button */}
+            <Card className="border-red-200 shadow-xl bg-red-50/50 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-900 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Signaler un problème
+                </CardTitle>
+                <CardDescription className="text-red-700">
+                  Si ce document enfreint les droits d'auteur ou contient du contenu inapproprié.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="reason" className="text-red-900">Raison du signalement</Label>
+                  <Select value={reportReason} onValueChange={setReportReason}>
+                    <SelectTrigger id="reason" className="bg-white border-red-300">
+                      <SelectValue placeholder="Choisir une raison" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="copyright">Violation de droits d'auteur</SelectItem>
+                      <SelectItem value="inappropriate">Contenu inapproprié</SelectItem>
+                      <SelectItem value="spam">Spam</SelectItem>
+                      <SelectItem value="misleading">Contenu trompeur</SelectItem>
+                      <SelectItem value="autre">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="details" className="text-red-900">Détails</Label>
+                  <Textarea
+                    id="details"
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    placeholder="Expliquez le problème..."
+                    className="bg-white border-red-300"
+                    rows={4}
+                  />
+                </div>
+                <Button
+                  onClick={handleReport}
+                  disabled={isReporting || !reportReason || !reportDetails}
+                  variant="destructive"
+                  className="w-full"
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  {isReporting ? "Envoi..." : "Envoyer le signalement"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>

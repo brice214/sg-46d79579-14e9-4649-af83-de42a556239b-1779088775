@@ -135,18 +135,23 @@ export default function Dashboard() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 py-12">
-        <div className="container max-w-6xl">
-          {/* Header Dashboard */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div className="relative pt-16 pb-12 border-b border-gold/20">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background"></div>
+        </div>
+        <div className="container max-w-6xl relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="font-serif text-3xl font-bold">Tableau de bord</h1>
-              <p className="text-muted-foreground">
+              <h1 className="font-serif text-4xl font-bold text-white drop-shadow-lg mb-2">Tableau de bord</h1>
+              <p className="text-gold/90 text-lg drop-shadow-md">
                 Bienvenue, {profile?.full_name || "Utilisateur"}
               </p>
             </div>
             {isAuthor && (
-              <Button asChild className="bg-gradient-to-r from-earth to-gold text-white shadow-md hover:opacity-90">
+              <Button asChild className="bg-gradient-to-r from-earth to-gold text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all border-none">
                 <Link href="/upload">
                   <Upload className="h-4 w-4 mr-2" />
                   Publier un document
@@ -154,7 +159,11 @@ export default function Dashboard() {
               </Button>
             )}
           </div>
+        </div>
+      </div>
 
+      <main className="flex-1 py-12 bg-gradient-to-b from-earth/5 via-background to-gold/5">
+        <div className="container max-w-6xl">
           {/* Statistiques (Auteurs uniquement) */}
           {isAuthor && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
