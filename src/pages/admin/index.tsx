@@ -1444,11 +1444,11 @@ export default function AdminDashboard() {
                     type="number"
                     min="0"
                     max="100"
-                    value={commissionRate}
+                    value={String(commissionRate)}
                     onChange={(e) => setCommissionRate(Number(e.target.value))}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Commission prélevée sur chaque vente (actuellement {commissionRate}%)
+                    Commission prélevée sur chaque vente (actuellement {String(commissionRate)}%)
                   </p>
                 </div>
 
@@ -1458,7 +1458,7 @@ export default function AdminDashboard() {
                     <input
                       id="mobile-money"
                       type="checkbox"
-                      checked={mobileMoneyEnabled}
+                      checked={Boolean(mobileMoneyEnabled)}
                       onChange={(e) => setMobileMoneyEnabled(e.target.checked)}
                       className="h-4 w-4"
                     />
@@ -1468,7 +1468,7 @@ export default function AdminDashboard() {
                     <input
                       id="card-payment"
                       type="checkbox"
-                      checked={cardPaymentEnabled}
+                      checked={Boolean(cardPaymentEnabled)}
                       onChange={(e) => setCardPaymentEnabled(e.target.checked)}
                       className="h-4 w-4"
                     />
@@ -1489,7 +1489,7 @@ export default function AdminDashboard() {
                   <Label htmlFor="platform-name">Nom de la plateforme</Label>
                   <Input
                     id="platform-name"
-                    value={platformName}
+                    value={String(platformName)}
                     onChange={(e) => setPlatformName(e.target.value)}
                   />
                 </div>
@@ -1500,12 +1500,12 @@ export default function AdminDashboard() {
                     <Input
                       id="primary-color"
                       type="color"
-                      value={primaryColor}
+                      value={String(primaryColor)}
                       onChange={(e) => setPrimaryColor(e.target.value)}
                       className="w-20"
                     />
                     <Input
-                      value={primaryColor}
+                      value={String(primaryColor)}
                       onChange={(e) => setPrimaryColor(e.target.value)}
                       className="flex-1 font-mono"
                     />
@@ -1527,7 +1527,7 @@ export default function AdminDashboard() {
                   <Textarea
                     id="terms"
                     rows={6}
-                    value={termsOfService}
+                    value={String(termsOfService)}
                     onChange={(e) => setTermsOfService(e.target.value)}
                     placeholder="Rédigez vos CGU..."
                   />
@@ -1538,7 +1538,7 @@ export default function AdminDashboard() {
                   <Textarea
                     id="privacy"
                     rows={6}
-                    value={privacyPolicy}
+                    value={String(privacyPolicy)}
                     onChange={(e) => setPrivacyPolicy(e.target.value)}
                     placeholder="Rédigez votre politique de confidentialité..."
                   />
