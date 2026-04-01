@@ -3,17 +3,44 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, DollarSign, Upload, Eye, Download, FileText, Settings, User } from "lucide-react";
+import { 
+  BookOpen, DollarSign, Upload, Eye, Download, FileText, Settings, User,
+  TrendingUp, Clock, CheckCircle, XCircle, Edit, Wallet, BarChart3,
+  AlertCircle, ArrowUpRight, ChevronRight
+} from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Document = Database["public"]["Tables"]["documents"]["Row"];
+
+interface DocumentStats {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  is_approved: boolean;
+  is_published: boolean;
+  view_count: number;
+  download_count: number;
+  cover_image_url: string | null;
+  created_at: string;
+  sales_count: number;
+  total_revenue: number;
+}
+
+interface WithdrawalRequest {
+  id: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  processed_at: string | null;
+}
 
 export default function Dashboard() {
   const router = useRouter();
@@ -21,13 +48,18 @@ export default function Dashboard() {
   
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [myDocuments, setMyDocuments] = useState<Document[]>([]);
+  const [myDocuments, setMyDocuments] = useState<DocumentStats[]>([]);
   const [myPurchases, setMyPurchases] = useState<any[]>([]);
+  const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
   
-  // Statistiques
+  // Statistiques enrichies
   const [totalViews, setTotalViews] = useState(0);
   const [totalDownloads, setTotalDownloads] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [availableBalance, setAvailableBalance] = useState(0);
+  const [pendingBalance, setPendingBalance] = useState(0);
+  const [salesThisMonth, setSalesThisMonth] = useState(0);
+  const [approvalRate, setApprovalRate] = useState(0);
 
   useEffect(() => {
     loadDashboardData();
@@ -52,7 +84,7 @@ export default function Dashboard() {
         
       setProfile(profileData);
 
-      // Charger les documents de l'auteur
+      // Charger les documents de l'auteur avec stats détaillées
       if (profileData?.role === "author" || profileData?.role === "admin") {
         const { data: docs } = await supabase
           .from("documents")
@@ -61,26 +93,93 @@ export default function Dashboard() {
           .order("created_at", { ascending: false });
           
         if (docs) {
-          setMyDocuments(docs);
+          // Enrichir avec les stats de ventes
+          const docsWithStats = await Promise.all(
+            docs.map(async (doc) => {
+              const { data: transactions } = await supabase
+                .from("transactions")
+                .select("amount, author_earnings, status")
+                .eq("document_id", doc.id)
+                .eq("status", "completed");
+              
+              const salesCount = transactions?.length || 0;
+              const totalRevenue = transactions?.reduce((sum, tx) => sum + Number(tx.author_earnings), 0) || 0;
+              
+              return {
+                ...doc,
+                sales_count: salesCount,
+                total_revenue: totalRevenue,
+              } as DocumentStats;
+            })
+          );
           
-          // Calculer les stats
-          const views = docs.reduce((acc, doc) => acc + (doc.view_count || 0), 0);
-          const downloads = docs.reduce((acc, doc) => acc + (doc.download_count || 0), 0);
+          setMyDocuments(docsWithStats);
+          
+          // Calculer les stats globales
+          const views = docsWithStats.reduce((acc, doc) => acc + (doc.view_count || 0), 0);
+          const downloads = docsWithStats.reduce((acc, doc) => acc + (doc.download_count || 0), 0);
+          const approved = docsWithStats.filter(d => d.is_approved).length;
+          const rate = docs.length > 0 ? (approved / docs.length) * 100 : 0;
+          
           setTotalViews(views);
           setTotalDownloads(downloads);
+          setApprovalRate(Math.round(rate));
         }
 
-        // Charger les revenus
-        const { data: transactions } = await supabase
+        // Charger les revenus (toutes transactions complétées)
+        const { data: allTransactions } = await supabase
           .from("transactions")
-          .select("author_earnings")
+          .select("author_earnings, created_at, status")
           .eq("author_id", session.user.id)
           .eq("status", "completed");
           
-        if (transactions) {
-          const earnings = transactions.reduce((acc, tx) => acc + Number(tx.author_earnings), 0);
-          setTotalEarnings(earnings);
+        if (allTransactions) {
+          const total = allTransactions.reduce((sum, tx) => sum + Number(tx.author_earnings), 0);
+          setTotalEarnings(total);
+          
+          // Ventes ce mois
+          const startOfMonth = new Date();
+          startOfMonth.setDate(1);
+          startOfMonth.setHours(0, 0, 0, 0);
+          
+          const thisMonth = allTransactions.filter(
+            tx => new Date(tx.created_at) >= startOfMonth
+          ).length;
+          setSalesThisMonth(thisMonth);
         }
+
+        // Charger les demandes de retrait
+        const { data: withdrawals } = await supabase
+          .from("withdrawal_requests")
+          .select("*")
+          .eq("author_id", session.user.id)
+          .order("created_at", { ascending: false })
+          .limit(5);
+        
+        if (withdrawals) {
+          setWithdrawalRequests(withdrawals);
+        }
+
+        // Calculer solde disponible vs en attente
+        const { data: totalWithdrawn } = await supabase
+          .from("withdrawal_requests")
+          .select("amount")
+          .eq("author_id", session.user.id)
+          .eq("status", "completed");
+        
+        const withdrawn = totalWithdrawn?.reduce((sum, w) => sum + Number(w.amount), 0) || 0;
+        const available = total - withdrawn;
+        
+        const { data: pendingWithdrawals } = await supabase
+          .from("withdrawal_requests")
+          .select("amount")
+          .eq("author_id", session.user.id)
+          .eq("status", "pending");
+        
+        const pending = pendingWithdrawals?.reduce((sum, w) => sum + Number(w.amount), 0) || 0;
+        
+        setAvailableBalance(available - pending);
+        setPendingBalance(pending);
       }
 
       // Charger les achats
@@ -117,6 +216,46 @@ export default function Dashboard() {
     }
   };
 
+  const handleRequestWithdrawal = async () => {
+    if (availableBalance < 5000) {
+      toast({
+        variant: "destructive",
+        title: "Solde insuffisant",
+        description: "Le montant minimum de retrait est de 5000 XOF."
+      });
+      return;
+    }
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { error } = await supabase
+        .from("withdrawal_requests")
+        .insert({
+          author_id: session.user.id,
+          amount: availableBalance,
+          status: "pending"
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande envoyée",
+        description: "Votre demande de retrait est en cours de traitement."
+      });
+
+      loadDashboardData();
+    } catch (error) {
+      console.error("Withdrawal error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de créer la demande de retrait."
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -142,7 +281,7 @@ export default function Dashboard() {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background"></div>
         </div>
-        <div className="container max-w-6xl relative z-10">
+        <div className="container max-w-7xl relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="font-serif text-4xl font-bold text-white drop-shadow-lg mb-2">Tableau de bord</h1>
@@ -163,59 +302,140 @@ export default function Dashboard() {
       </div>
 
       <main className="flex-1 py-12 bg-gradient-to-b from-earth/5 via-background to-gold/5">
-        <div className="container max-w-6xl">
-          {/* Statistiques (Auteurs uniquement) */}
+        <div className="container max-w-7xl">
+          {/* Statistiques enrichies (Auteurs uniquement) */}
           {isAuthor && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="border-border/40 bg-card/50 backdrop-blur">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Revenus Totaux
-                  </CardTitle>
-                  <DollarSign className="h-4 w-4 text-earth" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
-                    {totalEarnings.toLocaleString()} XOF
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-border/40 bg-card/50 backdrop-blur">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Vues Totales
-                  </CardTitle>
-                  <Eye className="h-4 w-4 text-gold" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
-                    {totalViews.toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-border/40 bg-card/50 backdrop-blur">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Téléchargements
-                  </CardTitle>
-                  <Download className="h-4 w-4 text-forest" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-foreground">
-                    {totalDownloads.toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="space-y-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-gold/20 bg-gradient-to-br from-card to-card/50 hover:shadow-lg transition-shadow">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Solde disponible
+                    </CardTitle>
+                    <Wallet className="h-4 w-4 text-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">
+                      {availableBalance.toLocaleString()} XOF
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      En attente: {pendingBalance.toLocaleString()} XOF
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/40 bg-card/50 backdrop-blur">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Revenus totaux
+                    </CardTitle>
+                    <DollarSign className="h-4 w-4 text-earth" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">
+                      {totalEarnings.toLocaleString()} XOF
+                    </div>
+                    <p className="text-xs text-green-600 flex items-center mt-1">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      {salesThisMonth} ventes ce mois
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/40 bg-card/50 backdrop-blur">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Vues totales
+                    </CardTitle>
+                    <Eye className="h-4 w-4 text-gold" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">
+                      {totalViews.toLocaleString()}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {myDocuments.length} documents publiés
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/40 bg-card/50 backdrop-blur">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      Taux d'approbation
+                    </CardTitle>
+                    <BarChart3 className="h-4 w-4 text-blue-500" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">
+                      {approvalRate}%
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {totalDownloads} téléchargements
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Alertes rapides */}
+              {(availableBalance >= 5000 || myDocuments.some(d => !d.is_approved && d.is_published)) && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {availableBalance >= 5000 && (
+                    <Card className="border-green-500/30 bg-green-500/5">
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <Wallet className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Retrait disponible</p>
+                            <p className="text-sm text-muted-foreground">
+                              {availableBalance.toLocaleString()} XOF disponibles
+                            </p>
+                          </div>
+                        </div>
+                        <Button size="sm" onClick={handleRequestWithdrawal}>
+                          Demander un retrait
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {myDocuments.some(d => !d.is_approved && d.is_published) && (
+                    <Card className="border-orange-500/30 bg-orange-500/5">
+                      <CardContent className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                            <Clock className="h-5 w-5 text-orange-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Documents en attente</p>
+                            <p className="text-sm text-muted-foreground">
+                              {myDocuments.filter(d => !d.is_approved && d.is_published).length} en cours de modération
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           <Tabs defaultValue={isAuthor ? "mes-documents" : "mes-achats"} className="space-y-6">
             <TabsList className="bg-muted/50 p-1">
               {isAuthor && (
-                <TabsTrigger value="mes-documents" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Mes Publications
-                </TabsTrigger>
+                <>
+                  <TabsTrigger value="mes-documents" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Mes Publications
+                  </TabsTrigger>
+                  <TabsTrigger value="retraits" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Wallet className="h-4 w-4 mr-2" />
+                    Retraits
+                  </TabsTrigger>
+                </>
               )}
               <TabsTrigger value="mes-achats" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <Download className="h-4 w-4 mr-2" />
@@ -227,12 +447,25 @@ export default function Dashboard() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Onglet: Mes Documents (Auteurs) */}
+            {/* Onglet: Mes Documents (Auteurs) - Version améliorée */}
             {isAuthor && (
               <TabsContent value="mes-documents">
                 <Card className="border-border/40">
                   <CardHeader>
-                    <CardTitle>Documents publiés</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>Documents publiés</CardTitle>
+                        <CardDescription>
+                          {myDocuments.length} documents · {myDocuments.filter(d => d.is_approved).length} approuvés
+                        </CardDescription>
+                      </div>
+                      <Button asChild variant="outline">
+                        <Link href="/upload">
+                          <Upload className="h-4 w-4 mr-2" />
+                          Nouveau document
+                        </Link>
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     {myDocuments.length === 0 ? (
@@ -247,36 +480,73 @@ export default function Dashboard() {
                     ) : (
                       <div className="divide-y divide-border/40">
                         {myDocuments.map((doc) => (
-                          <div key={doc.id} className="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                              <div className="h-16 w-12 bg-muted rounded overflow-hidden shrink-0">
+                          <div key={doc.id} className="py-6 flex flex-col lg:flex-row items-start gap-6">
+                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                              <div className="h-20 w-16 bg-muted rounded overflow-hidden shrink-0 shadow-sm">
                                 {doc.cover_image_url ? (
                                   <img src={doc.cover_image_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                  <FileText className="h-6 w-6 m-auto mt-5 text-muted-foreground" />
+                                  <FileText className="h-8 w-8 m-auto mt-6 text-muted-foreground" />
                                 )}
                               </div>
-                              <div>
-                                <Link href={`/documents/${doc.slug}`} className="font-semibold hover:text-gold transition-colors line-clamp-1">
+                              <div className="flex-1 min-w-0">
+                                <Link href={`/documents/${doc.slug}`} className="font-semibold hover:text-gold transition-colors line-clamp-1 text-lg">
                                   {doc.title}
                                 </Link>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant={doc.is_approved ? "default" : "secondary"} className="text-xs">
-                                    {doc.is_approved ? "Approuvé" : "En attente"}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground">
+                                <div className="flex items-center gap-2 mt-2">
+                                  {doc.is_approved ? (
+                                    <Badge className="bg-green-600 hover:bg-green-700">
+                                      <CheckCircle className="h-3 w-3 mr-1" />
+                                      Approuvé
+                                    </Badge>
+                                  ) : doc.is_published ? (
+                                    <Badge className="bg-orange-500 hover:bg-orange-600">
+                                      <Clock className="h-3 w-3 mr-1" />
+                                      En attente
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="secondary">
+                                      <XCircle className="h-3 w-3 mr-1" />
+                                      Brouillon
+                                    </Badge>
+                                  )}
+                                  <span className="text-sm text-muted-foreground">
                                     {doc.price === 0 ? "Gratuit" : `${doc.price} XOF`}
                                   </span>
                                 </div>
-                                <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                  <span className="flex items-center"><Eye className="h-3 w-3 mr-1" /> {doc.view_count || 0}</span>
-                                  <span className="flex items-center"><Download className="h-3 w-3 mr-1" /> {doc.download_count || 0}</span>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                                  <div className="flex items-center text-sm">
+                                    <Eye className="h-4 w-4 mr-2 text-muted-foreground" />
+                                    <span className="font-medium">{doc.view_count || 0}</span>
+                                    <span className="text-muted-foreground ml-1">vues</span>
+                                  </div>
+                                  <div className="flex items-center text-sm">
+                                    <Download className="h-4 w-4 mr-2 text-muted-foreground" />
+                                    <span className="font-medium">{doc.download_count || 0}</span>
+                                    <span className="text-muted-foreground ml-1">DL</span>
+                                  </div>
+                                  <div className="flex items-center text-sm">
+                                    <DollarSign className="h-4 w-4 mr-2 text-gold" />
+                                    <span className="font-medium">{doc.sales_count || 0}</span>
+                                    <span className="text-muted-foreground ml-1">ventes</span>
+                                  </div>
+                                  <div className="flex items-center text-sm">
+                                    <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                                    <span className="font-medium text-green-600">{doc.total_revenue.toLocaleString()} XOF</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex gap-2 w-full md:w-auto">
-                              <Button variant="outline" size="sm" asChild className="flex-1 md:flex-none">
-                                <Link href={`/documents/${doc.slug}`}>Voir</Link>
+                            <div className="flex gap-2 w-full lg:w-auto">
+                              <Button variant="outline" size="sm" asChild className="flex-1 lg:flex-none">
+                                <Link href={`/documents/${doc.slug}`}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  Voir
+                                </Link>
+                              </Button>
+                              <Button variant="outline" size="sm" className="flex-1 lg:flex-none">
+                                <Edit className="h-4 w-4 mr-2" />
+                                Éditer
                               </Button>
                             </div>
                           </div>
@@ -288,11 +558,110 @@ export default function Dashboard() {
               </TabsContent>
             )}
 
+            {/* Onglet: Retraits (Auteurs) */}
+            {isAuthor && (
+              <TabsContent value="retraits">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Card className="border-border/40">
+                    <CardHeader>
+                      <CardTitle>Demander un retrait</CardTitle>
+                      <CardDescription>
+                        Minimum de retrait: 5000 XOF
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Solde disponible</span>
+                          <span className="text-xl font-bold text-green-600">
+                            {availableBalance.toLocaleString()} XOF
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">En attente</span>
+                          <span className="font-medium">{pendingBalance.toLocaleString()} XOF</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground">Total gagné</span>
+                          <span className="font-medium">{totalEarnings.toLocaleString()} XOF</span>
+                        </div>
+                      </div>
+
+                      <Button 
+                        className="w-full" 
+                        onClick={handleRequestWithdrawal}
+                        disabled={availableBalance < 5000}
+                      >
+                        <Wallet className="h-4 w-4 mr-2" />
+                        Demander un retrait
+                      </Button>
+
+                      {availableBalance < 5000 && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          Vous devez avoir au moins 5000 XOF pour demander un retrait.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/40">
+                    <CardHeader>
+                      <CardTitle>Historique des retraits</CardTitle>
+                      <CardDescription>
+                        Vos 5 dernières demandes
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {withdrawalRequests.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">Aucune demande de retrait</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {withdrawalRequests.map((withdrawal) => (
+                            <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                              <div>
+                                <p className="font-medium">{withdrawal.amount.toLocaleString()} XOF</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(withdrawal.created_at).toLocaleDateString("fr-FR")}
+                                </p>
+                              </div>
+                              <Badge 
+                                variant={
+                                  withdrawal.status === "completed" ? "default" : 
+                                  withdrawal.status === "pending" ? "secondary" : 
+                                  "destructive"
+                                }
+                                className={
+                                  withdrawal.status === "completed" ? "bg-green-600" :
+                                  withdrawal.status === "pending" ? "bg-orange-500" :
+                                  ""
+                                }
+                              >
+                                {withdrawal.status === "completed" ? "Complété" :
+                                 withdrawal.status === "pending" ? "En attente" :
+                                 withdrawal.status === "rejected" ? "Refusé" :
+                                 withdrawal.status}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            )}
+
             {/* Onglet: Ma Bibliothèque (Achats/Accès gratuits) */}
             <TabsContent value="mes-achats">
               <Card className="border-border/40">
                 <CardHeader>
                   <CardTitle>Documents accessibles</CardTitle>
+                  <CardDescription>
+                    {myPurchases.length} documents dans votre bibliothèque
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {myPurchases.length === 0 ? (
@@ -353,6 +722,10 @@ export default function Dashboard() {
                   <div className="grid gap-2">
                     <div className="font-medium">Nom complet</div>
                     <div className="text-muted-foreground bg-muted/30 p-2 rounded">{profile?.full_name || "Non défini"}</div>
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="font-medium">Email</div>
+                    <div className="text-muted-foreground bg-muted/30 p-2 rounded">{profile?.email || "Non défini"}</div>
                   </div>
                   <div className="grid gap-2">
                     <div className="font-medium">Rôle</div>
