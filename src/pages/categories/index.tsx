@@ -138,10 +138,26 @@ export default function Categories() {
                 ))}
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category, index) => (
-                  <Link key={category.id} href={`/categories/${category.slug}`}>
-                    <Card className={`group p-8 hover:shadow-2xl transition-all duration-300 border-border/40 bg-gradient-to-br ${getCategoryGradient(index)} backdrop-blur-sm hover:border-gold/40 hover:scale-105 h-full`}>
+              <div className="grid md:grid-cols-3 gap-8">
+                {categories.map((category, index) => {
+                  const gradients = [
+                    "from-earth/20 to-gold/20",
+                    "from-gold/20 to-forest/20",
+                    "from-forest/20 to-earth/20",
+                    "from-earth/30 to-gold/10",
+                    "from-gold/30 to-forest/10",
+                    "from-forest/30 to-earth/10",
+                    "from-earth/10 to-gold/30",
+                    "from-gold/10 to-forest/30",
+                    "from-forest/10 to-earth/30",
+                  ];
+
+                  return (
+                    <Link
+                      key={category.id}
+                      href={`/categories/${category.slug}`}
+                      className="group relative overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-sm hover:shadow-2xl transition-all hover:scale-105 hover:border-gold/40"
+                    >
                       {/* Icon */}
                       <div className="text-6xl mb-6 group-hover:scale-125 transition-transform duration-300">
                         {getCategoryIcon(category.name)}
@@ -168,9 +184,9 @@ export default function Categories() {
                         </div>
                         <ArrowRight className="h-5 w-5 text-gold group-hover:translate-x-1 transition-transform" />
                       </div>
-                    </Card>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             )}
 

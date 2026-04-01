@@ -6,6 +6,18 @@ import Link from "next/link";
 import { BookOpen, Upload, TrendingUp, Shield, Globe, Users, ArrowRight, Sparkles } from "lucide-react";
 
 export default function Home() {
+  const categories = [
+    { id: 1, name: "Littérature", icon: "📚", description: "Des romans, essais, poésie et plus encore." },
+    { id: 2, name: "Sciences", icon: "🔬", description: "Médecine, physique, informatique et autres sciences." },
+    { id: 3, name: "Histoire", icon: "📜", description: "Histoire africaine, mondiale et culturelle." },
+    { id: 4, name: "Philosophie", icon: "💭", description: "Études philosophiques et réflexions sur la société." },
+    { id: 5, name: "Économie", icon: "📊", description: "Économie, finance et gestion." },
+    { id: 6, name: "Éducation", icon: "🎓", description: "Manuels scolaires, cours et ressources pédagogiques." },
+    { id: 7, name: "Arts", icon: "🎨", description: "Peinture, musique, cinéma et autres arts." },
+    { id: 8, name: "Droit", icon: "⚖️", description: "Droit international, droit africain et droit comparé." },
+    { id: 9, name: "Technologie", icon: "💻", description: "Informatique, cyber-sécurité et nouvelles technologies." }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -179,27 +191,20 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            {[
-              { name: "Littérature", icon: "📚", count: "2.5K", color: "from-earth/20 to-gold/20" },
-              { name: "Sciences", icon: "🔬", count: "1.8K", color: "from-forest/20 to-earth/20" },
-              { name: "Histoire", icon: "📜", count: "1.2K", color: "from-gold/20 to-forest/20" },
-              { name: "Philosophie", icon: "💭", count: "950", color: "from-earth/20 to-forest/20" },
-              { name: "Économie", icon: "📊", count: "1.1K", color: "from-gold/20 to-earth/20" },
-              { name: "Éducation", icon: "🎓", count: "2.2K", color: "from-forest/20 to-gold/20" },
-              { name: "Arts", icon: "🎨", count: "850", color: "from-earth/20 to-gold/20" },
-              { name: "Droit", icon: "⚖️", count: "720", color: "from-gold/20 to-forest/20" }
-            ].map((cat) => (
-              <Link 
-                key={cat.name}
-                href={`/categories/${cat.name.toLowerCase()}`}
-                className={`p-6 rounded-xl border border-border/40 bg-gradient-to-br ${cat.color} backdrop-blur-sm hover:border-gold/40 hover:shadow-xl hover:scale-105 transition-all duration-300 text-center group`}
+          <div className="grid md:grid-cols-3 gap-6">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/categories/${category.slug}`}
+                className="group p-6 rounded-xl border border-gold/20 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-105 hover:border-gold/40"
               >
-                <div className="text-4xl mb-3 group-hover:scale-125 transition-transform duration-300">
-                  {cat.icon}
-                </div>
-                <div className="font-semibold mb-1">{cat.name}</div>
-                <div className="text-sm text-muted-foreground">{cat.count} docs</div>
+                <div className="text-4xl mb-3">{category.icon || "📚"}</div>
+                <h3 className="font-serif text-xl font-semibold mb-2 group-hover:text-gold transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {category.description}
+                </p>
               </Link>
             ))}
           </div>
