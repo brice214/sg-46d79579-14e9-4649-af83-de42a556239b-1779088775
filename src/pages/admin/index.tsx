@@ -1,24 +1,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
-import { documentService } from "@/services/documentService";
-import { reportService } from "@/services/reportService";
-import { purchaseService } from "@/services/purchaseService";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   LayoutDashboard, Users, FileText, AlertTriangle, DollarSign, 
-  TrendingUp, Eye, Download, CheckCircle, XCircle, Clock, 
-  Search, Filter, MoreVertical, ShieldAlert, ArrowUpRight,
-  UserCheck, UserX, Edit, Trash2, Ban, Check, X
+  TrendingUp, Eye, CheckCircle, XCircle, Clock, 
+  Search, MoreVertical, ShieldAlert, ArrowUpRight,
+  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -40,6 +36,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+// Types
 interface DashboardStats {
   totalUsers: number;
   totalAuthors: number;
@@ -61,11 +58,41 @@ interface User {
   created_at: string;
 }
 
+interface Document {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  price: number;
+  is_published: boolean;
+  is_approved: boolean;
+  created_at: string;
+  author?: {
+    full_name: string;
+    email: string;
+  };
+}
+
+interface Report {
+  id: string;
+  reason: string;
+  details: string;
+  status: string;
+  created_at: string;
+  document_id: string;
+  reporter?: {
+    email: string;
+  };
+  document?: {
+    title: string;
+    slug: string;
+  };
+}
+
 interface Transaction {
   id: string;
   amount: number;
   platform_fee: number;
-  author_earnings: number;
   payment_method: string;
   status: string;
   created_at: string;
@@ -84,39 +111,23 @@ export default function AdminDashboard() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeModule, setActiveModule] = useState("overview");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
-  // Stats
-  const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    totalAuthors: 0,
-    totalDocuments: 0,
-    pendingDocuments: 0,
-    totalReports: 0,
-    totalTransactions: 0,
-    totalRevenue: 0,
-    platformRevenue: 0,
-    newUsersThisWeek: 0,
-    newDocumentsThisWeek: 0,
-  });
-
-  // Users
+  // Data States
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  // Filters
   const [usersSearch, setUsersSearch] = useState("");
   const [usersRoleFilter, setUsersRoleFilter] = useState("all");
-
-  // Documents
-  const [documents, setDocuments] = useState<any[]>([]);
   const [documentsSearch, setDocumentsSearch] = useState("");
   const [documentsStatusFilter, setDocumentsStatusFilter] = useState("all");
 
-  // Reports
-  const [reports, setReports] = useState<any[]>([]);
-
-  // Transactions
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  // Delete confirmation
+  // Dialog State
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     type: "user" | "document" | null;
@@ -130,31 +141,43 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    checkAuth();
+    checkAuthAndLoadData();
   }, []);
 
-  const checkAuth = async () => {
-    const session = await authService.getSession();
-    if (!session) {
-      router.push("/auth/login");
-      return;
-    }
+  const checkAuthAndLoadData = async () => {
+    try {
+      const session = await authService.getCurrentSession();
+      if (!session) {
+        router.push("/auth/login");
+        return;
+      }
 
-    const profile = await authService.getProfile(session.user.id);
-    if (profile?.role !== "admin") {
-      router.push("/dashboard");
-      toast({
-        title: "Accès refusé",
-        description: "Vous n'avez pas les permissions nécessaires.",
-        variant: "destructive",
-      });
-      return;
-    }
+      // Check admin role
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .single();
 
-    loadDashboardData();
+      if (profile?.role !== "admin") {
+        router.push("/dashboard");
+        toast({
+          title: "Accès refusé",
+          description: "Cette zone est réservée aux administrateurs.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Load all data
+      await loadAllData();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      router.push("/");
+    }
   };
 
-  const loadDashboardData = async () => {
+  const loadAllData = async () => {
     setLoading(true);
     try {
       await Promise.all([
@@ -165,10 +188,10 @@ export default function AdminDashboard() {
         loadTransactions(),
       ]);
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
+      console.error("Error loading data:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données du dashboard.",
+        title: "Erreur de chargement",
+        description: "Certaines données n'ont pas pu être chargées.",
         variant: "destructive",
       });
     } finally {
@@ -177,959 +200,774 @@ export default function AdminDashboard() {
   };
 
   const loadStats = async () => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Total users
-      const { count: totalUsers } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
 
-      // Total authors
-      const { count: totalAuthors } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .in("role", ["author", "admin"]);
+    // Fetch counts in parallel
+    const [
+      { count: totalUsers },
+      { count: totalAuthors },
+      { count: totalDocuments },
+      { count: pendingDocuments },
+      { count: totalReports },
+      { count: newUsers },
+      { count: newDocs },
+      { data: txData }
+    ] = await Promise.all([
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).in("role", ["author", "admin"]),
+      supabase.from("documents").select("*", { count: "exact", head: true }),
+      supabase.from("documents").select("*", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", false),
+      supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "pending"),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
+      supabase.from("documents").select("*", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
+      supabase.from("transactions").select("amount, platform_fee, status")
+    ]);
 
-      // Total documents
-      const { count: totalDocuments } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true });
+    const completedTx = txData?.filter(t => t.status === "completed") || [];
+    const totalRevenue = completedTx.reduce((sum, t) => sum + Number(t.amount), 0);
+    const platformRevenue = completedTx.reduce((sum, t) => sum + Number(t.platform_fee), 0);
 
-      // Pending documents
-      const { count: pendingDocuments } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      // Total reports
-      const { count: totalReports } = await supabase
-        .from("reports")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      // Total transactions
-      const { data: transactionsData } = await supabase
-        .from("transactions")
-        .select("amount, platform_fee, status");
-
-      const totalTransactions = transactionsData?.length || 0;
-      const totalRevenue = transactionsData
-        ?.filter(t => t.status === "completed")
-        .reduce((sum, t) => sum + t.amount, 0) || 0;
-      const platformRevenue = transactionsData
-        ?.filter(t => t.status === "completed")
-        .reduce((sum, t) => sum + t.platform_fee, 0) || 0;
-
-      // New users this week
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const { count: newUsersThisWeek } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", weekAgo.toISOString());
-
-      // New documents this week
-      const { count: newDocumentsThisWeek } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", weekAgo.toISOString());
-
-      setStats({
-        totalUsers: totalUsers || 0,
-        totalAuthors: totalAuthors || 0,
-        totalDocuments: totalDocuments || 0,
-        pendingDocuments: pendingDocuments || 0,
-        totalReports: totalReports || 0,
-        totalTransactions,
-        totalRevenue,
-        platformRevenue,
-        newUsersThisWeek: newUsersThisWeek || 0,
-        newDocumentsThisWeek: newDocumentsThisWeek || 0,
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
+    setStats({
+      totalUsers: totalUsers || 0,
+      totalAuthors: totalAuthors || 0,
+      totalDocuments: totalDocuments || 0,
+      pendingDocuments: pendingDocuments || 0,
+      totalReports: totalReports || 0,
+      totalTransactions: txData?.length || 0,
+      totalRevenue,
+      platformRevenue,
+      newUsersThisWeek: newUsers || 0,
+      newDocumentsThisWeek: newDocs || 0,
+    });
   };
 
   const loadUsers = async () => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (error) {
-      console.error("Error loading users:", error);
-    }
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setUsers(data as User[]);
   };
 
   const loadDocuments = async () => {
-    try {
-      const docs = await documentService.getAllDocuments();
-      setDocuments(docs);
-    } catch (error) {
-      console.error("Error loading documents:", error);
-    }
+    const { data } = await supabase
+      .from("documents")
+      .select(`
+        id, title, slug, description, price, is_published, is_approved, created_at,
+        author:profiles!documents_author_id_fkey(full_name, email)
+      `)
+      .order("created_at", { ascending: false });
+    
+    if (data) setDocuments(data as unknown as Document[]);
   };
 
   const loadReports = async () => {
-    try {
-      const reportsData = await reportService.getAllReports();
-      setReports(reportsData);
-    } catch (error) {
-      console.error("Error loading reports:", error);
-    }
+    const { data } = await supabase
+      .from("reports")
+      .select(`
+        id, reason, details, status, created_at, document_id,
+        reporter:profiles!reports_reporter_id_fkey(email),
+        document:documents!reports_document_id_fkey(title, slug)
+      `)
+      .order("created_at", { ascending: false });
+    
+    if (data) setReports(data as unknown as Report[]);
   };
 
   const loadTransactions = async () => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { data, error } = await supabase
-        .from("transactions")
-        .select(`
-          *,
-          document:documents(title),
-          buyer:profiles!transactions_buyer_id_fkey(email),
-          author:profiles!transactions_author_id_fkey(full_name)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setTransactions(data || []);
-    } catch (error) {
-      console.error("Error loading transactions:", error);
-    }
+    const { data } = await supabase
+      .from("transactions")
+      .select(`
+        id, amount, platform_fee, payment_method, status, created_at,
+        document:documents(title),
+        buyer:profiles!transactions_buyer_id_fkey(email),
+        author:profiles!transactions_author_id_fkey(full_name)
+      `)
+      .order("created_at", { ascending: false });
+    
+    if (data) setTransactions(data as unknown as Transaction[]);
   };
 
-  // User actions
+  // Actions Utils
   const handleChangeUserRole = async (userId: string, newRole: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      const { error } = await supabase
-        .from("profiles")
-        .update({ role: newRole })
-        .eq("id", userId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Rôle modifié",
-        description: "Le rôle de l'utilisateur a été mis à jour.",
-      });
-
+    const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", userId);
+    if (!error) {
+      toast({ title: "Succès", description: "Rôle mis à jour." });
       loadUsers();
       loadStats();
-    } catch (error) {
-      console.error("Error changing user role:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de modifier le rôle.",
-        variant: "destructive",
-      });
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    try {
-      const { supabase } = await import("@/integrations/supabase/client");
-      
-      // Delete profile (cascade will handle related data)
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", userId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Utilisateur supprimé",
-        description: "L'utilisateur a été supprimé avec succès.",
-      });
-
+    // Supabase auth.admin is required to fully delete users.
+    // As a workaround for client-side admin, we can disable the profile or just delete the profile record.
+    const { error } = await supabase.from("profiles").delete().eq("id", userId);
+    if (!error) {
+      toast({ title: "Succès", description: "Utilisateur supprimé (profil)." });
       loadUsers();
       loadStats();
-      setDeleteDialog({ open: false, type: null, id: null, title: "" });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'utilisateur.",
-        variant: "destructive",
-      });
     }
+    setDeleteDialog({ open: false, type: null, id: null, title: "" });
   };
 
-  // Document actions
-  const handleApproveDocument = async (documentId: string) => {
-    try {
-      await documentService.updateDocumentStatus(documentId, "published");
-      toast({
-        title: "Document approuvé",
-        description: "Le document a été publié avec succès.",
-      });
-      loadDocuments();
-      loadStats();
-    } catch (error) {
-      console.error("Error approving document:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'approuver le document.",
-        variant: "destructive",
-      });
+  const handleDocumentAction = async (documentId: string, action: "approve" | "reject" | "delete") => {
+    if (action === "delete") {
+      await supabase.from("documents").delete().eq("id", documentId);
+      toast({ title: "Succès", description: "Document supprimé." });
+    } else {
+      const is_approved = action === "approve";
+      const is_published = action === "approve"; // If rejected, we unpublish it
+      
+      await supabase.from("documents")
+        .update({ is_approved, is_published })
+        .eq("id", documentId);
+      
+      toast({ title: "Succès", description: action === "approve" ? "Document approuvé." : "Document rejeté." });
     }
+    loadDocuments();
+    loadStats();
+    setDeleteDialog({ open: false, type: null, id: null, title: "" });
   };
 
-  const handleRejectDocument = async (documentId: string) => {
-    try {
-      await documentService.updateDocumentStatus(documentId, "rejected");
-      toast({
-        title: "Document rejeté",
-        description: "Le document a été rejeté.",
-      });
-      loadDocuments();
-      loadStats();
-    } catch (error) {
-      console.error("Error rejecting document:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de rejeter le document.",
-        variant: "destructive",
-      });
+  const handleReportAction = async (reportId: string, documentId: string, action: "dismiss" | "remove_document") => {
+    if (action === "remove_document") {
+      // Suspend the document
+      await supabase.from("documents").update({ is_published: false, is_approved: false }).eq("id", documentId);
     }
+    // Update report status
+    await supabase.from("reports").update({ status: "resolved" }).eq("id", reportId);
+    
+    toast({ title: "Succès", description: "Signalement traité." });
+    loadReports();
+    loadDocuments();
+    loadStats();
   };
 
-  const handleDeleteDocument = async (documentId: string) => {
-    try {
-      await documentService.deleteDocument(documentId);
-      toast({
-        title: "Document supprimé",
-        description: "Le document a été supprimé définitivement.",
-      });
-      loadDocuments();
-      loadStats();
-      setDeleteDialog({ open: false, type: null, id: null, title: "" });
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le document.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Report actions
-  const handleResolveReport = async (reportId: string, action: "dismiss" | "remove_document") => {
-    try {
-      const report = reports.find(r => r.id === reportId);
-      if (!report) return;
-
-      if (action === "remove_document") {
-        await documentService.updateDocumentStatus(report.document_id, "rejected");
-      }
-
-      await reportService.updateReportStatus(reportId, "resolved");
-
-      toast({
-        title: "Signalement traité",
-        description: action === "remove_document" 
-          ? "Le document a été retiré de la plateforme."
-          : "Le signalement a été rejeté.",
-      });
-
-      loadReports();
-      loadDocuments();
-      loadStats();
-    } catch (error) {
-      console.error("Error resolving report:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de traiter le signalement.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Filtered data
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.email?.toLowerCase().includes(usersSearch.toLowerCase()) ||
-      user.full_name?.toLowerCase().includes(usersSearch.toLowerCase());
-    const matchesRole = usersRoleFilter === "all" || user.role === usersRoleFilter;
-    return matchesSearch && matchesRole;
-  });
-
-  const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = doc.title?.toLowerCase().includes(documentsSearch.toLowerCase());
-    const matchesStatus = documentsStatusFilter === "all" || doc.status === documentsStatusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusBadge = (status: string) => {
-    const variants: any = {
-      pending: "warning",
-      published: "default",
-      rejected: "destructive",
-      completed: "default",
-      failed: "destructive",
-    };
+  // Renderers
+  const renderOverview = () => {
+    if (!stats) return null;
     return (
-      <Badge variant={variants[status] || "secondary"}>
-        {status === "pending" && "En attente"}
-        {status === "published" && "Publié"}
-        {status === "rejected" && "Rejeté"}
-        {status === "completed" && "Complété"}
-        {status === "failed" && "Échoué"}
-      </Badge>
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs</CardTitle>
+              <Users className="h-4 w-4 text-blue-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-serif">{stats.totalUsers}</div>
+              <p className="text-xs text-green-600 flex items-center mt-1">
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                +{stats.newUsersThisWeek} cette semaine
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Documents</CardTitle>
+              <FileText className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-serif">{stats.totalDocuments}</div>
+              <p className="text-xs text-green-600 flex items-center mt-1">
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                +{stats.newDocumentsThisWeek} cette semaine
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Revenus (CFA/EUR)</CardTitle>
+              <DollarSign className="h-4 w-4 text-gold" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-serif">{stats.totalRevenue.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Commission: <span className="text-gold font-medium">{stats.platformRevenue.toLocaleString()}</span>
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">À Traiter</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-serif text-orange-500">{stats.pendingDocuments + stats.totalReports}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.pendingDocuments} docs en attente • {stats.totalReports} signalements
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="border-gold/20 shadow-md">
+            <CardHeader>
+              <CardTitle className="font-serif">Actions Rapides</CardTitle>
+              <CardDescription>Gérez les urgences de la plateforme</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button 
+                variant="outline" 
+                className="w-full justify-between h-14 bg-orange-500/5 hover:bg-orange-500/10 border-orange-500/20"
+                onClick={() => setActiveModule("documents")}
+              >
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 mr-3 text-orange-500" />
+                  <span className="font-medium">Documents en attente</span>
+                </div>
+                <Badge variant="destructive" className="bg-orange-500">{stats.pendingDocuments}</Badge>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-between h-14 bg-red-500/5 hover:bg-red-500/10 border-red-500/20"
+                onClick={() => setActiveModule("reports")}
+              >
+                <div className="flex items-center">
+                  <AlertTriangle className="h-5 w-5 mr-3 text-red-500" />
+                  <span className="font-medium">Signalements ouverts</span>
+                </div>
+                <Badge variant="destructive">{stats.totalReports}</Badge>
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-gold/20 shadow-md bg-cover bg-center relative overflow-hidden" style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}>
+            <div className="absolute inset-0 bg-black/80"></div>
+            <CardContent className="relative z-10 p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
+              <ShieldAlert className="h-12 w-12 text-gold mb-4" />
+              <h3 className="text-2xl font-serif font-bold text-white mb-2">Super Administrateur</h3>
+              <p className="text-gold/80">Vous avez le contrôle total sur la plateforme AfriLitt. Modérez le contenu pour garantir l'excellence.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     );
   };
 
-  const getRoleBadge = (role: string) => {
-    const colors: any = {
-      admin: "bg-red-500",
-      author: "bg-blue-500",
-      visitor: "bg-gray-500",
-    };
+  const renderUsers = () => {
+    const filtered = users.filter(user => {
+      const matchesSearch = user.email?.toLowerCase().includes(usersSearch.toLowerCase()) ||
+        user.full_name?.toLowerCase().includes(usersSearch.toLowerCase());
+      const matchesRole = usersRoleFilter === "all" || user.role === usersRoleFilter;
+      return matchesSearch && matchesRole;
+    });
+
     return (
-      <Badge className={colors[role] || "bg-gray-500"}>
-        {role === "admin" && "Admin"}
-        {role === "author" && "Auteur"}
-        {role === "visitor" && "Visiteur"}
-      </Badge>
+      <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
+        <CardHeader className="border-b border-gold/10 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="font-serif text-2xl">Gestion des utilisateurs</CardTitle>
+              <CardDescription>{filtered.length} utilisateurs trouvés</CardDescription>
+            </div>
+            <div className="flex gap-3">
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher par nom/email..."
+                  value={usersSearch}
+                  onChange={(e) => setUsersSearch(e.target.value)}
+                  className="pl-9 bg-background"
+                />
+              </div>
+              <Select value={usersRoleFilter} onValueChange={setUsersRoleFilter}>
+                <SelectTrigger className="w-[150px] bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les rôles</SelectItem>
+                  <SelectItem value="admin">Admins</SelectItem>
+                  <SelectItem value="author">Auteurs</SelectItem>
+                  <SelectItem value="visitor">Visiteurs</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="pl-6">Utilisateur</TableHead>
+                <TableHead>Rôle</TableHead>
+                <TableHead>Inscription</TableHead>
+                <TableHead className="text-right pr-6">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((user) => (
+                <TableRow key={user.id} className="hover:bg-muted/30">
+                  <TableCell className="pl-6">
+                    <div>
+                      <div className="font-medium text-foreground">{user.full_name || "Sans nom"}</div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={user.role === "admin" ? "destructive" : user.role === "author" ? "default" : "secondary"}>
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(user.created_at).toLocaleDateString("fr-FR")}
+                  </TableCell>
+                  <TableCell className="text-right pr-6">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuLabel>Changer de rôle</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "visitor")} disabled={user.role === "visitor"}>
+                          <UserX className="h-4 w-4 mr-2" /> Visiteur
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "author")} disabled={user.role === "author"}>
+                          <Edit className="h-4 w-4 mr-2" /> Auteur
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "admin")} disabled={user.role === "admin"}>
+                          <ShieldAlert className="h-4 w-4 mr-2" /> Admin
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteDialog({ open: true, type: "user", id: user.id, title: user.email })}>
+                          <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                    Aucun utilisateur trouvé
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderDocuments = () => {
+    const filtered = documents.filter(doc => {
+      const matchesSearch = doc.title?.toLowerCase().includes(documentsSearch.toLowerCase());
+      
+      let matchesStatus = true;
+      if (documentsStatusFilter === "pending") matchesStatus = doc.is_published && !doc.is_approved;
+      else if (documentsStatusFilter === "published") matchesStatus = doc.is_published && doc.is_approved;
+      else if (documentsStatusFilter === "rejected") matchesStatus = !doc.is_published && !doc.is_approved;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return (
+      <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
+        <CardHeader className="border-b border-gold/10 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="font-serif text-2xl">Modération des documents</CardTitle>
+              <CardDescription>{filtered.length} documents trouvés</CardDescription>
+            </div>
+            <div className="flex gap-3">
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un document..."
+                  value={documentsSearch}
+                  onChange={(e) => setDocumentsSearch(e.target.value)}
+                  className="pl-9 bg-background"
+                />
+              </div>
+              <Select value={documentsStatusFilter} onValueChange={setDocumentsStatusFilter}>
+                <SelectTrigger className="w-[180px] bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="pending">En attente (Urgent)</SelectItem>
+                  <SelectItem value="published">Publiés</SelectItem>
+                  <SelectItem value="rejected">Rejetés / Brouillons</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="pl-6">Document</TableHead>
+                <TableHead>Auteur</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Prix</TableHead>
+                <TableHead className="text-right pr-6">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((doc) => {
+                const isPending = doc.is_published && !doc.is_approved;
+                const isPublished = doc.is_published && doc.is_approved;
+                
+                return (
+                  <TableRow key={doc.id} className={`hover:bg-muted/30 ${isPending ? 'bg-orange-500/5' : ''}`}>
+                    <TableCell className="pl-6 max-w-[300px]">
+                      <div>
+                        <div className="font-medium text-foreground truncate">{doc.title}</div>
+                        <div className="text-xs text-muted-foreground mt-1">Créé le {new Date(doc.created_at).toLocaleDateString("fr-FR")}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">{doc.author?.full_name || "Inconnu"}</div>
+                      <div className="text-xs text-muted-foreground">{doc.author?.email}</div>
+                    </TableCell>
+                    <TableCell>
+                      {isPending && <Badge className="bg-orange-500 hover:bg-orange-600">En attente</Badge>}
+                      {isPublished && <Badge className="bg-green-600 hover:bg-green-700">Publié</Badge>}
+                      {!doc.is_published && !doc.is_approved && <Badge variant="secondary">Rejeté / Brouillon</Badge>}
+                    </TableCell>
+                    <TableCell>
+                      {doc.price === 0 ? <Badge variant="outline" className="border-green-500 text-green-600">Gratuit</Badge> : <span className="font-medium">{doc.price} CFA</span>}
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/documents/${doc.slug}`} target="_blank">
+                            <Eye className="h-4 w-4 text-blue-500" />
+                          </Link>
+                        </Button>
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Modération</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {!isPublished && (
+                              <DropdownMenuItem onClick={() => handleDocumentAction(doc.id, "approve")} className="text-green-600 focus:text-green-600">
+                                <CheckCircle className="h-4 w-4 mr-2" /> Approuver et Publier
+                              </DropdownMenuItem>
+                            )}
+                            {(isPublished || isPending) && (
+                              <DropdownMenuItem onClick={() => handleDocumentAction(doc.id, "reject")} className="text-orange-600 focus:text-orange-600">
+                                <XCircle className="h-4 w-4 mr-2" /> Rejeter / Suspendre
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteDialog({ open: true, type: "document", id: doc.id, title: doc.title })}>
+                              <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                    Aucun document trouvé
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderReports = () => {
+    return (
+      <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
+        <CardHeader className="border-b border-gold/10 pb-6">
+          <CardTitle className="font-serif text-2xl flex items-center gap-2">
+            <AlertTriangle className="h-6 w-6 text-red-500" /> Signalements à traiter
+          </CardTitle>
+          <CardDescription>Gérez les alertes de la communauté ({reports.filter(r => r.status === "pending").length} en attente)</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {reports.filter(r => r.status === "pending").map((report) => (
+              <Card key={report.id} className="border-red-500/30 shadow-md bg-red-500/5">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <Badge variant="destructive" className="mb-2">{report.reason}</Badge>
+                      <CardTitle className="text-lg line-clamp-1">
+                        Doc: {report.document?.title || "Document inconnu"}
+                      </CardTitle>
+                    </div>
+                    <Button variant="ghost" size="icon" asChild className="shrink-0 bg-background">
+                      <Link href={`/documents/${report.document?.slug}`} target="_blank">
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                  <CardDescription className="text-xs mt-1">
+                    Signalé par {report.reporter?.email} le {new Date(report.created_at).toLocaleDateString()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-background p-3 rounded-md text-sm border border-red-500/20 mb-4">
+                    "{report.details}"
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="default" 
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                      onClick={() => handleReportAction(report.id, report.document_id, "remove_document")}
+                    >
+                      <Ban className="h-4 w-4 mr-2" /> Suspendre Doc
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleReportAction(report.id, report.document_id, "dismiss")}
+                    >
+                      <Check className="h-4 w-4 mr-2" /> Ignorer (Faux)
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {reports.filter(r => r.status === "pending").length === 0 && (
+            <div className="text-center py-16 bg-muted/30 rounded-xl border border-dashed border-border mt-4">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 mb-4">
+                <CheckCircle className="h-8 w-8 text-green-500" />
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-1">Tout est en ordre</h3>
+              <p className="text-muted-foreground">Aucun signalement en attente de modération.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderTransactions = () => {
+    return (
+      <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
+        <CardHeader className="border-b border-gold/10 pb-6">
+          <CardTitle className="font-serif text-2xl flex items-center gap-2">
+            <DollarSign className="h-6 w-6 text-gold" /> Historique financier
+          </CardTitle>
+          <CardDescription>Consultez toutes les ventes de la plateforme</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="pl-6">Transaction ID</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Document / Auteur</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead className="text-right pr-6">Montant (Frais)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.map((tx) => (
+                <TableRow key={tx.id} className="hover:bg-muted/30">
+                  <TableCell className="pl-6 font-mono text-xs text-muted-foreground">
+                    {tx.id.split('-')[0]}...
+                  </TableCell>
+                  <TableCell>
+                    {new Date(tx.created_at).toLocaleDateString("fr-FR", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium truncate max-w-[250px]">{tx.document?.title || "N/A"}</div>
+                    <div className="text-xs text-muted-foreground">Vendeur: {tx.author?.full_name}</div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={tx.status === "completed" ? "default" : "secondary"} className={tx.status === "completed" ? "bg-green-600" : ""}>
+                      {tx.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right pr-6">
+                    <div className="font-bold">{Number(tx.amount).toLocaleString()} CFA</div>
+                    <div className="text-xs text-gold">Plateforme: {Number(tx.platform_fee).toLocaleString()} CFA</div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {transactions.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                    Aucune transaction trouvée
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     );
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+          <p className="text-muted-foreground font-serif">Chargement de l'espace administrateur...</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+  // Define sidebar navigation items
+  const navItems = [
+    { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
+    { id: "users", label: "Utilisateurs", icon: Users },
+    { id: "documents", label: "Documents", icon: FileText, badge: stats?.pendingDocuments || 0 },
+    { id: "reports", label: "Signalements", icon: AlertTriangle, badge: stats?.totalReports || 0, badgeColor: "bg-red-500" },
+    { id: "transactions", label: "Transactions", icon: DollarSign },
+  ];
 
-      {/* Hero */}
-      <div className="relative pt-16 pb-12 border-b border-gold/20">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-background"></div>
-        </div>
-        <div className="container max-w-7xl relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldAlert className="h-8 w-8 text-gold" />
-            <h1 className="font-serif text-4xl font-bold text-white drop-shadow-lg">
-              Dashboard Admin
-            </h1>
+  return (
+    <div className="min-h-screen flex flex-col bg-muted/20">
+      {/* Top Navbar for Admin */}
+      <header className="sticky top-0 z-40 w-full border-b border-gold/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+        <div className="flex h-16 items-center px-4 md:px-6 gap-4">
+          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-6 w-6 text-gold" />
+            <span className="font-serif text-xl font-bold hidden md:inline-block text-foreground">AfriLitt Admin</span>
           </div>
-          <p className="text-gold/90 text-lg drop-shadow-md">
-            Gérez tous les aspects de la plateforme AfriLitt
-          </p>
+
+          <div className="ml-auto flex items-center space-x-4">
+            <Button variant="outline" size="sm" asChild className="hidden sm:flex border-gold/30 text-gold hover:bg-gold hover:text-white transition-colors">
+              <Link href="/">Retour au site</Link>
+            </Button>
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={() => authService.signOut().then(() => router.push("/"))}>
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <aside className={`
+          fixed md:sticky top-16 z-30 h-[calc(100vh-4rem)] w-64 shrink-0 
+          border-r border-gold/10 bg-card transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}>
+          <div className="flex flex-col h-full py-6 px-3">
+            <div className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeModule === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveModule(item.id);
+                      if (window.innerWidth < 768) setIsSidebarOpen(false);
+                    }}
+                    className={`
+                      w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all
+                      ${isActive 
+                        ? "bg-gradient-to-r from-earth to-gold text-white shadow-md font-medium" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-muted-foreground"}`} />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge > 0 && (
+                      <Badge variant="destructive" className={`h-5 px-1.5 flex items-center justify-center text-xs ${isActive ? "bg-white text-earth border-none" : item.badgeColor || "bg-orange-500"}`}>
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <div className="mt-auto pt-6 border-t border-gold/10">
+              <div className="px-3 py-2 rounded-xl bg-muted/50 border border-gold/10">
+                <p className="text-xs text-muted-foreground font-medium mb-1">Status Système</p>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <span className="text-sm font-medium text-green-600">Tous les services OK</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Overlay for mobile sidebar */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 z-20 bg-black/50 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-[1600px] mx-auto">
+          {activeModule === "overview" && renderOverview()}
+          {activeModule === "users" && renderUsers()}
+          {activeModule === "documents" && renderDocuments()}
+          {activeModule === "reports" && renderReports()}
+          {activeModule === "transactions" && renderTransactions()}
+        </main>
       </div>
 
-      <main className="flex-1 py-8 bg-gradient-to-b from-earth/5 via-background to-gold/5">
-        <div className="container max-w-7xl">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            {/* Navigation Tabs */}
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-              <TabsTrigger value="overview" className="gap-2">
-                <LayoutDashboard className="h-4 w-4" />
-                Vue d'ensemble
-              </TabsTrigger>
-              <TabsTrigger value="users" className="gap-2">
-                <Users className="h-4 w-4" />
-                Utilisateurs
-              </TabsTrigger>
-              <TabsTrigger value="documents" className="gap-2">
-                <FileText className="h-4 w-4" />
-                Documents
-              </TabsTrigger>
-              <TabsTrigger value="reports" className="gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Signalements
-              </TabsTrigger>
-              <TabsTrigger value="transactions" className="gap-2">
-                <DollarSign className="h-4 w-4" />
-                Transactions
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
-              {/* KPIs Grid */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border-gold/20 bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Utilisateurs</CardTitle>
-                    <Users className="h-4 w-4 text-blue-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <ArrowUpRight className="h-3 w-3 text-green-500" />
-                      +{stats.newUsersThisWeek} cette semaine
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-gold/20 bg-gradient-to-br from-green-500/10 to-green-500/5">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Documents</CardTitle>
-                    <FileText className="h-4 w-4 text-green-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.totalDocuments}</div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <ArrowUpRight className="h-3 w-3 text-green-500" />
-                      +{stats.newDocumentsThisWeek} cette semaine
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-gold/20 bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">En attente</CardTitle>
-                    <Clock className="h-4 w-4 text-yellow-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.pendingDocuments}</div>
-                    <p className="text-xs text-muted-foreground">
-                      Documents à modérer
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-gold/20 bg-gradient-to-br from-gold/10 to-gold/5">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium">Revenus</CardTitle>
-                    <DollarSign className="h-4 w-4 text-gold" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.totalRevenue.toFixed(2)} €</div>
-                    <p className="text-xs text-muted-foreground">
-                      Commission: {stats.platformRevenue.toFixed(2)} €
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Secondary Stats */}
-              <div className="grid gap-6 md:grid-cols-3">
-                <Card className="border-gold/20">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <UserCheck className="h-4 w-4 text-blue-500" />
-                      Auteurs
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-blue-500">{stats.totalAuthors}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Contributeurs actifs
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-gold/20">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
-                      Signalements
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-orange-500">{stats.totalReports}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      À traiter
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-gold/20">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                      Transactions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold text-green-500">{stats.totalTransactions}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Ventes totales
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              <Card className="border-gold/20">
-                <CardHeader>
-                  <CardTitle>Actions rapides</CardTitle>
-                  <CardDescription>Accédez rapidement aux tâches importantes</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                  <Button 
-                    variant="outline" 
-                    className="justify-start gap-2"
-                    onClick={() => setActiveTab("documents")}
-                  >
-                    <Clock className="h-4 w-4" />
-                    {stats.pendingDocuments} documents en attente
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="justify-start gap-2"
-                    onClick={() => setActiveTab("reports")}
-                  >
-                    <AlertTriangle className="h-4 w-4" />
-                    {stats.totalReports} signalements
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="justify-start gap-2"
-                    onClick={() => setActiveTab("users")}
-                  >
-                    <Users className="h-4 w-4" />
-                    Gérer les utilisateurs
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="justify-start gap-2"
-                    onClick={() => setActiveTab("transactions")}
-                  >
-                    <DollarSign className="h-4 w-4" />
-                    Voir les transactions
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Users Tab */}
-            <TabsContent value="users" className="space-y-6">
-              <Card className="border-gold/20">
-                <CardHeader>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <CardTitle>Gestion des utilisateurs</CardTitle>
-                      <CardDescription>
-                        {filteredUsers.length} utilisateur(s) trouvé(s)
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Rechercher un utilisateur..."
-                          value={usersSearch}
-                          onChange={(e) => setUsersSearch(e.target.value)}
-                          className="pl-8"
-                        />
-                      </div>
-                      <Select value={usersRoleFilter} onValueChange={setUsersRoleFilter}>
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="author">Auteur</SelectItem>
-                          <SelectItem value="visitor">Visiteur</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Utilisateur</TableHead>
-                        <TableHead>Rôle</TableHead>
-                        <TableHead>Date d'inscription</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{user.full_name || "Sans nom"}</div>
-                              <div className="text-sm text-muted-foreground">{user.email}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>{getRoleBadge(user.role)}</TableCell>
-                          <TableCell>
-                            {new Date(user.created_at).toLocaleDateString("fr-FR")}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => handleChangeUserRole(user.id, "visitor")}
-                                  disabled={user.role === "visitor"}
-                                >
-                                  <UserX className="h-4 w-4 mr-2" />
-                                  Définir comme Visiteur
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleChangeUserRole(user.id, "author")}
-                                  disabled={user.role === "author"}
-                                >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Définir comme Auteur
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleChangeUserRole(user.id, "admin")}
-                                  disabled={user.role === "admin"}
-                                >
-                                  <ShieldAlert className="h-4 w-4 mr-2" />
-                                  Définir comme Admin
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-red-600"
-                                  onClick={() => setDeleteDialog({
-                                    open: true,
-                                    type: "user",
-                                    id: user.id,
-                                    title: `${user.full_name || user.email}`,
-                                  })}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Supprimer
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Documents Tab */}
-            <TabsContent value="documents" className="space-y-6">
-              <Card className="border-gold/20">
-                <CardHeader>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <CardTitle>Gestion des documents</CardTitle>
-                      <CardDescription>
-                        {filteredDocuments.length} document(s) trouvé(s)
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Rechercher un document..."
-                          value={documentsSearch}
-                          onChange={(e) => setDocumentsSearch(e.target.value)}
-                          className="pl-8"
-                        />
-                      </div>
-                      <Select value={documentsStatusFilter} onValueChange={setDocumentsStatusFilter}>
-                        <SelectTrigger className="w-40">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous</SelectItem>
-                          <SelectItem value="pending">En attente</SelectItem>
-                          <SelectItem value="published">Publiés</SelectItem>
-                          <SelectItem value="rejected">Rejetés</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Document</TableHead>
-                        <TableHead>Auteur</TableHead>
-                        <TableHead>Prix</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredDocuments.map((doc) => (
-                        <TableRow key={doc.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{doc.title}</div>
-                              <div className="text-sm text-muted-foreground line-clamp-1">
-                                {doc.description}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {doc.profiles?.full_name || "Inconnu"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {doc.price === 0 ? (
-                              <Badge variant="secondary">Gratuit</Badge>
-                            ) : (
-                              <span className="font-semibold">{doc.price} €</span>
-                            )}
-                          </TableCell>
-                          <TableCell>{getStatusBadge(doc.status)}</TableCell>
-                          <TableCell>
-                            {new Date(doc.created_at).toLocaleDateString("fr-FR")}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/documents/${doc.slug}`}>
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    Voir le document
-                                  </Link>
-                                </DropdownMenuItem>
-                                {doc.status === "pending" && (
-                                  <>
-                                    <DropdownMenuItem
-                                      onClick={() => handleApproveDocument(doc.id)}
-                                      className="text-green-600"
-                                    >
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Approuver
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => handleRejectDocument(doc.id)}
-                                      className="text-orange-600"
-                                    >
-                                      <XCircle className="h-4 w-4 mr-2" />
-                                      Rejeter
-                                    </DropdownMenuItem>
-                                  </>
-                                )}
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-red-600"
-                                  onClick={() => setDeleteDialog({
-                                    open: true,
-                                    type: "document",
-                                    id: doc.id,
-                                    title: doc.title,
-                                  })}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Supprimer
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Reports Tab */}
-            <TabsContent value="reports" className="space-y-6">
-              <Card className="border-gold/20">
-                <CardHeader>
-                  <CardTitle>Signalements en attente</CardTitle>
-                  <CardDescription>
-                    {reports.filter(r => r.status === "pending").length} signalement(s) à traiter
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {reports.filter(r => r.status === "pending").map((report) => (
-                      <Card key={report.id} className="border-orange-500/20">
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle className="text-base">
-                                {report.document?.title || "Document supprimé"}
-                              </CardTitle>
-                              <CardDescription className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline">{report.reason}</Badge>
-                                <span className="text-xs">
-                                  Par {report.reporter?.email || "Utilisateur"} - {new Date(report.created_at).toLocaleDateString("fr-FR")}
-                                </span>
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4">{report.details}</p>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleResolveReport(report.id, "dismiss")}
-                            >
-                              <X className="h-4 w-4 mr-2" />
-                              Rejeter le signalement
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleResolveReport(report.id, "remove_document")}
-                            >
-                              <Ban className="h-4 w-4 mr-2" />
-                              Retirer le document
-                            </Button>
-                            {report.document && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                asChild
-                              >
-                                <Link href={`/documents/${report.document.slug}`}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  Voir le document
-                                </Link>
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-
-                    {reports.filter(r => r.status === "pending").length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <CheckCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p>Aucun signalement en attente</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Transactions Tab */}
-            <TabsContent value="transactions" className="space-y-6">
-              <Card className="border-gold/20">
-                <CardHeader>
-                  <CardTitle>Historique des transactions</CardTitle>
-                  <CardDescription>
-                    {transactions.length} transaction(s) enregistrée(s)
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Document</TableHead>
-                        <TableHead>Acheteur</TableHead>
-                        <TableHead>Auteur</TableHead>
-                        <TableHead>Montant</TableHead>
-                        <TableHead>Commission</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Date</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {transactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell>
-                            <div className="font-medium">
-                              {transaction.document?.title || "Document supprimé"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {transaction.buyer?.email || "Inconnu"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {transaction.author?.full_name || "Inconnu"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <span className="font-semibold">{transaction.amount.toFixed(2)} €</span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-gold font-semibold">
-                              {transaction.platform_fee.toFixed(2)} €
-                            </span>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                          <TableCell>
-                            {new Date(transaction.created_at).toLocaleDateString("fr-FR")}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-
-                  {transactions.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <DollarSign className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Aucune transaction enregistrée</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-
-      {/* Delete Confirmation Dialog */}
+      {/* Dialogs */}
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, type: null, id: null, title: "" })}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-red-500/20">
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. {deleteDialog.type === "user" ? "L'utilisateur" : "Le document"} <strong>{deleteDialog.title}</strong> sera définitivement supprimé.
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmation de suppression
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base mt-2">
+              Vous êtes sur le point de supprimer définitivement {deleteDialog.type === "user" ? "l'utilisateur" : "le document"} : <br/>
+              <strong className="text-foreground mt-2 block p-2 bg-muted rounded-md">{deleteDialog.title}</strong>
+              <br/>
+              Cette action est irréversible et supprimera toutes les données associées.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deleteDialog.type === "user" && deleteDialog.id) {
                   handleDeleteUser(deleteDialog.id);
                 } else if (deleteDialog.type === "document" && deleteDialog.id) {
-                  handleDeleteDocument(deleteDialog.id);
+                  handleDocumentAction(deleteDialog.id, "delete");
                 }
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
-              Supprimer
+              Oui, supprimer définitivement
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Footer />
     </div>
   );
 }
