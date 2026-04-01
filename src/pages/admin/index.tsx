@@ -51,6 +51,10 @@ import {
 } from "@/components/ui/dialog";
 import type { Category } from "@/services/categoryService";
 import type { Banner } from "@/services/bannerService";
+import { SalesChart } from "@/components/admin/SalesChart";
+import { TopDocumentsChart } from "@/components/admin/TopDocumentsChart";
+import { TopAuthorsChart } from "@/components/admin/TopAuthorsChart";
+import { ConversionMetrics } from "@/components/admin/ConversionMetrics";
 
 // Types
 interface DashboardStats {
@@ -1302,6 +1306,117 @@ export default function AdminDashboard() {
     );
   };
 
+  const renderBanners = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-gold/20 shadow-lg">
+          <CardHeader className="border-b border-gold/10 pb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                  <Image className="h-6 w-6 text-gold" />
+                  Gestion des bannières
+                </CardTitle>
+                <CardDescription>Personnalisez les bannières de la page d'accueil</CardDescription>
+              </div>
+              <Button onClick={() => {
+                setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_link: "", display_order: banners.length + 1, is_active: true });
+                setBannerDialog({ open: true, mode: "create", banner: null });
+              }}>
+                <Plus className="h-4 w-4 mr-2" /> Nouvelle bannière
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {banners.map((banner) => (
+                <Card key={banner.id} className="border-gold/20 overflow-hidden">
+                  <div className="h-40 bg-cover bg-center relative" style={{ backgroundImage: `url(${banner.image_url})` }}>
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="text-center text-white p-4">
+                        <h3 className="text-xl font-bold mb-1">{banner.title}</h3>
+                        <p className="text-sm opacity-90">{banner.subtitle}</p>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <Badge variant={banner.is_active ? "default" : "secondary"} className={banner.is_active ? "bg-green-600" : ""}>
+                        {banner.is_active ? "Actif" : "Inactif"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        CTA: {banner.cta_text} → {banner.cta_link}
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleToggleBanner(banner.id, banner.is_active || false)}>
+                            <Eye className="h-4 w-4 mr-2" /> 
+                            {banner.is_active ? "Désactiver" : "Activer"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            setBannerForm({
+                              title: banner.title,
+                              subtitle: banner.subtitle || "",
+                              image_url: banner.image_url || "",
+                              cta_text: banner.cta_text || "",
+                              cta_link: banner.cta_link || "",
+                              display_order: banner.display_order || 1,
+                              is_active: banner.is_active ?? true,
+                            });
+                            setBannerDialog({ open: true, mode: "edit", banner });
+                          }}>
+                            <Edit className="h-4 w-4 mr-2" /> Modifier
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-600"
+                            onClick={() => setDeleteDialog({ open: true, type: "banner", id: banner.id, title: banner.title })}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {banners.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Image className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Aucune bannière configurée</p>
+                <p className="text-sm">Créez votre première bannière pour personnaliser la page d'accueil</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderAnalytics = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <SalesChart />
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          <TopDocumentsChart />
+          <TopAuthorsChart />
+        </div>
+
+        <ConversionMetrics />
+      </div>
+    );
+  };
+
   const renderSettings = () => {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
@@ -1437,125 +1552,6 @@ export default function AdminDashboard() {
                 Enregistrer la configuration
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
-
-  const renderAnalytics = () => {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-500">
-        <Card className="border-gold/20 shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-serif text-2xl flex items-center gap-2">
-              <BarChart3 className="h-6 w-6 text-gold" />
-              Analytics & Statistiques
-            </CardTitle>
-            <CardDescription>Tableau de bord détaillé des performances</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-16 text-muted-foreground">
-              <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">Statistiques avancées à venir</p>
-              <p className="text-sm">Graphiques de ventes, top documents, top auteurs...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
-
-  const renderBanners = () => {
-    return (
-      <div className="space-y-6 animate-in fade-in duration-500">
-        <Card className="border-gold/20 shadow-lg">
-          <CardHeader className="border-b border-gold/10 pb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="font-serif text-2xl flex items-center gap-2">
-                  <Image className="h-6 w-6 text-gold" />
-                  Gestion des bannières
-                </CardTitle>
-                <CardDescription>Personnalisez les bannières de la page d'accueil</CardDescription>
-              </div>
-              <Button onClick={() => {
-                setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_link: "", display_order: banners.length + 1, is_active: true });
-                setBannerDialog({ open: true, mode: "create", banner: null });
-              }}>
-                <Plus className="h-4 w-4 mr-2" /> Nouvelle bannière
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              {banners.map((banner) => (
-                <Card key={banner.id} className="border-gold/20 overflow-hidden">
-                  <div className="h-40 bg-cover bg-center relative" style={{ backgroundImage: `url(${banner.image_url})` }}>
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <div className="text-center text-white p-4">
-                        <h3 className="text-xl font-bold mb-1">{banner.title}</h3>
-                        <p className="text-sm opacity-90">{banner.subtitle}</p>
-                      </div>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <Badge variant={banner.is_active ? "default" : "secondary"} className={banner.is_active ? "bg-green-600" : ""}>
-                        {banner.is_active ? "Actif" : "Inactif"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        CTA: {banner.cta_text} → {banner.cta_link}
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleToggleBanner(banner.id, banner.is_active || false)}>
-                            <Eye className="h-4 w-4 mr-2" /> 
-                            {banner.is_active ? "Désactiver" : "Activer"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {
-                            setBannerForm({
-                              title: banner.title,
-                              subtitle: banner.subtitle || "",
-                              image_url: banner.image_url || "",
-                              cta_text: banner.cta_text || "",
-                              cta_link: banner.cta_link || "",
-                              display_order: banner.display_order || 1,
-                              is_active: banner.is_active ?? true,
-                            });
-                            setBannerDialog({ open: true, mode: "edit", banner });
-                          }}>
-                            <Edit className="h-4 w-4 mr-2" /> Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-red-600"
-                            onClick={() => setDeleteDialog({ open: true, type: "banner", id: banner.id, title: banner.title })}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" /> Supprimer
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {banners.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
-                <Image className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">Aucune bannière configurée</p>
-                <p className="text-sm">Créez votre première bannière pour personnaliser la page d'accueil</p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
