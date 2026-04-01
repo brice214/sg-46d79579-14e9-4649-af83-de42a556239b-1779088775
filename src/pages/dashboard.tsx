@@ -928,7 +928,7 @@ export default function Dashboard() {
                                             </Link>
                                           ) : (
                                             <Link href={`/documents/${doc.slug}`} className="block">
-                                              <Button size="lg" className="w-full bg-gradient-to-r from-terre to-orange-600 hover:from-terre/90 hover:to-orange-700 text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                              <Button size="lg" className="w-full bg-gradient-to-r from-gold via-amber-500 to-gold hover:from-gold/90 hover:via-amber-600 hover:to-gold/90 text-noir font-bold shadow-md hover:shadow-lg transition-all">
                                                 <ShoppingCart className="h-4 w-4 mr-2" />
                                                 Acheter ce document
                                               </Button>
