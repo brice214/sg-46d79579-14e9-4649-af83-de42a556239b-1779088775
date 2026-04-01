@@ -103,7 +103,8 @@ class CategoryService {
       .from("documents")
       .select("id", { count: "exact", head: true })
       .eq("category_id", categoryId)
-      .eq("status", "published");
+      .eq("is_published", true)
+      .eq("is_approved", true) as any;
 
     if (error) {
       console.error("Error counting documents:", error);
