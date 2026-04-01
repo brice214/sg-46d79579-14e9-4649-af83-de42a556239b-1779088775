@@ -13,7 +13,7 @@ import {
   LayoutDashboard, Users, FileText, AlertTriangle, DollarSign, 
   TrendingUp, Eye, CheckCircle, XCircle, Clock, 
   Search, MoreVertical, ShieldAlert, ArrowUpRight,
-  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check
+  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check, PenTool, Lock
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -37,7 +37,7 @@ import {
 
 // Types
 interface DashboardStats {
-  totalUsers: number;
+  totalVisitors: number;
   totalAuthors: number;
   totalDocuments: number;
   pendingDocuments: number;
@@ -45,7 +45,8 @@ interface DashboardStats {
   totalTransactions: number;
   totalRevenue: number;
   platformRevenue: number;
-  newUsersThisWeek: number;
+  newVisitorsThisWeek: number;
+  newAuthorsThisWeek: number;
   newDocumentsThisWeek: number;
 }
 
@@ -55,6 +56,17 @@ interface User {
   full_name: string | null;
   role: string;
   created_at: string;
+}
+
+interface Author {
+  id: string;
+  email: string;
+  full_name: string | null;
+  created_at: string;
+  is_blocked?: boolean;
+  total_documents?: number;
+  total_sales?: number;
+  total_revenue?: number;
 }
 
 interface Document {
@@ -115,21 +127,22 @@ export default function AdminDashboard() {
   
   // Data States
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [visitors, setVisitors] = useState<User[]>([]);
+  const [authors, setAuthors] = useState<Author[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   // Filters
-  const [usersSearch, setUsersSearch] = useState("");
-  const [usersRoleFilter, setUsersRoleFilter] = useState("all");
+  const [visitorsSearch, setVisitorsSearch] = useState("");
+  const [authorsSearch, setAuthorsSearch] = useState("");
   const [documentsSearch, setDocumentsSearch] = useState("");
   const [documentsStatusFilter, setDocumentsStatusFilter] = useState("all");
 
   // Dialog State
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
-    type: "user" | "document" | null;
+    type: "visitor" | "author" | "document" | null;
     id: string | null;
     title: string;
   }>({
@@ -181,7 +194,8 @@ export default function AdminDashboard() {
     try {
       await Promise.all([
         loadStats(),
-        loadUsers(),
+        loadVisitors(),
+        loadAuthors(),
         loadDocuments(),
         loadReports(),
         loadTransactions(),
@@ -204,21 +218,23 @@ export default function AdminDashboard() {
 
     // Fetch counts in parallel
     const [
-      { count: totalUsers },
+      { count: totalVisitors },
       { count: totalAuthors },
       { count: totalDocuments },
       { count: pendingDocuments },
       { count: totalReports },
-      { count: newUsers },
+      { count: newVisitors },
+      { count: newAuthors },
       { count: newDocs },
       { data: txData }
     ] = await Promise.all([
-      supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("profiles").select("*", { count: "exact", head: true }).in("role", ["author", "admin"]),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "visitor"),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "author"),
       supabase.from("documents").select("*", { count: "exact", head: true }),
       supabase.from("documents").select("*", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", false),
       supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "pending"),
-      supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "visitor").gte("created_at", weekAgo.toISOString()),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "author").gte("created_at", weekAgo.toISOString()),
       supabase.from("documents").select("*", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
       supabase.from("transactions").select("amount, platform_fee, status")
     ]);
@@ -228,7 +244,7 @@ export default function AdminDashboard() {
     const platformRevenue = completedTx.reduce((sum, t) => sum + Number(t.platform_fee), 0);
 
     setStats({
-      totalUsers: totalUsers || 0,
+      totalVisitors: totalVisitors || 0,
       totalAuthors: totalAuthors || 0,
       totalDocuments: totalDocuments || 0,
       pendingDocuments: pendingDocuments || 0,
@@ -236,17 +252,53 @@ export default function AdminDashboard() {
       totalTransactions: txData?.length || 0,
       totalRevenue,
       platformRevenue,
-      newUsersThisWeek: newUsers || 0,
+      newVisitorsThisWeek: newVisitors || 0,
+      newAuthorsThisWeek: newAuthors || 0,
       newDocumentsThisWeek: newDocs || 0,
     });
   };
 
-  const loadUsers = async () => {
+  const loadVisitors = async () => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
+      .eq("role", "visitor")
       .order("created_at", { ascending: false });
-    if (data) setUsers(data as User[]);
+    if (data) setVisitors(data as User[]);
+  };
+
+  const loadAuthors = async () => {
+    const { data: authorProfiles } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("role", "author")
+      .order("created_at", { ascending: false });
+
+    if (authorProfiles) {
+      // Load additional stats for each author
+      const authorsWithStats = await Promise.all(
+        authorProfiles.map(async (author) => {
+          const [
+            { count: totalDocuments },
+            { data: sales }
+          ] = await Promise.all([
+            supabase.from("documents").select("*", { count: "exact", head: true }).eq("author_id", author.id),
+            supabase.from("transactions").select("amount, status").eq("author_id", author.id).eq("status", "completed")
+          ]);
+
+          const totalRevenue = sales?.reduce((sum, s) => sum + Number(s.amount), 0) || 0;
+
+          return {
+            ...author,
+            total_documents: totalDocuments || 0,
+            total_sales: sales?.length || 0,
+            total_revenue: totalRevenue,
+            is_blocked: false, // TODO: Add blocked status to profiles table
+          };
+        })
+      );
+      setAuthors(authorsWithStats as Author[]);
+    }
   };
 
   const loadDocuments = async () => {
@@ -288,24 +340,50 @@ export default function AdminDashboard() {
     if (data) setTransactions(data as unknown as Transaction[]);
   };
 
-  // Actions Utils
-  const handleChangeUserRole = async (userId: string, newRole: string) => {
-    const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", userId);
+  // Actions Utils - Visitors
+  const handleDeleteVisitor = async (visitorId: string) => {
+    const { error } = await supabase.from("profiles").delete().eq("id", visitorId);
     if (!error) {
-      toast({ title: "Succès", description: "Rôle mis à jour." });
-      loadUsers();
-      loadStats();
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    const { error } = await supabase.from("profiles").delete().eq("id", userId);
-    if (!error) {
-      toast({ title: "Succès", description: "Utilisateur supprimé (profil)." });
-      loadUsers();
+      toast({ title: "Succès", description: "Utilisateur supprimé." });
+      loadVisitors();
       loadStats();
     }
     setDeleteDialog({ open: false, type: null, id: null, title: "" });
+  };
+
+  // Actions Utils - Authors
+  const handleBlockAuthor = async (authorId: string, isBlocked: boolean) => {
+    // TODO: Implement blocking logic (add is_blocked column to profiles)
+    toast({ 
+      title: isBlocked ? "Auteur débloqué" : "Auteur bloqué", 
+      description: "Fonctionnalité en développement" 
+    });
+  };
+
+  const handleDeleteAuthor = async (authorId: string) => {
+    const { error } = await supabase.from("profiles").delete().eq("id", authorId);
+    if (!error) {
+      toast({ title: "Succès", description: "Auteur supprimé." });
+      loadAuthors();
+      loadStats();
+    }
+    setDeleteDialog({ open: false, type: null, id: null, title: "" });
+  };
+
+  const handleResetAuthorPassword = async (authorEmail: string) => {
+    try {
+      await supabase.auth.resetPasswordForEmail(authorEmail);
+      toast({ 
+        title: "Email envoyé", 
+        description: `Un email de réinitialisation a été envoyé à ${authorEmail}` 
+      });
+    } catch (error) {
+      toast({ 
+        title: "Erreur", 
+        description: "Impossible d'envoyer l'email de réinitialisation", 
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleDocumentAction = async (documentId: string, action: "approve" | "reject" | "delete") => {
@@ -347,14 +425,28 @@ export default function AdminDashboard() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs (Clients)</CardTitle>
               <Users className="h-5 w-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold font-serif">{stats.totalUsers}</div>
+              <div className="text-3xl font-bold font-serif">{stats.totalVisitors}</div>
               <p className="text-xs text-green-600 flex items-center mt-1">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
-                +{stats.newUsersThisWeek} cette semaine
+                +{stats.newVisitorsThisWeek} cette semaine
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Auteurs</CardTitle>
+              <PenTool className="h-5 w-5 text-purple-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-serif">{stats.totalAuthors}</div>
+              <p className="text-xs text-green-600 flex items-center mt-1">
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                +{stats.newAuthorsThisWeek} cette semaine
               </p>
             </CardContent>
           </Card>
@@ -382,19 +474,6 @@ export default function AdminDashboard() {
               <div className="text-3xl font-bold font-serif">{stats.totalRevenue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 Commission: <span className="text-gold font-medium">{stats.platformRevenue.toLocaleString()}</span>
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">À Traiter</CardTitle>
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold font-serif text-orange-500">{stats.pendingDocuments + stats.totalReports}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.pendingDocuments} docs • {stats.totalReports} signalements
               </p>
             </CardContent>
           </Card>
@@ -445,43 +524,28 @@ export default function AdminDashboard() {
     );
   };
 
-  const renderUsers = () => {
-    const filtered = users.filter(user => {
-      const matchesSearch = user.email?.toLowerCase().includes(usersSearch.toLowerCase()) ||
-        user.full_name?.toLowerCase().includes(usersSearch.toLowerCase());
-      const matchesRole = usersRoleFilter === "all" || user.role === usersRoleFilter;
-      return matchesSearch && matchesRole;
-    });
+  const renderVisitors = () => {
+    const filtered = visitors.filter(visitor => 
+      visitor.email?.toLowerCase().includes(visitorsSearch.toLowerCase()) ||
+      visitor.full_name?.toLowerCase().includes(visitorsSearch.toLowerCase())
+    );
 
     return (
       <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
         <CardHeader className="border-b border-gold/10 pb-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <CardTitle className="font-serif text-2xl">Gestion des utilisateurs</CardTitle>
+              <CardTitle className="font-serif text-2xl">Gestion des utilisateurs (Clients)</CardTitle>
               <CardDescription>{filtered.length} utilisateurs trouvés</CardDescription>
             </div>
-            <div className="flex gap-3">
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par nom/email..."
-                  value={usersSearch}
-                  onChange={(e) => setUsersSearch(e.target.value)}
-                  className="pl-9 bg-background"
-                />
-              </div>
-              <Select value={usersRoleFilter} onValueChange={setUsersRoleFilter}>
-                <SelectTrigger className="w-[150px] bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les rôles</SelectItem>
-                  <SelectItem value="admin">Admins</SelectItem>
-                  <SelectItem value="author">Auteurs</SelectItem>
-                  <SelectItem value="visitor">Visiteurs</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par nom/email..."
+                value={visitorsSearch}
+                onChange={(e) => setVisitorsSearch(e.target.value)}
+                className="pl-9 bg-background"
+              />
             </div>
           </div>
         </CardHeader>
@@ -490,27 +554,21 @@ export default function AdminDashboard() {
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead className="pl-6">Utilisateur</TableHead>
-                <TableHead>Rôle</TableHead>
                 <TableHead>Inscription</TableHead>
                 <TableHead className="text-right pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((user) => (
-                <TableRow key={user.id} className="hover:bg-muted/30">
+              {filtered.map((visitor) => (
+                <TableRow key={visitor.id} className="hover:bg-muted/30">
                   <TableCell className="pl-6">
                     <div>
-                      <div className="font-medium text-foreground">{user.full_name || "Sans nom"}</div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                      <div className="font-medium text-foreground">{visitor.full_name || "Sans nom"}</div>
+                      <div className="text-sm text-muted-foreground">{visitor.email}</div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={user.role === "admin" ? "destructive" : user.role === "author" ? "default" : "secondary"}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(user.created_at).toLocaleDateString("fr-FR")}
+                    {new Date(visitor.created_at).toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell className="text-right pr-6">
                     <DropdownMenu>
@@ -520,19 +578,9 @@ export default function AdminDashboard() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel>Changer de rôle</DropdownMenuLabel>
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "visitor")} disabled={user.role === "visitor"}>
-                          <UserX className="h-4 w-4 mr-2" /> Visiteur
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "author")} disabled={user.role === "author"}>
-                          <Edit className="h-4 w-4 mr-2" /> Auteur
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleChangeUserRole(user.id, "admin")} disabled={user.role === "admin"}>
-                          <ShieldAlert className="h-4 w-4 mr-2" /> Admin
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteDialog({ open: true, type: "user", id: user.id, title: user.email })}>
+                        <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteDialog({ open: true, type: "visitor", id: visitor.id, title: visitor.email })}>
                           <Trash2 className="h-4 w-4 mr-2" /> Supprimer
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -542,8 +590,120 @@ export default function AdminDashboard() {
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={3} className="h-32 text-center text-muted-foreground">
                     Aucun utilisateur trouvé
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderAuthors = () => {
+    const filtered = authors.filter(author => 
+      author.email?.toLowerCase().includes(authorsSearch.toLowerCase()) ||
+      author.full_name?.toLowerCase().includes(authorsSearch.toLowerCase())
+    );
+
+    return (
+      <Card className="border-gold/20 shadow-lg animate-in fade-in duration-500">
+        <CardHeader className="border-b border-gold/10 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <PenTool className="h-6 w-6 text-purple-500" />
+                Gestion des auteurs
+              </CardTitle>
+              <CardDescription>{filtered.length} auteurs trouvés</CardDescription>
+            </div>
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un auteur..."
+                value={authorsSearch}
+                onChange={(e) => setAuthorsSearch(e.target.value)}
+                className="pl-9 bg-background"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="pl-6">Auteur</TableHead>
+                <TableHead>Documents</TableHead>
+                <TableHead>Ventes</TableHead>
+                <TableHead>Revenus</TableHead>
+                <TableHead>Inscription</TableHead>
+                <TableHead className="text-right pr-6">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((author) => (
+                <TableRow key={author.id} className={`hover:bg-muted/30 ${author.is_blocked ? 'bg-red-500/5' : ''}`}>
+                  <TableCell className="pl-6">
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <div className="font-medium text-foreground">{author.full_name || "Sans nom"}</div>
+                        <div className="text-sm text-muted-foreground">{author.email}</div>
+                      </div>
+                      {author.is_blocked && (
+                        <Badge variant="destructive" className="text-xs">Bloqué</Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="font-mono">
+                      {author.total_documents || 0}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="font-mono">
+                      {author.total_sales || 0}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-medium text-gold">
+                      {(author.total_revenue || 0).toLocaleString()} CFA
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(author.created_at).toLocaleDateString("fr-FR")}
+                  </TableCell>
+                  <TableCell className="text-right pr-6">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>Gestion de l'auteur</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleBlockAuthor(author.id, author.is_blocked || false)}>
+                          <Ban className="h-4 w-4 mr-2" /> 
+                          {author.is_blocked ? "Débloquer" : "Bloquer"} l'auteur
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleResetAuthorPassword(author.email)}>
+                          <Lock className="h-4 w-4 mr-2" /> Réinitialiser mot de passe
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteDialog({ open: true, type: "author", id: author.id, title: author.email })}>
+                          <Trash2 className="h-4 w-4 mr-2" /> Supprimer l'auteur
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                    Aucun auteur trouvé
                   </TableCell>
                 </TableRow>
               )}
@@ -827,7 +987,8 @@ export default function AdminDashboard() {
 
   const navItems = [
     { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
-    { id: "users", label: "Utilisateurs", icon: Users },
+    { id: "visitors", label: "Utilisateurs", icon: Users },
+    { id: "authors", label: "Auteurs", icon: PenTool },
     { id: "documents", label: "Documents", icon: FileText, badge: stats?.pendingDocuments || 0 },
     { id: "reports", label: "Signalements", icon: AlertTriangle, badge: stats?.totalReports || 0, badgeColor: "bg-red-500" },
     { id: "transactions", label: "Transactions", icon: DollarSign },
@@ -919,7 +1080,8 @@ export default function AdminDashboard() {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-[1600px] mx-auto">
           {activeModule === "overview" && renderOverview()}
-          {activeModule === "users" && renderUsers()}
+          {activeModule === "visitors" && renderVisitors()}
+          {activeModule === "authors" && renderAuthors()}
           {activeModule === "documents" && renderDocuments()}
           {activeModule === "reports" && renderReports()}
           {activeModule === "transactions" && renderTransactions()}
@@ -934,7 +1096,7 @@ export default function AdminDashboard() {
               Confirmation de suppression
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base mt-2">
-              Vous êtes sur le point de supprimer définitivement {deleteDialog.type === "user" ? "l'utilisateur" : "le document"} : <br/>
+              Vous êtes sur le point de supprimer définitivement {deleteDialog.type === "visitor" ? "l'utilisateur" : deleteDialog.type === "author" ? "l'auteur" : "le document"} : <br/>
               <strong className="text-foreground mt-2 block p-2 bg-muted rounded-md">{deleteDialog.title}</strong>
               <br/>
               Cette action est irréversible et supprimera toutes les données associées.
@@ -944,8 +1106,10 @@ export default function AdminDashboard() {
             <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (deleteDialog.type === "user" && deleteDialog.id) {
-                  handleDeleteUser(deleteDialog.id);
+                if (deleteDialog.type === "visitor" && deleteDialog.id) {
+                  handleDeleteVisitor(deleteDialog.id);
+                } else if (deleteDialog.type === "author" && deleteDialog.id) {
+                  handleDeleteAuthor(deleteDialog.id);
                 } else if (deleteDialog.type === "document" && deleteDialog.id) {
                   handleDocumentAction(deleteDialog.id, "delete");
                 }
