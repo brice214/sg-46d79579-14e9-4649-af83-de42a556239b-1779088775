@@ -635,9 +635,9 @@ export default function DocumentPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {pdfUrl ? (
+                {currentUser ? (
                   <PDFViewer 
-                    fileUrl={pdfUrl} 
+                    fileUrl={pdfUrl || ""} 
                     hasAccess={isAdmin || hasAccess || document.price === 0}
                     onPurchase={document.price > 0 && !hasAccess ? handlePurchase : undefined}
                     documentTitle={document.title}
@@ -645,9 +645,7 @@ export default function DocumentPage() {
                 ) : (
                   <div className="bg-white/50 backdrop-blur rounded-lg p-8 border-2 border-dashed border-terre/30 text-center">
                     <p className="text-noir/60 mb-4">
-                      {currentUser 
-                        ? "Chargement du document..."
-                        : "Connectez-vous pour voir l'aperçu du document"}
+                      Connectez-vous pour voir l'aperçu du document
                     </p>
                   </div>
                 )}
