@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -300,8 +301,6 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    // Supabase auth.admin is required to fully delete users.
-    // As a workaround for client-side admin, we can disable the profile or just delete the profile record.
     const { error } = await supabase.from("profiles").delete().eq("id", userId);
     if (!error) {
       toast({ title: "Succès", description: "Utilisateur supprimé (profil)." });
@@ -317,7 +316,7 @@ export default function AdminDashboard() {
       toast({ title: "Succès", description: "Document supprimé." });
     } else {
       const is_approved = action === "approve";
-      const is_published = action === "approve"; // If rejected, we unpublish it
+      const is_published = action === "approve";
       
       await supabase.from("documents")
         .update({ is_approved, is_published })
@@ -332,10 +331,8 @@ export default function AdminDashboard() {
 
   const handleReportAction = async (reportId: string, documentId: string, action: "dismiss" | "remove_document") => {
     if (action === "remove_document") {
-      // Suspend the document
       await supabase.from("documents").update({ is_published: false, is_approved: false }).eq("id", documentId);
     }
-    // Update report status
     await supabase.from("reports").update({ status: "resolved" }).eq("id", reportId);
     
     toast({ title: "Succès", description: "Signalement traité." });
@@ -350,10 +347,10 @@ export default function AdminDashboard() {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs</CardTitle>
-              <Users className="h-4 w-4 text-blue-500" />
+              <Users className="h-5 w-5 text-blue-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-serif">{stats.totalUsers}</div>
@@ -364,10 +361,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Documents</CardTitle>
-              <FileText className="h-4 w-4 text-green-500" />
+              <FileText className="h-5 w-5 text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-serif">{stats.totalDocuments}</div>
@@ -378,10 +375,10 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Revenus (CFA/EUR)</CardTitle>
-              <DollarSign className="h-4 w-4 text-gold" />
+              <DollarSign className="h-5 w-5 text-gold" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-serif">{stats.totalRevenue.toLocaleString()}</div>
@@ -391,15 +388,15 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50">
+          <Card className="border-gold/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">À Traiter</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-serif text-orange-500">{stats.pendingDocuments + stats.totalReports}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.pendingDocuments} docs en attente • {stats.totalReports} signalements
+                {stats.pendingDocuments} docs • {stats.totalReports} signalements
               </p>
             </CardContent>
           </Card>
@@ -442,7 +439,7 @@ export default function AdminDashboard() {
             <CardContent className="relative z-10 p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
               <ShieldAlert className="h-12 w-12 text-gold mb-4" />
               <h3 className="text-2xl font-serif font-bold text-white mb-2">Super Administrateur</h3>
-              <p className="text-gold/80">Vous avez le contrôle total sur la plateforme AfriLitt. Modérez le contenu pour garantir l'excellence.</p>
+              <p className="text-gold/80">Vous avez le contrôle total sur AfriLitt. Modérez le contenu pour garantir l'excellence.</p>
             </CardContent>
           </Card>
         </div>
@@ -830,7 +827,6 @@ export default function AdminDashboard() {
     );
   }
 
-  // Define sidebar navigation items
   const navItems = [
     { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
     { id: "users", label: "Utilisateurs", icon: Users },
@@ -841,7 +837,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/20">
-      {/* Top Navbar for Admin */}
       <header className="sticky top-0 z-40 w-full border-b border-gold/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="flex h-16 items-center px-4 md:px-6 gap-4">
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden">
@@ -865,7 +860,6 @@ export default function AdminDashboard() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <aside className={`
           fixed md:sticky top-16 z-30 h-[calc(100vh-4rem)] w-64 shrink-0 
           border-r border-gold/10 bg-card transition-transform duration-300 ease-in-out
@@ -918,7 +912,6 @@ export default function AdminDashboard() {
           </div>
         </aside>
 
-        {/* Overlay for mobile sidebar */}
         {isSidebarOpen && (
           <div 
             className="fixed inset-0 z-20 bg-black/50 md:hidden"
@@ -926,7 +919,6 @@ export default function AdminDashboard() {
           />
         )}
 
-        {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-[1600px] mx-auto">
           {activeModule === "overview" && renderOverview()}
           {activeModule === "users" && renderUsers()}
@@ -936,7 +928,6 @@ export default function AdminDashboard() {
         </main>
       </div>
 
-      {/* Dialogs */}
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, type: null, id: null, title: "" })}>
         <AlertDialogContent className="border-red-500/20">
           <AlertDialogHeader>
