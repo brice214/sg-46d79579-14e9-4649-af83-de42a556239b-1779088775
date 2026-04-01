@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Search, Filter, BookOpen, User, Tag } from "lucide-react";
+import { Search, Filter, BookOpen, User, Tag, Eye, Download } from "lucide-react";
 import { documentService } from "@/services/documentService";
 import { categoryService } from "@/services/categoryService";
 import type { Database } from "@/integrations/supabase/types";
@@ -65,7 +65,7 @@ export default function Catalogue() {
       <Header />
 
       {/* Hero Section avec background */}
-      <section className="relative py-16 overflow-hidden border-b border-gold/20">
+      <section className="relative py-20 overflow-hidden border-b border-gold/20">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
@@ -75,10 +75,10 @@ export default function Catalogue() {
         
         <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
+            <h1 className="font-serif text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
               Catalogue de documents
             </h1>
-            <p className="text-lg text-gray-200 drop-shadow-md">
+            <p className="text-lg text-gold/90 drop-shadow-md">
               Découvrez {documents.length} documents publiés par des auteurs africains
             </p>
 
@@ -219,85 +219,100 @@ export default function Catalogue() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {filteredDocuments.map((doc) => (
                     <Link key={doc.id} href={`/documents/${doc.slug}`}>
-                      <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-gold/20 bg-gradient-to-br from-card to-gold/5 hover:border-gold/40 hover:scale-[1.02]">
-                        {/* Image de couverture */}
-                        <div className="relative h-48 bg-gradient-to-br from-earth/20 to-gold/20 overflow-hidden">
-                          {doc.cover_image_url ? (
-                            <img
-                              src={doc.cover_image_url}
-                              alt={doc.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <BookOpen className="h-16 w-16 text-gold/40" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                          
-                          {/* Badge prix */}
-                          <div className="absolute top-3 right-3">
-                            {Number(doc.price) === 0 ? (
-                              <Badge className="bg-forest/90 text-white backdrop-blur-sm shadow-lg">
-                                Gratuit
-                              </Badge>
+                      <Card className="group relative overflow-hidden border-2 border-gold/20 bg-gradient-to-br from-card via-card to-card/80 hover:border-gold/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-gold/20">
+                        {/* Background gradient on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-earth/10 to-gold/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        {/* Decorative elements */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl group-hover:bg-gold/10 transition-colors"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-earth/5 rounded-full blur-2xl group-hover:bg-earth/10 transition-colors"></div>
+
+                        <div className="relative">
+                          {/* Image de couverture */}
+                          <div className="relative h-56 bg-gradient-to-br from-earth/20 to-gold/20 overflow-hidden">
+                            {doc.cover_image_url ? (
+                              <img
+                                src={doc.cover_image_url}
+                                alt={doc.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
                             ) : (
-                              <Badge className="bg-gold/90 text-white backdrop-blur-sm shadow-lg">
-                                {Number(doc.price).toLocaleString()} {doc.currency}
-                              </Badge>
-                            )}
-                          </div>
-
-                          {/* Stats */}
-                          <div className="absolute bottom-3 left-3 flex gap-3 text-white text-sm">
-                            <span className="flex items-center gap-1 backdrop-blur-sm bg-black/30 px-2 py-1 rounded">
-                              <BookOpen className="h-3 w-3" />
-                              {doc.view_count || 0}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Contenu */}
-                        <div className="p-5">
-                          <div className="flex items-center gap-2 mb-3">
-                            {doc.categories && (
-                              <Badge variant="outline" className="border-earth/30 text-earth text-xs">
-                                {doc.categories.name}
-                              </Badge>
-                            )}
-                            <Badge variant="outline" className="border-gold/30 text-gold text-xs capitalize">
-                              {doc.document_type}
-                            </Badge>
-                          </div>
-
-                          <h3 className="font-semibold text-lg mb-2 group-hover:text-gold transition-colors line-clamp-2">
-                            {doc.title}
-                          </h3>
-
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                            {doc.description}
-                          </p>
-
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <User className="h-4 w-4" />
-                            <span>{doc.profiles?.full_name || "Auteur anonyme"}</span>
-                          </div>
-
-                          {doc.keywords && doc.keywords.length > 0 && (
-                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gold/10">
-                              <Tag className="h-3 w-3 text-muted-foreground" />
-                              <div className="flex flex-wrap gap-1">
-                                {doc.keywords.slice(0, 3).map((keyword, i) => (
-                                  <span key={i} className="text-xs text-muted-foreground">
-                                    {keyword}{i < Math.min(doc.keywords!.length, 3) - 1 ? ',' : ''}
-                                  </span>
-                                ))}
-                                {doc.keywords.length > 3 && (
-                                  <span className="text-xs text-muted-foreground">+{doc.keywords.length - 3}</span>
-                                )}
+                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-earth/30 to-gold/30">
+                                <BookOpen className="h-20 w-20 text-gold/40" />
                               </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                            
+                            {/* Badge prix */}
+                            <div className="absolute top-4 right-4">
+                              {Number(doc.price) === 0 ? (
+                                <Badge className="bg-forest text-white backdrop-blur-sm shadow-lg border-none px-3 py-1.5 font-semibold">
+                                  Gratuit
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-gradient-to-r from-gold to-amber-500 text-black backdrop-blur-sm shadow-lg border-none px-3 py-1.5 font-semibold">
+                                  {Number(doc.price).toLocaleString()} {doc.currency}
+                                </Badge>
+                              )}
                             </div>
-                          )}
+
+                            {/* Stats */}
+                            <div className="absolute bottom-4 left-4 flex gap-4 text-white text-sm">
+                              <span className="flex items-center gap-1.5 backdrop-blur-md bg-black/40 px-3 py-1.5 rounded-full border border-white/20">
+                                <Eye className="h-3.5 w-3.5" />
+                                <span className="font-medium">{doc.view_count || 0}</span>
+                              </span>
+                              <span className="flex items-center gap-1.5 backdrop-blur-md bg-black/40 px-3 py-1.5 rounded-full border border-white/20">
+                                <Download className="h-3.5 w-3.5" />
+                                <span className="font-medium">{doc.download_count || 0}</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Contenu */}
+                          <div className="p-6">
+                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                              {doc.categories && (
+                                <Badge variant="outline" className="border-earth/30 text-earth text-xs font-medium bg-earth/5">
+                                  {doc.categories.name}
+                                </Badge>
+                              )}
+                              <Badge variant="outline" className="border-gold/30 text-gold text-xs font-medium bg-gold/5 capitalize">
+                                {doc.document_type}
+                              </Badge>
+                            </div>
+
+                            <h3 className="font-serif text-xl font-bold mb-2 group-hover:text-gold transition-colors line-clamp-2 leading-tight">
+                              {doc.title}
+                            </h3>
+
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
+                              {doc.description}
+                            </p>
+
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground pt-3 border-t border-gold/10">
+                              <User className="h-4 w-4 text-gold" />
+                              <span className="font-medium">{doc.profiles?.full_name || "Auteur anonyme"}</span>
+                            </div>
+
+                            {doc.keywords && doc.keywords.length > 0 && (
+                              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gold/10">
+                                <Tag className="h-3.5 w-3.5 text-gold/60" />
+                                <div className="flex flex-wrap gap-1.5">
+                                  {doc.keywords.slice(0, 3).map((keyword, i) => (
+                                    <span key={i} className="text-xs text-muted-foreground bg-gold/5 px-2 py-0.5 rounded-full">
+                                      {keyword}
+                                    </span>
+                                  ))}
+                                  {doc.keywords.length > 3 && (
+                                    <span className="text-xs text-gold font-medium px-2 py-0.5">
+                                      +{doc.keywords.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </Card>
                     </Link>
