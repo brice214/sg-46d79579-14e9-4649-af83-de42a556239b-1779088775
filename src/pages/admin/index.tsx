@@ -218,8 +218,9 @@ export default function AdminDashboard() {
     subtitle: "",
     image_url: "",
     cta_text: "",
-    cta_url: "",
+    cta_link: "",
     display_order: 1,
+    is_active: true,
   });
 
   useEffect(() => {
@@ -501,7 +502,7 @@ export default function AdminDashboard() {
       toast({ title: "Succès", description: "Bannière créée." });
       loadBanners();
       setBannerDialog({ open: false, mode: "create", banner: null });
-      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: 1 });
+      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_link: "", display_order: 1, is_active: true });
     }
   };
 
@@ -513,7 +514,7 @@ export default function AdminDashboard() {
       toast({ title: "Succès", description: "Bannière mise à jour." });
       loadBanners();
       setBannerDialog({ open: false, mode: "create", banner: null });
-      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: 1 });
+      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_link: "", display_order: 1, is_active: true });
     }
   };
 
@@ -689,7 +690,7 @@ export default function AdminDashboard() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border-gold/20 shadow-md">
             <CardHeader>
-              <CardTitle className="font-serif">Actions Rapides</CardTitle>
+              <CardTitle className="font-serif text-2xl">Actions Rapides</CardTitle>
               <CardDescription>Gérez les urgences de la plateforme</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1150,7 +1151,7 @@ export default function AdminDashboard() {
                     {tx.id.split('-')[0]}...
                   </TableCell>
                   <TableCell>
-                    {new Date(tx.created_at).toLocaleDateString("fr-FR", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(tx.created_at).toLocaleDateString("fr-FR", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' } as any)}
                   </TableCell>
                   <TableCell>
                     <div className="font-medium truncate max-w-[250px]">{tx.document?.title || "N/A"}</div>
@@ -1480,7 +1481,7 @@ export default function AdminDashboard() {
                 <CardDescription>Personnalisez les bannières de la page d'accueil</CardDescription>
               </div>
               <Button onClick={() => {
-                setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: banners.length + 1 });
+                setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_link: "", display_order: banners.length + 1, is_active: true });
                 setBannerDialog({ open: true, mode: "create", banner: null });
               }}>
                 <Plus className="h-4 w-4 mr-2" /> Nouvelle bannière
@@ -1507,7 +1508,7 @@ export default function AdminDashboard() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-muted-foreground">
-                        CTA: {banner.cta_text} → {banner.cta_url}
+                        CTA: {banner.cta_text} → {banner.cta_link}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -1524,10 +1525,11 @@ export default function AdminDashboard() {
                             setBannerForm({
                               title: banner.title,
                               subtitle: banner.subtitle || "",
-                              image_url: banner.image_url,
+                              image_url: banner.image_url || "",
                               cta_text: banner.cta_text || "",
-                              cta_url: banner.cta_url || "",
+                              cta_link: banner.cta_link || "",
                               display_order: banner.display_order || 1,
+                              is_active: banner.is_active ?? true,
                             });
                             setBannerDialog({ open: true, mode: "edit", banner });
                           }}>
@@ -1846,8 +1848,8 @@ export default function AdminDashboard() {
                 <Label htmlFor="banner-url">Lien du CTA</Label>
                 <Input
                   id="banner-url"
-                  value={bannerForm.cta_url}
-                  onChange={(e) => setBannerForm({ ...bannerForm, cta_url: e.target.value })}
+                  value={bannerForm.cta_link}
+                  onChange={(e) => setBannerForm({ ...bannerForm, cta_link: e.target.value })}
                   placeholder="/catalogue, /categories..."
                 />
               </div>
