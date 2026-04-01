@@ -75,7 +75,10 @@ export function Header() {
           <Link href="/categories" className="text-sm font-medium hover:text-gold transition-colors">
             Catégories
           </Link>
-          <Link href="/about" className="text-sm font-medium hover:text-gold transition-colors">
+          <Link 
+            href="/a-propos" 
+            className="text-sm font-medium text-foreground/80 hover:text-gold transition-colors"
+          >
             À propos
           </Link>
         </nav>

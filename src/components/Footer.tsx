@@ -70,26 +70,22 @@ export function Footer() {
 
           {/* Colonne 3 : Ressources */}
           <div>
-            <h3 className="font-semibold mb-4 text-gold">Ressources</h3>
-            <ul className="space-y-3">
+            <h3 className="font-serif text-lg font-semibold mb-4 text-gold">À propos</h3>
+            <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-                  À propos
+                <Link 
+                  href="/a-propos" 
+                  className="text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  Notre histoire
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/support" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-                  Support
+                <Link 
+                  href="/a-propos" 
+                  className="text-sm text-muted-foreground hover:text-gold transition-colors"
+                >
+                  Notre mission
                 </Link>
               </li>
             </ul>
