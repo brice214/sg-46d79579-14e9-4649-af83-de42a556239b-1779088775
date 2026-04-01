@@ -132,18 +132,15 @@ export default function DocumentPage() {
         setHasAccess(userHasAccess);
       }
 
-      // Load PDF URL for viewer (admin always has access)
-      if (currentUser && (isAdmin || userHasAccess || doc.price === 0)) {
+      // Load PDF URL for viewer - ALWAYS load for preview (even for paid docs)
+      if (currentUser && doc.file_url) {
         // Extract relative path from full URL if needed
         let filePath = doc.file_url;
-        
-        console.log("Original file_url:", filePath);
         
         // If file_url contains full URL, extract the path after /documents/
         if (filePath.includes("/storage/v1/object/public/documents/")) {
           const parts = filePath.split("/storage/v1/object/public/documents/");
           filePath = parts[1];
-          console.log("Extracted path:", filePath);
         }
         
         const { data, error } = await supabase.storage
@@ -153,7 +150,6 @@ export default function DocumentPage() {
         if (error) {
           console.error("Error creating signed URL:", error);
         } else if (data?.signedUrl) {
-          console.log("Generated signed URL:", data.signedUrl);
           setPdfUrl(data.signedUrl);
         }
       }
