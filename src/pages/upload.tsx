@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryService } from "@/services/categoryService";
 import { documentService } from "@/services/documentService";
-import { Upload as UploadIcon, FileText, AlertCircle, CheckCircle2, Upload } from "lucide-react";
+import { Upload as UploadIcon, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import type { Category } from "@/services/categoryService";
 
@@ -535,7 +535,7 @@ export default function Upload() {
                       </>
                     ) : (
                       <>
-                        <Upload className="mr-2 h-5 w-5" />
+                        <UploadIcon className="mr-2 h-5 w-5" />
                         Publier le document
                       </>
                     )}
