@@ -75,7 +75,8 @@ export default function CategoryPage() {
       "Économie": "📊",
       "Éducation": "🎓",
       "Arts": "🎨",
-      "Droit": "⚖️"
+      "Droit": "⚖️",
+      "Affaires": "💼"
     };
     return iconMap[name] || "📖";
   };
