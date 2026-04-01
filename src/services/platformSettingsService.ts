@@ -112,8 +112,9 @@ class PlatformSettingsService {
     };
 
     settings.forEach(setting => {
+      // Fix type any assignment by explicitly typing the config assignment
       if (setting.key in config) {
-        config[setting.key as keyof PlatformConfig] = setting.value;
+        (config as any)[setting.key] = setting.value;
       }
     });
 

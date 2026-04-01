@@ -4,10 +4,10 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
-  description?: string;
-  icon?: string;
-  display_order?: number;
-  is_active?: boolean;
+  description: string | null;
+  icon: string | null;
+  display_order: number | null;
+  is_active: boolean | null;
   created_at: string;
 }
 
@@ -101,7 +101,7 @@ class CategoryService {
   async getCategoryDocumentCount(categoryId: string): Promise<number> {
     const { count, error } = await supabase
       .from("documents")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact", head: true })
       .eq("category_id", categoryId)
       .eq("status", "published");
 
