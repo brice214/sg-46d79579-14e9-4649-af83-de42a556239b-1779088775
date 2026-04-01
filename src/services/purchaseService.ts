@@ -107,7 +107,7 @@ export const purchaseService = {
 
   async getUserPurchases(userId: string) {
     const { data, error } = await supabase
-      .from("document_access")
+      .from("purchases")
       .select("document_id")
       .eq("user_id", userId);
 

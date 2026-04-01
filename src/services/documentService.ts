@@ -109,10 +109,11 @@ export const documentService = {
       .from("documents")
       .select(`
         *,
-        profiles (full_name),
-        categories (name)
+        profiles!documents_author_id_fkey(full_name),
+        categories(name)
       `)
-      .eq("status", "published")
+      .eq("is_published", true)
+      .eq("is_approved", true)
       .gt("price", 0)
       .order("created_at", { ascending: false })
       .limit(limit);
