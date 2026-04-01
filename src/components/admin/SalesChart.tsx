@@ -26,8 +26,8 @@ export function SalesChart() {
     return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
   };
 
-  const totalRevenue = salesData.reduce((sum, d) => sum + d.total_revenue, 0);
-  const totalSales = salesData.reduce((sum, d) => sum + d.total_sales, 0);
+  const totalRevenue = salesData.reduce((sum, d) => sum + Number(d.total_revenue || 0), 0);
+  const totalSales = salesData.reduce((sum, d) => sum + Number(d.total_sales || 0), 0);
 
   return (
     <Card className="border-gold/20 shadow-lg">
@@ -95,12 +95,13 @@ export function SalesChart() {
                   />
                   <YAxis stroke="#6b7280" />
                   <Tooltip 
-                    formatter={(value: number, name: string) => {
-                      if (name === "total_revenue") return [`${value.toLocaleString()} CFA`, "Revenus commission"];
-                      if (name === "total_sales") return [`${value.toLocaleString()} CFA`, "Ventes totales"];
-                      return [value, name];
+                    formatter={(value: any, name: string) => {
+                      const numValue = Number(value || 0);
+                      if (name === "total_revenue") return [`${numValue.toLocaleString()} CFA`, "Revenus commission"];
+                      if (name === "total_sales") return [`${numValue.toLocaleString()} CFA`, "Ventes totales"];
+                      return [`${numValue.toLocaleString()}`, String(name)];
                     }}
-                    labelFormatter={(label) => formatDate(label)}
+                    labelFormatter={(label) => formatDate(String(label))}
                     contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #D4AF37" }}
                   />
                   <Legend />

@@ -52,10 +52,10 @@ export function TopDocumentsChart() {
                   width={200}
                   stroke="#6b7280"
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => value.length > 25 ? value.substring(0, 25) + "..." : value}
+                  tickFormatter={(value) => String(value).length > 25 ? String(value).substring(0, 25) + "..." : String(value)}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`${value.toLocaleString()} CFA`, "Revenus"]}
+                  formatter={(value: any) => [`${Number(value || 0).toLocaleString()} CFA`, "Revenus"]}
                   contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #D4AF37" }}
                 />
                 <Bar dataKey="total_revenue" radius={[0, 8, 8, 0]}>
@@ -79,8 +79,8 @@ export function TopDocumentsChart() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="font-mono">{doc.total_sales} ventes</Badge>
-                    <p className="font-bold text-gold">{doc.total_revenue.toLocaleString()} CFA</p>
+                    <Badge variant="outline" className="font-mono">{Number(doc.total_sales || 0)} ventes</Badge>
+                    <p className="font-bold text-gold">{Number(doc.total_revenue || 0).toLocaleString()} CFA</p>
                   </div>
                 </div>
               ))}

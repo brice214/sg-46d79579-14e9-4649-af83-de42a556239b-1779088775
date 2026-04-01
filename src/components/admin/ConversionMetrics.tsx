@@ -19,24 +19,24 @@ export function ConversionMetrics() {
       analyticsService.getConversionRate(),
       analyticsService.getMonthlyRevenue(6)
     ]);
-    setConversionRate(rate);
+    setConversionRate(Number(rate || 0));
     setMonthlyRevenue(revenue);
     setLoading(false);
   };
 
   const pieData = [
-    { name: "Visiteurs convertis", value: conversionRate, color: "#D4AF37" },
-    { name: "Visiteurs non-convertis", value: 100 - conversionRate, color: "#e5e7eb" }
+    { name: "Visiteurs convertis", value: Number(conversionRate || 0), color: "#D4AF37" },
+    { name: "Visiteurs non-convertis", value: 100 - Number(conversionRate || 0), color: "#e5e7eb" }
   ];
 
   const formatMonth = (monthStr: string) => {
-    const [year, month] = monthStr.split("-");
+    const [year, month] = String(monthStr).split("-");
     const date = new Date(Number(year), Number(month) - 1);
     return date.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
   };
 
   const latestMonthRevenue = monthlyRevenue[monthlyRevenue.length - 1];
-  const totalRevenue = monthlyRevenue.reduce((sum, m) => sum + m.total_revenue, 0);
+  const totalRevenue = monthlyRevenue.reduce((sum, m) => sum + Number(m.total_revenue || 0), 0);
   const avgMonthlyRevenue = monthlyRevenue.length > 0 ? totalRevenue / monthlyRevenue.length : 0;
 
   return (
@@ -73,12 +73,12 @@ export function ConversionMetrics() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => `${value.toFixed(2)}%`} />
+                      <Tooltip formatter={(value: any) => `${Number(value || 0).toFixed(2)}%`} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-4xl font-bold text-gold">{conversionRate.toFixed(1)}%</p>
+                      <p className="text-4xl font-bold text-gold">{Number(conversionRate || 0).toFixed(1)}%</p>
                       <p className="text-xs text-muted-foreground">Conversion</p>
                     </div>
                   </div>
@@ -98,7 +98,7 @@ export function ConversionMetrics() {
                     <ShoppingCart className="h-5 w-5 text-gold" />
                     <span className="text-sm font-medium">Acheteurs</span>
                   </div>
-                  <span className="font-bold text-gold">{conversionRate.toFixed(1)}%</span>
+                  <span className="font-bold text-gold">{Number(conversionRate || 0).toFixed(1)}%</span>
                 </div>
               </div>
 
@@ -138,7 +138,7 @@ export function ConversionMetrics() {
                 <div className="bg-gradient-to-br from-gold/10 to-gold/5 p-4 rounded-xl border border-gold/20">
                   <p className="text-xs text-muted-foreground mb-1">Mois actuel</p>
                   <p className="text-2xl font-bold text-gold">
-                    {latestMonthRevenue ? latestMonthRevenue.total_revenue.toLocaleString() : 0} CFA
+                    {latestMonthRevenue ? Number(latestMonthRevenue.total_revenue || 0).toLocaleString() : 0} CFA
                   </p>
                 </div>
                 <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 p-4 rounded-xl border border-blue-500/20">
@@ -150,15 +150,16 @@ export function ConversionMetrics() {
               </div>
 
               <div className="space-y-2">
-                {monthlyRevenue.slice(-6).reverse().map((month, index) => {
-                  const maxRevenue = Math.max(...monthlyRevenue.map(m => m.total_revenue));
-                  const percentage = (month.total_revenue / maxRevenue) * 100;
+                {monthlyRevenue.slice(-6).reverse().map((month) => {
+                  const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.total_revenue || 0)));
+                  const monthRevenue = Number(month.total_revenue || 0);
+                  const percentage = maxRevenue > 0 ? (monthRevenue / maxRevenue) * 100 : 0;
                   
                   return (
                     <div key={month.month}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium">{formatMonth(month.month)}</span>
-                        <span className="text-sm font-bold text-gold">{month.total_revenue.toLocaleString()} CFA</span>
+                        <span className="text-sm font-bold text-gold">{monthRevenue.toLocaleString()} CFA</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div 
@@ -167,8 +168,8 @@ export function ConversionMetrics() {
                         />
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>Commission: {month.commission_revenue.toLocaleString()} CFA</span>
-                        <span>Auteurs: {month.author_revenue.toLocaleString()} CFA</span>
+                        <span>Commission: {Number(month.commission_revenue || 0).toLocaleString()} CFA</span>
+                        <span>Auteurs: {Number(month.author_revenue || 0).toLocaleString()} CFA</span>
                       </div>
                     </div>
                   );

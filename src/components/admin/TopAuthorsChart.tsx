@@ -22,7 +22,7 @@ export function TopAuthorsChart() {
   };
 
   const getInitials = (name: string) => {
-    return name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+    return String(name).split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
   };
 
   return (
@@ -55,14 +55,15 @@ export function TopAuthorsChart() {
                   angle={-45}
                   textAnchor="end"
                   height={100}
-                  tickFormatter={(value) => value.length > 15 ? value.substring(0, 15) + "..." : value}
+                  tickFormatter={(value) => String(value).length > 15 ? String(value).substring(0, 15) + "..." : String(value)}
                 />
                 <YAxis stroke="#6b7280" />
                 <Tooltip 
-                  formatter={(value: number, name: string) => {
-                    if (name === "total_revenue") return [`${value.toLocaleString()} CFA`, "Revenus"];
-                    if (name === "total_documents") return [value, "Documents"];
-                    return [value, name];
+                  formatter={(value: any, name: string) => {
+                    const numValue = Number(value || 0);
+                    if (name === "total_revenue") return [`${numValue.toLocaleString()} CFA`, "Revenus"];
+                    if (name === "total_documents") return [numValue, "Documents"];
+                    return [numValue, String(name)];
                   }}
                   contentStyle={{ backgroundColor: "rgba(255, 255, 255, 0.95)", border: "1px solid #D4AF37" }}
                 />
@@ -90,16 +91,16 @@ export function TopAuthorsChart() {
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-1 text-xs">
                         <Users className="h-3 w-3 text-blue-500" />
-                        <span className="text-muted-foreground">{author.total_documents} docs</span>
+                        <span className="text-muted-foreground">{Number(author.total_documents || 0)} docs</span>
                       </div>
                       <div className="flex items-center gap-1 text-xs">
                         <TrendingUp className="h-3 w-3 text-green-500" />
-                        <span className="text-muted-foreground">{author.total_sales} ventes</span>
+                        <span className="text-muted-foreground">{Number(author.total_sales || 0)} ventes</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gold text-lg">{author.total_revenue.toLocaleString()}</p>
+                    <p className="font-bold text-gold text-lg">{Number(author.total_revenue || 0).toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">CFA</p>
                   </div>
                 </div>
