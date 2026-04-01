@@ -774,7 +774,7 @@ export default function DocumentPage() {
                     <ShoppingCart className="h-6 w-6" />
                     <span className="text-lg font-bold">Mobile Money</span>
                   </div>
-                  <span className="text-sm text-white/80">Orange Money, MTN Money, Moov Money</span>
+                  <span className="text-sm text-white/80">Airtel Money, Moov Money, Orange Money, MTN Money</span>
                 </div>
               </Button>
 
