@@ -754,7 +754,7 @@ export default function DocumentPage() {
 
         {/* Payment Method Dialog */}
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-noir">Choisir un moyen de paiement</DialogTitle>
               <DialogDescription className="text-noir/60">
@@ -762,56 +762,53 @@ export default function DocumentPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-3 py-4">
+            <div className="space-y-4 py-6">
               {/* Mobile Money */}
-              <Button
+              <button
                 onClick={() => handlePaymentMethodSelect("mobile_money")}
-                className="w-full h-auto py-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
-                size="lg"
+                className="w-full p-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
               >
-                <div className="flex flex-col items-start w-full">
-                  <div className="flex items-center gap-3 mb-1">
-                    <ShoppingCart className="h-6 w-6" />
-                    <span className="text-lg font-bold">Mobile Money</span>
-                  </div>
-                  <span className="text-sm text-white/80">Airtel Money, Moov Money, Orange Money, MTN Money</span>
+                <div className="flex items-center gap-3 mb-2">
+                  <ShoppingCart className="h-6 w-6" />
+                  <span className="text-xl font-bold">Mobile Money</span>
                 </div>
-              </Button>
+                <p className="text-sm text-white/90 ml-9">
+                  Airtel Money, Moov Money, Orange Money, MTN Money
+                </p>
+              </button>
 
               {/* Stripe */}
-              <Button
+              <button
                 onClick={() => handlePaymentMethodSelect("stripe")}
-                className="w-full h-auto py-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
-                size="lg"
+                className="w-full p-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
               >
-                <div className="flex flex-col items-start w-full">
-                  <div className="flex items-center gap-3 mb-1">
-                    <ShoppingCart className="h-6 w-6" />
-                    <span className="text-lg font-bold">Stripe (Link)</span>
-                  </div>
-                  <span className="text-sm text-white/80">Carte bancaire, Apple Pay, Google Pay</span>
+                <div className="flex items-center gap-3 mb-2">
+                  <ShoppingCart className="h-6 w-6" />
+                  <span className="text-xl font-bold">Stripe (Link)</span>
                 </div>
-              </Button>
+                <p className="text-sm text-white/90 ml-9">
+                  Carte bancaire, Apple Pay, Google Pay
+                </p>
+              </button>
 
               {/* PayPal */}
-              <Button
+              <button
                 onClick={() => handlePaymentMethodSelect("paypal")}
-                className="w-full h-auto py-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-                size="lg"
+                className="w-full p-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
               >
-                <div className="flex flex-col items-start w-full">
-                  <div className="flex items-center gap-3 mb-1">
-                    <ShoppingCart className="h-6 w-6" />
-                    <span className="text-lg font-bold">PayPal</span>
-                  </div>
-                  <span className="text-sm text-white/80">Compte PayPal ou carte bancaire</span>
+                <div className="flex items-center gap-3 mb-2">
+                  <ShoppingCart className="h-6 w-6" />
+                  <span className="text-xl font-bold">PayPal</span>
                 </div>
-              </Button>
+                <p className="text-sm text-white/90 ml-9">
+                  Compte PayPal ou carte bancaire
+                </p>
+              </button>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-noir/60 bg-amber-50 p-3 rounded-lg border border-terre/20">
-              <Check className="h-4 w-4 text-foret" />
-              <span>Paiement sécurisé • Accès immédiat</span>
+            <div className="flex items-center justify-center gap-2 text-sm text-noir/70 bg-green-50 p-4 rounded-lg border border-green-200">
+              <Check className="h-5 w-5 text-green-600" />
+              <span className="font-medium">Paiement sécurisé • Accès immédiat</span>
             </div>
           </DialogContent>
         </Dialog>
