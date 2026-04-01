@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2, ShoppingCart, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-// Configure PDF.js worker - use unpkg with version that matches our package
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
+// Configure PDF.js worker - use local file to avoid CORS issues
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 interface PDFViewerProps {
   fileUrl: string;
