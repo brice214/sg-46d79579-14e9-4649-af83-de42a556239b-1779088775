@@ -1501,140 +1501,593 @@ export default function AdminDashboard() {
   const renderSettings = () => {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
-        <Card className="border-gold/20 shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-serif text-2xl flex items-center gap-2">
-              <Settings className="h-6 w-6 text-gold" />
-              Configuration de la plateforme
-            </CardTitle>
-            <CardDescription>Gérez les paramètres globaux d'AfriLitt</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            {/* Payment Settings */}
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">💳 Paramètres de paiement</h3>
-                <p className="text-sm text-muted-foreground mb-4">Configurez les méthodes de paiement et les commissions</p>
-              </div>
-              
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="commission">Taux de commission plateforme (%)</Label>
-                  <Input
-                    id="commission"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={String(commissionRate)}
-                    onChange={(e) => setCommissionRate(Number(e.target.value))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Commission prélevée sur chaque vente (actuellement {String(commissionRate)}%)
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="mobile-money">Mobile Money</Label>
-                    <input
-                      id="mobile-money"
-                      type="checkbox"
-                      checked={Boolean(mobileMoneyEnabled)}
-                      onChange={(e) => setMobileMoneyEnabled(e.target.checked)}
-                      className="h-4 w-4"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="card-payment">Carte bancaire</Label>
-                    <input
-                      id="card-payment"
-                      type="checkbox"
-                      checked={Boolean(cardPaymentEnabled)}
-                      onChange={(e) => setCardPaymentEnabled(e.target.checked)}
-                      className="h-4 w-4"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Branding */}
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">🎨 Identité visuelle</h3>
-                <p className="text-sm text-muted-foreground mb-4">Personnalisez l'apparence de la plateforme</p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="platform-name">Nom de la plateforme</Label>
-                  <Input
-                    id="platform-name"
-                    value={String(platformName)}
-                    onChange={(e) => setPlatformName(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="primary-color">Couleur primaire</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="primary-color"
-                      type="color"
-                      value={String(primaryColor)}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-20"
-                    />
-                    <Input
-                      value={String(primaryColor)}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="flex-1 font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Legal */}
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">⚖️ Mentions légales</h3>
-                <p className="text-sm text-muted-foreground mb-4">Conditions d'utilisation et politique de confidentialité</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="terms">Conditions Générales d'Utilisation (CGU)</Label>
-                  <Textarea
-                    id="terms"
-                    rows={6}
-                    value={String(termsOfService)}
-                    onChange={(e) => setTermsOfService(e.target.value)}
-                    placeholder="Rédigez vos CGU..."
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="privacy">Politique de confidentialité</Label>
-                  <Textarea
-                    id="privacy"
-                    rows={6}
-                    value={String(privacyPolicy)}
-                    onChange={(e) => setPrivacyPolicy(e.target.value)}
-                    placeholder="Rédigez votre politique de confidentialité..."
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-4 border-t">
-              <Button onClick={handleSavePlatformSettings} size="lg">
-                <Save className="h-4 w-4 mr-2" />
-                Enregistrer la configuration
+        {/* Tab Navigation */}
+        <Card className="border-gold/20">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={settingsSubTab === "general" ? "default" : "outline"}
+                onClick={() => setSettingsSubTab("general")}
+                size="sm"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Général
+              </Button>
+              <Button
+                variant={settingsSubTab === "seo" ? "default" : "outline"}
+                onClick={() => setSettingsSubTab("seo")}
+                size="sm"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                SEO
+              </Button>
+              <Button
+                variant={settingsSubTab === "smtp" ? "default" : "outline"}
+                onClick={() => setSettingsSubTab("smtp")}
+                size="sm"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                SMTP
+              </Button>
+              <Button
+                variant={settingsSubTab === "payment" ? "default" : "outline"}
+                onClick={() => setSettingsSubTab("payment")}
+                size="sm"
+              >
+                <DollarSign className="h-4 w-4 mr-2" />
+                Paiement
+              </Button>
+              <Button
+                variant={settingsSubTab === "security" ? "default" : "outline"}
+                onClick={() => setSettingsSubTab("security")}
+                size="sm"
+              >
+                <ShieldAlert className="h-4 w-4 mr-2" />
+                Sécurité
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* General Settings */}
+        {settingsSubTab === "general" && (
+          <Card className="border-gold/20 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <Settings className="h-6 w-6 text-gold" />
+                Configuration générale
+              </CardTitle>
+              <CardDescription>Paramètres de base de la plateforme</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Payment Settings */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">💳 Paramètres de paiement</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Configurez les méthodes de paiement et les commissions</p>
+                </div>
+                
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="commission">Taux de commission plateforme (%)</Label>
+                    <Input
+                      id="commission"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={String(commissionRate)}
+                      onChange={(e) => setCommissionRate(Number(e.target.value))}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Commission prélevée sur chaque vente (actuellement {String(commissionRate)}%)
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="mobile-money">Mobile Money</Label>
+                      <input
+                        id="mobile-money"
+                        type="checkbox"
+                        checked={Boolean(mobileMoneyEnabled)}
+                        onChange={(e) => setMobileMoneyEnabled(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="card-payment">Carte bancaire</Label>
+                      <input
+                        id="card-payment"
+                        type="checkbox"
+                        checked={Boolean(cardPaymentEnabled)}
+                        onChange={(e) => setCardPaymentEnabled(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Branding */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">🎨 Identité visuelle</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Personnalisez l'apparence de la plateforme</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="platform-name">Nom de la plateforme</Label>
+                    <Input
+                      id="platform-name"
+                      value={String(platformName)}
+                      onChange={(e) => setPlatformName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="primary-color">Couleur primaire</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="primary-color"
+                        type="color"
+                        value={String(primaryColor)}
+                        onChange={(e) => setPrimaryColor(e.target.value)}
+                        className="w-20"
+                      />
+                      <Input
+                        value={String(primaryColor)}
+                        onChange={(e) => setPrimaryColor(e.target.value)}
+                        className="flex-1 font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legal */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">⚖️ Mentions légales</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Conditions d'utilisation et politique de confidentialité</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="terms">Conditions Générales d'Utilisation (CGU)</Label>
+                    <Textarea
+                      id="terms"
+                      rows={6}
+                      value={String(termsOfService)}
+                      onChange={(e) => setTermsOfService(e.target.value)}
+                      placeholder="Rédigez vos CGU..."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="privacy">Politique de confidentialité</Label>
+                    <Textarea
+                      id="privacy"
+                      rows={6}
+                      value={String(privacyPolicy)}
+                      onChange={(e) => setPrivacyPolicy(e.target.value)}
+                      placeholder="Rédigez votre politique de confidentialité..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSavePlatformSettings} size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* SEO Settings */}
+        {settingsSubTab === "seo" && (
+          <Card className="border-gold/20 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <TrendingUp className="h-6 w-6 text-gold" />
+                Configuration SEO
+              </CardTitle>
+              <CardDescription>Optimisez le référencement de votre plateforme</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="site-title">Titre du site</Label>
+                  <Input
+                    id="site-title"
+                    value={String(siteTitle)}
+                    onChange={(e) => setSiteTitle(e.target.value)}
+                    placeholder="AfriLitt - Plateforme de Documents Africains"
+                  />
+                  <p className="text-xs text-muted-foreground">Apparaît dans les onglets et résultats de recherche</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="site-description">Description du site</Label>
+                  <Textarea
+                    id="site-description"
+                    rows={3}
+                    value={String(siteDescription)}
+                    onChange={(e) => setSiteDescription(e.target.value)}
+                    placeholder="Une courte description de votre plateforme..."
+                  />
+                  <p className="text-xs text-muted-foreground">160 caractères max pour un bon référencement</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="site-keywords">Mots-clés (séparés par des virgules)</Label>
+                  <Input
+                    id="site-keywords"
+                    value={String(siteKeywords)}
+                    onChange={(e) => setSiteKeywords(e.target.value)}
+                    placeholder="afrique, littérature, documents, culture"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="og-image">Image Open Graph (URL)</Label>
+                  <Input
+                    id="og-image"
+                    value={String(ogImage)}
+                    onChange={(e) => setOgImage(e.target.value)}
+                    placeholder="https://example.com/og-image.jpg"
+                  />
+                  <p className="text-xs text-muted-foreground">Image affichée lors du partage sur les réseaux sociaux (1200x630px recommandé)</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="twitter-handle">Compte Twitter</Label>
+                  <Input
+                    id="twitter-handle"
+                    value={String(twitterHandle)}
+                    onChange={(e) => setTwitterHandle(e.target.value)}
+                    placeholder="@afrilitt"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSavePlatformSettings} size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* SMTP Settings */}
+        {settingsSubTab === "smtp" && (
+          <Card className="border-gold/20 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-gold" />
+                Configuration SMTP
+              </CardTitle>
+              <CardDescription>Configurez l'envoi d'emails automatiques</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 <strong>Astuce :</strong> Utilisez Gmail, SendGrid, Mailgun ou AWS SES pour l'envoi d'emails.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-host">Serveur SMTP</Label>
+                  <Input
+                    id="smtp-host"
+                    value={String(smtpHost)}
+                    onChange={(e) => setSmtpHost(e.target.value)}
+                    placeholder="smtp.gmail.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-port">Port SMTP</Label>
+                  <Input
+                    id="smtp-port"
+                    value={String(smtpPort)}
+                    onChange={(e) => setSmtpPort(e.target.value)}
+                    placeholder="587"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-user">Nom d'utilisateur</Label>
+                  <Input
+                    id="smtp-user"
+                    value={String(smtpUser)}
+                    onChange={(e) => setSmtpUser(e.target.value)}
+                    placeholder="votre-email@gmail.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-password">Mot de passe</Label>
+                  <Input
+                    id="smtp-password"
+                    type="password"
+                    value={String(smtpPassword)}
+                    onChange={(e) => setSmtpPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-from-email">Email d'envoi</Label>
+                  <Input
+                    id="smtp-from-email"
+                    value={String(smtpFromEmail)}
+                    onChange={(e) => setSmtpFromEmail(e.target.value)}
+                    placeholder="noreply@afrilitt.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="smtp-from-name">Nom d'affichage</Label>
+                  <Input
+                    id="smtp-from-name"
+                    value={String(smtpFromName)}
+                    onChange={(e) => setSmtpFromName(e.target.value)}
+                    placeholder="AfriLitt"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSavePlatformSettings} size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Payment Settings */}
+        {settingsSubTab === "payment" && (
+          <Card className="border-gold/20 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <DollarSign className="h-6 w-6 text-gold" />
+                Configuration de Paiement
+              </CardTitle>
+              <CardDescription>Clés API des prestataires de paiement</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Mobile Money */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">📱 Mobile Money</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Clés API pour les opérateurs africains</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mtn-api">MTN Mobile Money API Key</Label>
+                    <Input
+                      id="mtn-api"
+                      type="password"
+                      value={String(mtnApiKey)}
+                      onChange={(e) => setMtnApiKey(e.target.value)}
+                      placeholder="mtn_live_xxxxxxxxxxxx"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="orange-api">Orange Money API Key</Label>
+                    <Input
+                      id="orange-api"
+                      type="password"
+                      value={String(orangeApiKey)}
+                      onChange={(e) => setOrangeApiKey(e.target.value)}
+                      placeholder="orange_live_xxxxxxxxxxxx"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="moov-api">Moov Money API Key</Label>
+                    <Input
+                      id="moov-api"
+                      type="password"
+                      value={String(moovApiKey)}
+                      onChange={(e) => setMoovApiKey(e.target.value)}
+                      placeholder="moov_live_xxxxxxxxxxxx"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Card Payment */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">💳 Paiement par carte</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Configuration Stripe</p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="stripe-public">Clé publique Stripe</Label>
+                    <Input
+                      id="stripe-public"
+                      value={String(stripePublicKey)}
+                      onChange={(e) => setStripePublicKey(e.target.value)}
+                      placeholder="pk_live_xxxxxxxxxxxx"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stripe-secret">Clé secrète Stripe</Label>
+                    <Input
+                      id="stripe-secret"
+                      type="password"
+                      value={String(stripeSecretKey)}
+                      onChange={(e) => setStripeSecretKey(e.target.value)}
+                      placeholder="sk_live_xxxxxxxxxxxx"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <div>
+                    <Label htmlFor="test-mode">Mode Test</Label>
+                    <p className="text-xs text-muted-foreground">Utilisez les clés de test pour les essais</p>
+                  </div>
+                  <input
+                    id="test-mode"
+                    type="checkbox"
+                    checked={Boolean(paymentTestMode)}
+                    onChange={(e) => setPaymentTestMode(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSavePlatformSettings} size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Security Settings */}
+        {settingsSubTab === "security" && (
+          <Card className="border-gold/20 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                <ShieldAlert className="h-6 w-6 text-gold" />
+                Configuration de Sécurité
+              </CardTitle>
+              <CardDescription>Protégez votre plateforme contre les abus</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* CAPTCHA */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">🤖 Protection Anti-Bot (CAPTCHA)</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Google reCAPTCHA v3</p>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg mb-4">
+                  <div>
+                    <Label htmlFor="captcha-enabled">Activer CAPTCHA</Label>
+                    <p className="text-xs text-muted-foreground">Protection sur les formulaires sensibles</p>
+                  </div>
+                  <input
+                    id="captcha-enabled"
+                    type="checkbox"
+                    checked={Boolean(captchaEnabled)}
+                    onChange={(e) => setCaptchaEnabled(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                </div>
+
+                {captchaEnabled && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="captcha-site">Site Key (publique)</Label>
+                      <Input
+                        id="captcha-site"
+                        value={String(captchaSiteKey)}
+                        onChange={(e) => setCaptchaSiteKey(e.target.value)}
+                        placeholder="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="captcha-secret">Secret Key</Label>
+                      <Input
+                        id="captcha-secret"
+                        type="password"
+                        value={String(captchaSecretKey)}
+                        onChange={(e) => setCaptchaSecretKey(e.target.value)}
+                        placeholder="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Rate Limiting */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">⏱️ Limitation de débit</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Prévenir les abus API</p>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg mb-4">
+                  <div>
+                    <Label htmlFor="rate-limit-enabled">Activer Rate Limiting</Label>
+                    <p className="text-xs text-muted-foreground">Limite les requêtes par minute</p>
+                  </div>
+                  <input
+                    id="rate-limit-enabled"
+                    type="checkbox"
+                    checked={Boolean(rateLimitEnabled)}
+                    onChange={(e) => setRateLimitEnabled(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                </div>
+
+                {rateLimitEnabled && (
+                  <div className="space-y-2">
+                    <Label htmlFor="max-requests">Requêtes maximum par minute</Label>
+                    <Input
+                      id="max-requests"
+                      type="number"
+                      min="10"
+                      max="1000"
+                      value={String(maxRequestsPerMinute)}
+                      onChange={(e) => setMaxRequestsPerMinute(Number(e.target.value))}
+                    />
+                    <p className="text-xs text-muted-foreground">Recommandé : 60-100 requêtes/minute</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Session */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">🔐 Gestion des sessions</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Sécurité des connexions utilisateur</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="session-timeout">Timeout de session (minutes)</Label>
+                  <Input
+                    id="session-timeout"
+                    type="number"
+                    min="5"
+                    max="1440"
+                    value={String(sessionTimeout)}
+                    onChange={(e) => setSessionTimeout(Number(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">Déconnexion automatique après inactivité (recommandé : 30 min)</p>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleSavePlatformSettings} size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   };
