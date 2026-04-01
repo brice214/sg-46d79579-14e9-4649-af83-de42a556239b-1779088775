@@ -14,7 +14,7 @@ import {
   LayoutDashboard, Users, FileText, AlertTriangle, DollarSign, 
   TrendingUp, Eye, CheckCircle, XCircle, Clock, 
   Search, MoreVertical, ShieldAlert, ArrowUpRight,
-  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut
+  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check
 } from "lucide-react";
 import Link from "next/link";
 import {
