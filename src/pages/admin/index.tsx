@@ -55,6 +55,8 @@ import { SalesChart } from "@/components/admin/SalesChart";
 import { TopDocumentsChart } from "@/components/admin/TopDocumentsChart";
 import { TopAuthorsChart } from "@/components/admin/TopAuthorsChart";
 import { ConversionMetrics } from "@/components/admin/ConversionMetrics";
+import { WithdrawalSettings } from "@/components/admin/WithdrawalSettings";
+import { WithdrawalRequests } from "@/components/admin/WithdrawalRequests";
 
 // Types
 interface DashboardStats {
@@ -226,6 +228,21 @@ export default function AdminDashboard() {
     display_order: 1,
     is_active: true,
   });
+
+  const [activeTab, setActiveTab] = useState<
+    | "overview"
+    | "users"
+    | "documents"
+    | "reports"
+    | "transactions"
+    | "categories"
+    | "banners"
+    | "analytics"
+    | "settings"
+    | "withdrawals"
+  >("overview");
+  
+  const [withdrawalSubTab, setWithdrawalSubTab] = useState<"settings" | "requests">("settings");
 
   useEffect(() => {
     checkAuthAndLoadData();
@@ -1417,6 +1434,37 @@ export default function AdminDashboard() {
     );
   };
 
+  const renderWithdrawals = () => {
+    return (
+      <div className="space-y-6">
+        {/* Sub-navigation tabs */}
+        <Card className="border-gold/20">
+          <CardContent className="p-4">
+            <div className="flex gap-2">
+              <Button
+                variant={withdrawalSubTab === "settings" ? "default" : "outline"}
+                onClick={() => setWithdrawalSubTab("settings")}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Paramètres
+              </Button>
+              <Button
+                variant={withdrawalSubTab === "requests" ? "default" : "outline"}
+                onClick={() => setWithdrawalSubTab("requests")}
+              >
+                <Wallet className="h-4 w-4 mr-2" />
+                Demandes
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Content based on sub-tab */}
+        {withdrawalSubTab === "settings" ? <WithdrawalSettings /> : <WithdrawalRequests />}
+      </div>
+    );
+  };
+
   const renderSettings = () => {
     return (
       <div className="space-y-6 animate-in fade-in duration-500">
@@ -1667,16 +1715,17 @@ export default function AdminDashboard() {
         )}
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-[1600px] mx-auto">
-          {activeModule === "overview" && renderOverview()}
-          {activeModule === "visitors" && renderVisitors()}
-          {activeModule === "authors" && renderAuthors()}
-          {activeModule === "documents" && renderDocuments()}
-          {activeModule === "reports" && renderReports()}
-          {activeModule === "transactions" && renderTransactions()}
-          {activeModule === "categories" && renderCategories()}
-          {activeModule === "settings" && renderSettings()}
-          {activeModule === "analytics" && renderAnalytics()}
-          {activeModule === "banners" && renderBanners()}
+          {activeTab === "overview" && renderOverview()}
+          {activeTab === "visitors" && renderVisitors()}
+          {activeTab === "authors" && renderAuthors()}
+          {activeTab === "documents" && renderDocuments()}
+          {activeTab === "reports" && renderReports()}
+          {activeTab === "transactions" && renderTransactions()}
+          {activeTab === "categories" && renderCategories()}
+          {activeTab === "banners" && renderBanners()}
+          {activeTab === "analytics" && renderAnalytics()}
+          {activeTab === "withdrawals" && renderWithdrawals()}
+          {activeTab === "settings" && renderSettings()}
         </main>
       </div>
 
