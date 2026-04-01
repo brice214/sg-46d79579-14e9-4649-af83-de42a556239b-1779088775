@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryService } from "@/services/categoryService";
 import { documentService } from "@/services/documentService";
-import { Upload as UploadIcon, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Upload as UploadIcon, FileText, AlertCircle, CheckCircle2, Upload } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import type { Category } from "@/services/categoryService";
 
@@ -26,7 +26,18 @@ export default function Upload() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  // Word counter helper function
+  const countWords = (text: string): number => {
+    if (!text.trim()) return 0;
+    // Split by whitespace and filter out empty strings
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  };
+
+  const [descriptionWordCount, setDescriptionWordCount] = useState(0);
+  const MIN_WORDS = 300;
+  const MAX_WORDS = 500;
 
   // Form state
   const [title, setTitle] = useState("");
@@ -272,12 +283,41 @@ export default function Upload() {
                   <Label htmlFor="description">Description / Résumé *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Décrivez le contenu de votre document..."
                     value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={5}
-                    required
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      const wordCount = countWords(newValue);
+                      setDescriptionWordCount(wordCount);
+                      setDescription(newValue);
+                    }}
+                    placeholder="Décrivez le contenu de votre document..."
+                    rows={6}
+                    className="resize-none"
                   />
+                  <div className="flex items-center justify-between text-sm">
+                    <p className={`font-medium ${
+                      descriptionWordCount < MIN_WORDS 
+                        ? "text-destructive" 
+                        : descriptionWordCount > MAX_WORDS
+                        ? "text-orange-600"
+                        : "text-foret"
+                    }`}>
+                      {descriptionWordCount} / {MIN_WORDS}-{MAX_WORDS} mots
+                    </p>
+                    {descriptionWordCount < MIN_WORDS && (
+                      <p className="text-xs text-destructive">
+                        Encore {MIN_WORDS - descriptionWordCount} mots requis
+                      </p>
+                    )}
+                    {descriptionWordCount > MAX_WORDS && (
+                      <p className="text-xs text-orange-600">
+                        {descriptionWordCount - MAX_WORDS} mots en trop
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Une description détaillée (300-500 mots) aide les lecteurs à découvrir votre document et améliore son référencement.
+                  </p>
                 </div>
 
                 {/* Catégorie et Type */}
@@ -475,19 +515,42 @@ export default function Upload() {
                   </Button>
                   <Button
                     type="submit"
-                    disabled={uploading || !certifyRights || !acceptTerms}
-                    className="flex-1 bg-gradient-to-r from-earth to-gold text-white"
+                    size="lg"
+                    disabled={
+                      uploading || 
+                      !title || 
+                      !description || 
+                      descriptionWordCount < MIN_WORDS ||
+                      descriptionWordCount > MAX_WORDS ||
+                      !categoryId || 
+                      !documentType || 
+                      !pdfFile
+                    }
+                    className="w-full bg-gradient-to-r from-gold via-amber-500 to-gold hover:from-gold/90 hover:via-amber-600 hover:to-gold/90 text-noir font-bold shadow-lg"
                   >
                     {uploading ? (
-                      <>Upload en cours...</>
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-noir mr-2" />
+                        Publication en cours...
+                      </>
                     ) : (
                       <>
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        <Upload className="mr-2 h-5 w-5" />
                         Publier le document
                       </>
                     )}
                   </Button>
                 </div>
+
+                {/* Help text for disabled button */}
+                {(descriptionWordCount < MIN_WORDS || descriptionWordCount > MAX_WORDS) && (
+                  <p className="text-sm text-center text-destructive font-medium">
+                    {descriptionWordCount < MIN_WORDS 
+                      ? `⚠️ La description doit contenir au moins ${MIN_WORDS} mots pour être publiée`
+                      : `⚠️ La description ne doit pas dépasser ${MAX_WORDS} mots`
+                    }
+                  </p>
+                )}
 
                 {uploading && (
                   <Alert>
