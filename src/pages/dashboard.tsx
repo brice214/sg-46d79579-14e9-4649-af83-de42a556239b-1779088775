@@ -168,7 +168,8 @@ export default function Dashboard() {
           .eq("status", "completed");
         
         const withdrawn = totalWithdrawn?.reduce((sum, w) => sum + Number(w.amount), 0) || 0;
-        const available = total - withdrawn;
+        const totalEarned = allTransactions?.reduce((sum, tx) => sum + Number(tx.author_earnings), 0) || 0;
+        const available = totalEarned - withdrawn;
         
         const { data: pendingWithdrawals } = await supabase
           .from("withdrawal_requests")
@@ -235,6 +236,8 @@ export default function Dashboard() {
         .insert({
           author_id: session.user.id,
           amount: availableBalance,
+          net_amount: availableBalance,
+          payment_method: "mobile_money",
           status: "pending"
         });
 
