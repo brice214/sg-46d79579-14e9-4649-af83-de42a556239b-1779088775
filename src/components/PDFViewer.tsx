@@ -1,10 +1,6 @@
 import { useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
-
-// Configure worker with jsdelivr CDN (better CORS support)
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Maximize2 } from "lucide-react";
 
 interface PDFViewerProps {
   fileUrl: string;
@@ -12,97 +8,97 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ fileUrl, maxPages }: PDFViewerProps) {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [scale, setScale] = useState<number>(1.0);
+  const [scale, setScale] = useState(1);
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
+  const handleZoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.25, 2));
   };
 
-  const goToPrevPage = () => setPageNumber((prev) => Math.max(prev - 1, 1));
-  const goToNextPage = () => setPageNumber((prev) => Math.min(prev + 1, maxPages || numPages));
-  const zoomIn = () => setScale((prev) => Math.min(prev + 0.2, 2.0));
-  const zoomOut = () => setScale((prev) => Math.max(prev - 0.2, 0.5));
+  const handleZoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.25, 0.5));
+  };
 
-  const displayPages = maxPages ? Math.min(numPages, maxPages) : numPages;
+  const handleDownload = () => {
+    window.open(fileUrl, "_blank");
+  };
+
+  const handleFullscreen = () => {
+    window.open(fileUrl, "_blank");
+  };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
       {/* Controls */}
-      <div className="flex items-center justify-between mb-4 p-4 bg-white/50 backdrop-blur rounded-lg border border-terre/20">
+      <div className="flex items-center justify-between gap-2 p-3 bg-terre/5 rounded-lg border border-terre/20">
         <div className="flex items-center gap-2">
           <Button
-            onClick={goToPrevPage}
-            disabled={pageNumber <= 1}
+            onClick={handleZoomOut}
             variant="outline"
             size="sm"
+            disabled={scale <= 0.5}
+            className="border-terre/30"
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm text-noir">
-            Page {pageNumber} / {displayPages}
-            {maxPages && numPages > maxPages && (
-              <span className="text-xs text-noir/60 ml-2">
-                (Aperçu limité à {maxPages} pages)
-              </span>
-            )}
-          </span>
-          <Button
-            onClick={goToNextPage}
-            disabled={pageNumber >= displayPages}
-            variant="outline"
-            size="sm"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button onClick={zoomOut} disabled={scale <= 0.5} variant="outline" size="sm">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm text-noir">{Math.round(scale * 100)}%</span>
-          <Button onClick={zoomIn} disabled={scale >= 2.0} variant="outline" size="sm">
+          <span className="text-sm font-medium text-noir min-w-[60px] text-center">
+            {Math.round(scale * 100)}%
+          </span>
+          <Button
+            onClick={handleZoomIn}
+            variant="outline"
+            size="sm"
+            disabled={scale >= 2}
+            className="border-terre/30"
+          >
             <ZoomIn className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleFullscreen}
+            variant="outline"
+            size="sm"
+            className="border-terre/30"
+          >
+            <Maximize2 className="h-4 w-4 mr-2" />
+            Plein écran
+          </Button>
+          <Button
+            onClick={handleDownload}
+            variant="outline"
+            size="sm"
+            className="border-terre/30"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Télécharger
+          </Button>
+        </div>
       </div>
 
-      {/* PDF Display */}
-      <div className="flex justify-center bg-slate-100 rounded-lg p-4 border-2 border-dashed border-terre/30">
-        <Document
-          file={fileUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={
-            <div className="text-center py-12">
-              <div className="animate-spin h-8 w-8 border-4 border-terre border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-noir/60">Chargement du PDF...</p>
-            </div>
-          }
-          error={
-            <div className="text-center py-12">
-              <p className="text-red-600 font-medium mb-2">Erreur de chargement</p>
-              <p className="text-noir/60 text-sm">Impossible de charger le document PDF</p>
-            </div>
-          }
+      {/* PDF Viewer - Native iframe */}
+      <div className="relative w-full bg-white rounded-lg border-2 border-terre/20 overflow-hidden shadow-lg">
+        <div 
+          className="w-full transition-transform duration-200 origin-top-left"
+          style={{ 
+            transform: `scale(${scale})`,
+            transformOrigin: "0 0",
+            width: `${100 / scale}%`,
+          }}
         >
-          <Page
-            pageNumber={pageNumber}
-            scale={scale}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
+          <iframe
+            src={fileUrl}
+            className="w-full border-0"
+            style={{ height: "800px" }}
+            title="Aperçu du document PDF"
           />
-        </Document>
+        </div>
       </div>
 
-      {maxPages && numPages > maxPages && (
-        <div className="mt-4 p-4 bg-or/10 border border-or/30 rounded-lg text-center">
-          <p className="text-noir/80 font-medium mb-1">
-            🔒 Aperçu limité aux {maxPages} premières pages
-          </p>
-          <p className="text-sm text-noir/60">
-            Le document complet contient {numPages} pages
+      {maxPages && (
+        <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
+          <p className="text-sm text-noir/70">
+            📄 Aperçu limité aux {maxPages} premières pages. Achetez le document pour voir l'intégralité.
           </p>
         </div>
       )}
