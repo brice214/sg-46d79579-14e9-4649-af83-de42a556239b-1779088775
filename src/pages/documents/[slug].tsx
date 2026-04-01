@@ -112,14 +112,15 @@ export default function DocumentPage() {
       // Increment view count
       await documentService.incrementViewCount(doc.id);
 
+      let userHasAccess = false;
       // Check if user has access
       if (currentUser) {
-        const access = await documentService.checkUserAccess(doc.id, currentUser.id);
-        setHasAccess(access);
+        userHasAccess = await documentService.checkUserAccess(doc.id, currentUser.id);
+        setHasAccess(userHasAccess);
       }
 
       // Load PDF URL for viewer (admin always has access)
-      if (currentUser && (isAdmin || access || doc.price === 0)) {
+      if (currentUser && (isAdmin || userHasAccess || doc.price === 0)) {
         const { data } = await supabase.storage
           .from("documents")
           .createSignedUrl(doc.file_url, 3600); // 1 hour expiry
