@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -66,8 +68,23 @@ export default function Dashboard() {
   const [editForm, setEditForm] = useState({
     full_name: "",
     country: "",
-    bio: ""
+    bio: "",
+    avatar_url: ""
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
+  
+  // Liste des pays (focus Afrique)
+  const countries = [
+    "Gabon", "Cameroun", "Congo-Brazzaville", "RD Congo", "Tchad", "Centrafrique",
+    "Guinée Équatoriale", "Sénégal", "Côte d'Ivoire", "Burkina Faso", "Mali", "Niger",
+    "Bénin", "Togo", "Ghana", "Nigeria", "Guinée", "Liberia", "Sierra Leone",
+    "Mauritanie", "Maroc", "Algérie", "Tunisie", "Libye", "Égypte", "Soudan",
+    "Éthiopie", "Kenya", "Tanzanie", "Ouganda", "Rwanda", "Burundi",
+    "Angola", "Zambie", "Zimbabwe", "Mozambique", "Madagascar", "Afrique du Sud",
+    "Namibie", "Botswana", "Maurice", "Seychelles", "Comores", "Mayotte",
+    "France", "Belgique", "Suisse", "Canada", "États-Unis", "Autre"
+  ].sort();
   
   // Statistiques enrichies
   const [totalViews, setTotalViews] = useState(0);
@@ -298,9 +315,76 @@ export default function Dashboard() {
     setEditForm({
       full_name: profile?.full_name || "",
       country: profile?.country || "",
-      bio: profile?.bio || ""
+      bio: profile?.bio || "",
+      avatar_url: profile?.avatar_url || ""
     });
+    setAvatarPreview(profile?.avatar_url || "");
+    setAvatarFile(null);
     setIsEditingProfile(true);
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Vérifier le type de fichier
+    if (!file.type.startsWith("image/")) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Veuillez sélectionner une image (JPG, PNG, etc.)"
+      });
+      return;
+    }
+
+    // Vérifier la taille (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "L'image ne doit pas dépasser 5 MB"
+      });
+      return;
+    }
+
+    setAvatarFile(file);
+    
+    // Créer un aperçu
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const uploadAvatar = async (userId: string): Promise<string | null> => {
+    if (!avatarFile) return null;
+
+    try {
+      const fileExt = avatarFile.name.split(".").pop();
+      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("documents")
+        .upload(filePath, avatarFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("documents")
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Avatar upload error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de télécharger la photo de profil"
+      });
+      return null;
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -308,12 +392,23 @@ export default function Dashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
 
+      let avatarUrl = editForm.avatar_url;
+
+      // Upload avatar if a new file was selected
+      if (avatarFile) {
+        const uploadedUrl = await uploadAvatar(session.user.id);
+        if (uploadedUrl) {
+          avatarUrl = uploadedUrl;
+        }
+      }
+
       const { error } = await supabase
         .from("profiles")
         .update({
           full_name: editForm.full_name,
           country: editForm.country,
-          bio: editForm.bio
+          bio: editForm.bio,
+          avatar_url: avatarUrl
         })
         .eq("id", session.user.id);
 
@@ -801,6 +896,16 @@ export default function Dashboard() {
                     <CardTitle>Informations du profil</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                    {/* Avatar Display */}
+                    <div className="flex justify-center pb-4 border-b border-terre/10">
+                      <Avatar className="h-24 w-24 border-4 border-terre/20">
+                        <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || "User"} />
+                        <AvatarFallback className="bg-gradient-to-br from-terre to-orange-500 text-white text-2xl font-bold">
+                          {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Nom complet</Label>
                       <div className="p-3 bg-muted rounded-md">
@@ -1000,7 +1105,7 @@ export default function Dashboard() {
 
       {/* Edit Profile Dialog */}
       <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-noir">Modifier mon profil</DialogTitle>
             <DialogDescription>
@@ -1009,6 +1114,40 @@ export default function Dashboard() {
           </DialogHeader>
           
           <div className="space-y-5 py-4">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-4 pb-4 border-b border-terre/10">
+              <Avatar className="h-24 w-24 border-4 border-terre/20">
+                <AvatarImage src={avatarPreview || editForm.avatar_url} alt="Avatar" />
+                <AvatarFallback className="bg-gradient-to-br from-terre to-orange-500 text-white text-2xl font-bold">
+                  {editForm.full_name ? editForm.full_name.charAt(0).toUpperCase() : "?"}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex flex-col items-center gap-2">
+                <Label htmlFor="avatar" className="cursor-pointer">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="border-terre/30 hover:bg-terre/5"
+                    onClick={() => document.getElementById("avatar")?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Changer la photo
+                  </Button>
+                </Label>
+                <input
+                  id="avatar"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+                <p className="text-xs text-muted-foreground">
+                  JPG, PNG ou GIF (max 5 MB)
+                </p>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="full_name" className="text-sm font-medium">
                 Nom complet *
@@ -1026,13 +1165,21 @@ export default function Dashboard() {
               <Label htmlFor="country" className="text-sm font-medium">
                 Pays
               </Label>
-              <Input
-                id="country"
-                value={editForm.country}
-                onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
-                placeholder="Ex: Gabon, Cameroun, etc."
-                className="border-terre/20 focus:border-terre"
-              />
+              <Select 
+                value={editForm.country} 
+                onValueChange={(value) => setEditForm({ ...editForm, country: value })}
+              >
+                <SelectTrigger className="border-terre/20 focus:border-terre">
+                  <SelectValue placeholder="Sélectionnez votre pays" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {countries.map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -1046,6 +1193,7 @@ export default function Dashboard() {
                 placeholder="Parlez-nous un peu de vous..."
                 rows={4}
                 className="border-terre/20 focus:border-terre resize-none"
+                maxLength={500}
               />
               <p className="text-xs text-muted-foreground">
                 {editForm.bio.length}/500 caractères
