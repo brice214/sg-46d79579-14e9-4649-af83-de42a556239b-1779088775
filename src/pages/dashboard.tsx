@@ -211,6 +211,24 @@ export default function Dashboard() {
         setMyPurchases(purchases);
       }
 
+      // Charger les 10 dernières parutions payantes
+      const { data: latestPaidDocs } = await supabase
+        .from("documents")
+        .select(`
+          *,
+          profiles!documents_author_id_fkey(full_name),
+          categories(name)
+        `)
+        .eq("is_published", true)
+        .eq("is_approved", true)
+        .gt("price", 0)
+        .order("created_at", { ascending: false })
+        .limit(10);
+        
+      if (latestPaidDocs) {
+        setLatestPaidDocuments(latestPaidDocs);
+      }
+
     } catch (error) {
       console.error("Dashboard error:", error);
       toast({
@@ -815,13 +833,13 @@ export default function Dashboard() {
                         plugins={[
                           Autoplay({
                             delay: 4000,
-                          }),
+                          }) as any,
                         ]}
                         className="w-full"
                       >
                         <CarouselContent>
                           {latestPaidDocuments.map((doc) => {
-                            const hasPurchased = myPurchases.some(p => p.id === doc.id);
+                            const hasPurchased = myPurchases.some(p => p.documents?.id === doc.id);
                             
                             return (
                               <CarouselItem key={doc.id}>
