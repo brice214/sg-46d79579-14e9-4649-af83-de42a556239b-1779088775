@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2, ShoppingCart, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-// Configure PDF.js worker to use local file
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+// Configure PDF.js worker - use unpkg with version that matches our package
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 
 interface PDFViewerProps {
   fileUrl: string;
