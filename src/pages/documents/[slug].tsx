@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { PDFViewer } from "@/components/PDFViewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,19 @@ import { purchaseService } from "@/services/purchaseService";
 import { reportService } from "@/services/reportService";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles, CheckCircle, XCircle } from "lucide-react";
+
+// Import PDFViewer dynamically to avoid SSR issues
+const PDFViewer = dynamic(
+  () => import("@/components/PDFViewer").then((mod) => mod.PDFViewer),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="bg-white/50 backdrop-blur rounded-lg p-8 border-2 border-dashed border-terre/30 text-center">
+        <p className="text-noir/60">Chargement du lecteur PDF...</p>
+      </div>
+    )
+  }
+);
 
 type Document = {
   id: string;
