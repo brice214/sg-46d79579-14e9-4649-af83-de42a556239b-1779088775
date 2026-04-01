@@ -561,9 +561,9 @@ export default function DocumentPage() {
             <div className="flex items-center gap-4">
               {document.price > 0 ? (
                 <>
-                  <div className="text-3xl font-bold text-or flex items-center gap-2">
+                  <div className="text-3xl font-bold text-terre flex items-center gap-2">
                     <DollarSign className="h-8 w-8" />
-                    {document.price.toLocaleString()} {document.currency}
+                    {document.price === 0 ? "Gratuit" : `${document.price} XAF`}
                   </div>
                   {hasAccess ? (
                     <Badge className="bg-green-500 text-white text-lg px-4 py-2">
