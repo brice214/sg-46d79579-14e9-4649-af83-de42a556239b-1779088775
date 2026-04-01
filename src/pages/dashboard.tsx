@@ -12,9 +12,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, DollarSign, Upload, Eye, Download, FileText, Settings, User,
   TrendingUp, Clock, CheckCircle, XCircle, Edit, Wallet, BarChart3,
-  AlertCircle, ArrowUpRight, ChevronRight
+  AlertCircle, ArrowUpRight, ChevronRight, ShoppingCart, Lock
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Document = Database["public"]["Tables"]["documents"]["Row"];
@@ -51,6 +55,7 @@ export default function Dashboard() {
   const [myDocuments, setMyDocuments] = useState<DocumentStats[]>([]);
   const [myPurchases, setMyPurchases] = useState<any[]>([]);
   const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
+  const [latestPaidDocuments, setLatestPaidDocuments] = useState<any[]>([]);
   
   // Statistiques enrichies
   const [totalViews, setTotalViews] = useState(0);
@@ -444,7 +449,7 @@ export default function Dashboard() {
                 <Download className="h-4 w-4 mr-2" />
                 Ma Bibliothèque
               </TabsTrigger>
-              <TabsTrigger value="profil" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <TabsTrigger value="profile" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <User className="h-4 w-4 mr-2" />
                 Profil
               </TabsTrigger>
@@ -716,48 +721,184 @@ export default function Dashboard() {
             </TabsContent>
 
             {/* Onglet: Profil */}
-            <TabsContent value="profil">
-              <Card className="border-border/40 max-w-2xl">
-                <CardHeader>
-                  <CardTitle>Informations du profil</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-2">
-                    <div className="font-medium">Nom complet</div>
-                    <div className="text-muted-foreground bg-muted/30 p-2 rounded">{profile?.full_name || "Non défini"}</div>
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="font-medium">Email</div>
-                    <div className="text-muted-foreground bg-muted/30 p-2 rounded">{profile?.email || "Non défini"}</div>
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="font-medium">Rôle</div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="capitalize">{profile?.role}</Badge>
-                      {profile?.role === "visitor" && (
-                        <span className="text-xs text-muted-foreground">Contactez le support pour devenir auteur.</span>
-                      )}
+            <TabsContent value="profile" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Left: Profile Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations du profil</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Nom complet</Label>
+                      <div className="p-3 bg-muted rounded-md">
+                        <p className="text-sm">{profile?.full_name || "Non défini"}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="font-medium">Pays</div>
-                    <div className="text-muted-foreground bg-muted/30 p-2 rounded">{profile?.country || "Non défini"}</div>
-                  </div>
-                  <div className="grid gap-2">
-                    <div className="font-medium">Biographie</div>
-                    <div className="text-muted-foreground bg-muted/30 p-2 rounded min-h-[100px] whitespace-pre-wrap">
-                      {profile?.bio || "Aucune biographie."}
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Email</Label>
+                      <div className="p-3 bg-muted rounded-md">
+                        <p className="text-sm">{profile?.email}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="pt-4 border-t border-border/40">
-                    <Button variant="outline">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Modifier le profil
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Rôle</Label>
+                      <div className="p-3 bg-muted rounded-md">
+                        <Badge variant={profile?.role === "author" ? "default" : "secondary"}>
+                          {profile?.role === "author" ? "Auteur" : "Lecteur"}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Pays</Label>
+                      <div className="p-3 bg-muted rounded-md">
+                        <p className="text-sm">{profile?.country || "Non défini"}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Biographie</Label>
+                      <div className="p-3 bg-muted rounded-md min-h-[80px]">
+                        <p className="text-sm text-muted-foreground">{profile?.bio || "Aucune biographie."}</p>
+                      </div>
+                    </div>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" className="w-full">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Modifier le profil
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Modifier le profil</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Cette fonctionnalité sera bientôt disponible.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Fermer</AlertDialogCancel>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </CardContent>
+                </Card>
+
+                {/* Right: Latest Paid Documents Carousel */}
+                <Card className="bg-gradient-to-br from-terre/5 to-orange-50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-terre" />
+                      Dernières parutions payantes
+                    </CardTitle>
+                    <CardDescription>
+                      Découvrez les 10 derniers documents publiés
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {latestPaidDocuments.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+                        <p className="text-sm text-muted-foreground">Aucun document disponible</p>
+                      </div>
+                    ) : (
+                      <Carousel
+                        opts={{
+                          align: "start",
+                          loop: true,
+                        }}
+                        plugins={[
+                          Autoplay({
+                            delay: 4000,
+                          }),
+                        ]}
+                        className="w-full"
+                      >
+                        <CarouselContent>
+                          {latestPaidDocuments.map((doc) => {
+                            const hasPurchased = myPurchases.some(p => p.id === doc.id);
+                            
+                            return (
+                              <CarouselItem key={doc.id}>
+                                <div className="p-1">
+                                  <Card className="border-terre/20 hover:shadow-lg transition-shadow">
+                                    <CardContent className="p-6 space-y-4">
+                                      {/* Document Title */}
+                                      <div>
+                                        <Link 
+                                          href={`/documents/${doc.slug}`}
+                                          className="text-lg font-bold text-noir hover:text-terre transition-colors line-clamp-2"
+                                        >
+                                          {doc.title}
+                                        </Link>
+                                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                          {doc.description}
+                                        </p>
+                                      </div>
+
+                                      {/* Metadata */}
+                                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                        <div className="flex items-center gap-1">
+                                          <User className="h-3 w-3" />
+                                          <span>{doc.profiles?.full_name || "Auteur"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Eye className="h-3 w-3" />
+                                          <span>{doc.views || 0}</span>
+                                        </div>
+                                      </div>
+
+                                      <Separator />
+
+                                      {/* Price & Action */}
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <p className="text-2xl font-bold text-terre">
+                                            {doc.price} XAF
+                                          </p>
+                                        </div>
+                                        
+                                        {hasPurchased ? (
+                                          <Link href={`/documents/${doc.slug}`}>
+                                            <Button size="sm" className="bg-foret hover:bg-foret/90">
+                                              <Download className="h-4 w-4 mr-2" />
+                                              Télécharger
+                                            </Button>
+                                          </Link>
+                                        ) : (
+                                          <Link href={`/documents/${doc.slug}`}>
+                                            <Button size="sm" className="bg-gradient-to-r from-terre to-orange-600 hover:from-terre/90 hover:to-orange-700">
+                                              <ShoppingCart className="h-4 w-4 mr-2" />
+                                              Acheter
+                                            </Button>
+                                          </Link>
+                                        )}
+                                      </div>
+
+                                      {/* Category Badge */}
+                                      {doc.categories?.name && (
+                                        <Badge variant="outline" className="text-xs">
+                                          {doc.categories.name}
+                                        </Badge>
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </CarouselItem>
+                            );
+                          })}
+                        </CarouselContent>
+                        <CarouselPrevious className="-left-4" />
+                        <CarouselNext className="-right-4" />
+                      </Carousel>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
           </Tabs>

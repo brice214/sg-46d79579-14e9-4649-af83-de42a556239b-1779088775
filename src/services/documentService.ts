@@ -104,6 +104,27 @@ export const documentService = {
     return data || [];
   },
 
+  async getLatestPaidDocuments(limit: number = 10) {
+    const { data, error } = await supabase
+      .from("documents")
+      .select(`
+        *,
+        profiles (full_name),
+        categories (name)
+      `)
+      .eq("status", "published")
+      .gt("price", 0)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("Error fetching latest paid documents:", error);
+      throw error;
+    }
+
+    return data || [];
+  },
+
   async createDocument(document: DocumentInsert) {
     const { data, error } = await supabase
       .from("documents")

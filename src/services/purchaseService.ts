@@ -107,23 +107,13 @@ export const purchaseService = {
 
   async getUserPurchases(userId: string) {
     const { data, error } = await supabase
-      .from("purchases")
-      .select(`
-        *,
-        documents(
-          *,
-          profiles!documents_author_id_fkey(id, full_name, avatar_url),
-          categories(name, slug)
-        )
-      `)
-      .eq("user_id", userId)
-      .order("access_granted_at", { ascending: false });
-
-    console.log("getUserPurchases:", { data, error });
+      .from("document_access")
+      .select("document_id")
+      .eq("user_id", userId);
 
     if (error) {
       console.error("Error fetching user purchases:", error);
-      throw error;
+      return [];
     }
 
     return data || [];
