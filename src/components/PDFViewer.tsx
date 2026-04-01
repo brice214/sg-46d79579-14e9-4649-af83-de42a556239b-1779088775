@@ -236,10 +236,10 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
                   {onPurchase && (
                     <Button
                       onClick={onPurchase}
-                      className="w-full bg-gradient-to-r from-terre to-foret hover:from-terre/90 hover:to-foret/90 text-white font-bold shadow-lg"
                       size="lg"
+                      className="bg-gradient-to-r from-terre to-orange-600 hover:from-terre/90 hover:to-orange-700 text-noir font-bold shadow-2xl px-8 py-6 text-lg"
                     >
-                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      <ShoppingCart className="h-6 w-6 mr-2 text-noir" />
                       Acheter maintenant
                     </Button>
                   )}

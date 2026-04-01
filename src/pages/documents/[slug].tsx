@@ -17,7 +17,7 @@ import { documentService } from "@/services/documentService";
 import { purchaseService } from "@/services/purchaseService";
 import { reportService } from "@/services/reportService";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles, CheckCircle, XCircle } from "lucide-react";
+import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles, CheckCircle, XCircle, Check } from "lucide-react";
 
 // Import PDFViewer dynamically to avoid SSR issues
 const PDFViewer = dynamic(
@@ -70,6 +70,7 @@ export default function DocumentPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   // Report modal state
   const [reportReason, setReportReason] = useState("");
@@ -224,43 +225,49 @@ export default function DocumentPage() {
   };
 
   const handlePurchase = async () => {
+    setShowPaymentDialog(true);
+  };
+
+  const handlePaymentMethodSelect = async (method: "mobile_money" | "stripe" | "paypal") => {
     if (!currentUser) {
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour acheter ce document.",
-        variant: "destructive",
-      });
       router.push("/auth/login");
       return;
     }
 
-    if (!document) return;
-
     try {
-      // Simulate payment process
-      const success = await purchaseService.createTransaction({
-        document_id: document.id,
-        buyer_id: currentUser.id,
-        author_id: document.author_id,
-        amount: document.price,
-        platform_fee: document.price * 0.15,
-        author_earnings: document.price * 0.85,
-        payment_method: 'card',
-        status: 'completed'
-      });
-
-      if (success) {
+      // For now, we'll implement Mobile Money only
+      // Stripe and PayPal will be added later
+      if (method === "mobile_money") {
+        const result = await createPurchase(document.id, currentUser.id);
+        
+        if (result.success) {
+          toast({
+            title: "Achat réussi !",
+            description: "Vous avez maintenant accès au document complet.",
+          });
+          setHasAccess(true);
+          setShowPaymentDialog(false);
+          
+          // Reload to get full access
+          router.reload();
+        } else {
+          toast({
+            title: "Erreur",
+            description: result.error || "Une erreur est survenue lors de l'achat.",
+            variant: "destructive",
+          });
+        }
+      } else {
         toast({
-          title: "✅ Achat réussi !",
-          description: "Vous pouvez maintenant télécharger ce document.",
+          title: "Bientôt disponible",
+          description: `Le paiement via ${method === "stripe" ? "Stripe" : "PayPal"} sera disponible prochainement.`,
         });
-        setHasAccess(true);
       }
     } catch (error) {
       console.error("Purchase error:", error);
       toast({
-        title: "Erreur de paiement",
-        description: "Une erreur est survenue lors du paiement.",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'achat.",
         variant: "destructive",
       });
     }
@@ -743,6 +750,70 @@ export default function DocumentPage() {
             </Card>
           </div>
         </div>
+
+        {/* Payment Method Dialog */}
+        <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-noir">Choisir un moyen de paiement</DialogTitle>
+              <DialogDescription className="text-noir/60">
+                Sélectionnez votre méthode de paiement préférée pour acheter ce document
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-3 py-4">
+              {/* Mobile Money */}
+              <Button
+                onClick={() => handlePaymentMethodSelect("mobile_money")}
+                className="w-full h-auto py-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+                size="lg"
+              >
+                <div className="flex flex-col items-start w-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <ShoppingCart className="h-6 w-6" />
+                    <span className="text-lg font-bold">Mobile Money</span>
+                  </div>
+                  <span className="text-sm text-white/80">Orange Money, MTN Money, Moov Money</span>
+                </div>
+              </Button>
+
+              {/* Stripe */}
+              <Button
+                onClick={() => handlePaymentMethodSelect("stripe")}
+                className="w-full h-auto py-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                size="lg"
+              >
+                <div className="flex flex-col items-start w-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <ShoppingCart className="h-6 w-6" />
+                    <span className="text-lg font-bold">Stripe (Link)</span>
+                  </div>
+                  <span className="text-sm text-white/80">Carte bancaire, Apple Pay, Google Pay</span>
+                </div>
+              </Button>
+
+              {/* PayPal */}
+              <Button
+                onClick={() => handlePaymentMethodSelect("paypal")}
+                className="w-full h-auto py-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                size="lg"
+              >
+                <div className="flex flex-col items-start w-full">
+                  <div className="flex items-center gap-3 mb-1">
+                    <ShoppingCart className="h-6 w-6" />
+                    <span className="text-lg font-bold">PayPal</span>
+                  </div>
+                  <span className="text-sm text-white/80">Compte PayPal ou carte bancaire</span>
+                </div>
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-noir/60 bg-amber-50 p-3 rounded-lg border border-terre/20">
+              <Check className="h-4 w-4 text-foret" />
+              <span>Paiement sécurisé • Accès immédiat</span>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
 
       <Footer />
