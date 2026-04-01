@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -19,6 +21,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Separator } from "@/components/ui/separator";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogCancel } from "@/components/ui/dialog";
 import Autoplay from "embla-carousel-autoplay";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -57,6 +60,14 @@ export default function Dashboard() {
   const [myPurchases, setMyPurchases] = useState<any[]>([]);
   const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
   const [latestPaidDocuments, setLatestPaidDocuments] = useState<any[]>([]);
+  
+  // Edit profile state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: "",
+    country: "",
+    bio: ""
+  });
   
   // Statistiques enrichies
   const [totalViews, setTotalViews] = useState(0);
@@ -279,6 +290,48 @@ export default function Dashboard() {
         variant: "destructive",
         title: "Erreur",
         description: "Impossible de créer la demande de retrait."
+      });
+    }
+  };
+
+  const handleEditProfile = () => {
+    setEditForm({
+      full_name: profile?.full_name || "",
+      country: profile?.country || "",
+      bio: profile?.bio || ""
+    });
+    setIsEditingProfile(true);
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: editForm.full_name,
+          country: editForm.country,
+          bio: editForm.bio
+        })
+        .eq("id", session.user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été enregistrées avec succès."
+      });
+
+      setIsEditingProfile(false);
+      loadDashboardData();
+    } catch (error) {
+      console.error("Profile update error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de mettre à jour le profil."
       });
     }
   };
@@ -785,25 +838,14 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" className="w-full">
-                          <Settings className="h-4 w-4 mr-2" />
-                          Modifier le profil
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Modifier le profil</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Cette fonctionnalité sera bientôt disponible.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Fermer</AlertDialogCancel>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={handleEditProfile}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Modifier le profil
+                    </Button>
                   </CardContent>
                 </Card>
 
@@ -955,6 +997,80 @@ export default function Dashboard() {
           </Tabs>
         </div>
       </main>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={isEditingProfile} onOpenChange={setIsEditingProfile}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-noir">Modifier mon profil</DialogTitle>
+            <DialogDescription>
+              Mettez à jour vos informations personnelles
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-5 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="full_name" className="text-sm font-medium">
+                Nom complet *
+              </Label>
+              <Input
+                id="full_name"
+                value={editForm.full_name}
+                onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                placeholder="Votre nom complet"
+                className="border-terre/20 focus:border-terre"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="country" className="text-sm font-medium">
+                Pays
+              </Label>
+              <Input
+                id="country"
+                value={editForm.country}
+                onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                placeholder="Ex: Gabon, Cameroun, etc."
+                className="border-terre/20 focus:border-terre"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio" className="text-sm font-medium">
+                Biographie
+              </Label>
+              <Textarea
+                id="bio"
+                value={editForm.bio}
+                onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                placeholder="Parlez-nous un peu de vous..."
+                rows={4}
+                className="border-terre/20 focus:border-terre resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                {editForm.bio.length}/500 caractères
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditingProfile(false)}
+              className="border-terre/20 hover:bg-terre/5"
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleSaveProfile}
+              disabled={!editForm.full_name.trim()}
+              className="bg-gradient-to-r from-gold via-amber-500 to-gold hover:from-gold/90 hover:via-amber-600 hover:to-gold/90 text-noir font-semibold"
+            >
+              Enregistrer les modifications
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
