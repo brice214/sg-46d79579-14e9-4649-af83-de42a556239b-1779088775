@@ -214,8 +214,10 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
         <div className="flex justify-center">
           <div className="relative inline-block">
             <canvas
-              ref={(el) => (canvasRefs.current[currentPage] = el)}
-              className={`border-2 border-terre/20 shadow-xl rounded ${
+              ref={(el) => {
+                if (el) canvasRefs.current[currentPage] = el;
+              }}
+              className={`border-2 border-terre/20 shadow-xl rounded bg-white ${
                 isPageLocked ? "blur-md" : ""
               }`}
             />
