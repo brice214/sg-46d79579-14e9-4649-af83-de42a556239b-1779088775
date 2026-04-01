@@ -62,16 +62,32 @@ export default function Categories() {
 
   const getCategoryGradient = (index: number): string => {
     const gradients = [
-      "from-earth/20 to-gold/20",
-      "from-forest/20 to-earth/20",
-      "from-gold/20 to-forest/20",
-      "from-earth/20 to-forest/20",
-      "from-gold/20 to-earth/20",
-      "from-forest/20 to-gold/20",
-      "from-earth/20 to-gold/20",
-      "from-gold/20 to-forest/20"
+      "from-amber-500/20 to-orange-600/20",
+      "from-blue-500/20 to-cyan-600/20",
+      "from-yellow-600/20 to-amber-700/20",
+      "from-purple-500/20 to-pink-600/20",
+      "from-green-500/20 to-emerald-600/20",
+      "from-indigo-500/20 to-blue-600/20",
+      "from-pink-500/20 to-rose-600/20",
+      "from-slate-500/20 to-gray-600/20",
+      "from-earth/30 to-gold/30"
     ];
     return gradients[index % gradients.length];
+  };
+
+  const getIconBg = (index: number): string => {
+    const backgrounds = [
+      "bg-gradient-to-br from-amber-500 to-orange-600",
+      "bg-gradient-to-br from-blue-500 to-cyan-600",
+      "bg-gradient-to-br from-yellow-600 to-amber-700",
+      "bg-gradient-to-br from-purple-500 to-pink-600",
+      "bg-gradient-to-br from-green-500 to-emerald-600",
+      "bg-gradient-to-br from-indigo-500 to-blue-600",
+      "bg-gradient-to-br from-pink-500 to-rose-600",
+      "bg-gradient-to-br from-slate-500 to-gray-600",
+      "bg-gradient-to-br from-earth to-gold"
+    ];
+    return backgrounds[index % backgrounds.length];
   };
 
   return (
@@ -140,54 +156,49 @@ export default function Categories() {
               </div>
             ) : (
               <div className="grid md:grid-cols-3 gap-8">
-                {categories.map((category, index) => {
-                  const gradients = [
-                    "from-earth/20 to-gold/20",
-                    "from-gold/20 to-forest/20",
-                    "from-forest/20 to-earth/20",
-                    "from-earth/30 to-gold/10",
-                    "from-gold/30 to-forest/10",
-                    "from-forest/30 to-earth/10",
-                    "from-earth/10 to-gold/30",
-                    "from-gold/10 to-forest/30",
-                    "from-forest/10 to-earth/30",
-                  ];
+                {categories.map((category, index) => (
+                  <Link
+                    key={category.id}
+                    href={`/categories/${category.slug}`}
+                    className="group relative overflow-hidden rounded-2xl border-2 border-gold/20 bg-gradient-to-br from-card via-card to-card/80 hover:border-gold/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gold/20"
+                  >
+                    {/* Background gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryGradient(index)} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                    
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl group-hover:bg-gold/10 transition-colors"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-earth/5 rounded-full blur-2xl group-hover:bg-earth/10 transition-colors"></div>
 
-                  return (
-                    <Link
-                      key={category.id}
-                      href={`/categories/${category.slug}`}
-                      className="group relative overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-card/90 to-card/60 backdrop-blur-sm hover:shadow-2xl transition-all hover:scale-105 hover:border-gold/40"
-                    >
-                      {/* Icon */}
-                      <div className="text-6xl mb-6 group-hover:scale-125 transition-transform duration-300">
-                        {getCategoryIcon(category.name)}
+                    <div className="relative p-6">
+                      {/* Icon with gradient background */}
+                      <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${getIconBg(index)} shadow-lg mb-4 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                        <span className="text-3xl drop-shadow-lg">{getCategoryIcon(category.name)}</span>
                       </div>
 
-                      {/* Name */}
-                      <h3 className="font-serif text-2xl font-bold mb-3 group-hover:text-gold transition-colors">
+                      {/* Title */}
+                      <h3 className="font-serif text-2xl font-bold mb-2 group-hover:text-gold transition-colors">
                         {category.name}
                       </h3>
 
                       {/* Description */}
                       {category.description && (
-                        <p className="text-muted-foreground mb-4 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
                           {category.description}
                         </p>
                       )}
 
-                      {/* Stats */}
-                      <div className="flex items-center justify-between pt-4 border-t border-gold/10">
+                      {/* Footer with arrow */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gold/10">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <BookOpen className="h-4 w-4" />
                           <span className="font-semibold text-foreground">{category.documentCount}</span>
                           <span>document{category.documentCount > 1 ? 's' : ''}</span>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-gold group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="h-5 w-5 text-gold transform group-hover:translate-x-2 transition-transform" />
                       </div>
-                    </Link>
-                  );
-                })}
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
 
