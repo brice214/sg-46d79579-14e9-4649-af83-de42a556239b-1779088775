@@ -1,16 +1,20 @@
 import { useState, useEffect, useRef } from "react";
+import * as pdfjsLib from "pdfjs-dist";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2, ShoppingCart, Lock, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+// Configure worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
 interface PDFViewerProps {
   fileUrl: string;
-  hasAccess: boolean;
+  hasAccess?: boolean;
   onPurchase?: () => void;
   documentTitle?: string;
 }
 
-export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDFViewerProps) {
+export function PDFViewer({ fileUrl, hasAccess = false, onPurchase, documentTitle }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(1.0);
