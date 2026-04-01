@@ -4,16 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
+import { categoryService } from "@/services/categoryService";
+import { platformSettingsService } from "@/services/platformSettingsService";
+import { analyticsService } from "@/services/analyticsService";
+import { bannerService } from "@/services/bannerService";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   LayoutDashboard, Users, FileText, AlertTriangle, DollarSign, 
   TrendingUp, Eye, CheckCircle, XCircle, Clock, 
   Search, MoreVertical, ShieldAlert, ArrowUpRight,
-  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check, PenTool, Lock
+  UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check, PenTool, Lock,
+  Settings, BarChart3, Image, FolderTree, Plus, Save, GripVertical, ChevronUp, ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -34,6 +41,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import type { Category } from "@/services/categoryService";
+import type { Banner } from "@/services/bannerService";
 
 // Types
 interface DashboardStats {
@@ -118,6 +135,10 @@ interface Transaction {
   };
 }
 
+interface CategoryWithCount extends Category {
+  documentCount: number;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const { toast } = useToast();
@@ -132,6 +153,17 @@ export default function AdminDashboard() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [categories, setCategories] = useState<CategoryWithCount[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  
+  // Platform Settings States
+  const [commissionRate, setCommissionRate] = useState(15);
+  const [mobileMoneyEnabled, setMobileMoneyEnabled] = useState(true);
+  const [cardPaymentEnabled, setCardPaymentEnabled] = useState(true);
+  const [platformName, setPlatformName] = useState("AfriLitt");
+  const [primaryColor, setPrimaryColor] = useState("#D4AF37");
+  const [termsOfService, setTermsOfService] = useState("");
+  const [privacyPolicy, setPrivacyPolicy] = useState("");
 
   // Filters
   const [visitorsSearch, setVisitorsSearch] = useState("");
@@ -139,10 +171,10 @@ export default function AdminDashboard() {
   const [documentsSearch, setDocumentsSearch] = useState("");
   const [documentsStatusFilter, setDocumentsStatusFilter] = useState("all");
 
-  // Dialog State
+  // Dialog States
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
-    type: "visitor" | "author" | "document" | null;
+    type: "visitor" | "author" | "document" | "category" | "banner" | null;
     id: string | null;
     title: string;
   }>({
@@ -150,6 +182,44 @@ export default function AdminDashboard() {
     type: null,
     id: null,
     title: "",
+  });
+
+  const [categoryDialog, setCategoryDialog] = useState<{
+    open: boolean;
+    mode: "create" | "edit";
+    category: Category | null;
+  }>({
+    open: false,
+    mode: "create",
+    category: null,
+  });
+
+  const [bannerDialog, setBannerDialog] = useState<{
+    open: boolean;
+    mode: "create" | "edit";
+    banner: Banner | null;
+  }>({
+    open: false,
+    mode: "create",
+    banner: null,
+  });
+
+  // Category Form States
+  const [categoryForm, setCategoryForm] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    icon: "",
+  });
+
+  // Banner Form States
+  const [bannerForm, setBannerForm] = useState({
+    title: "",
+    subtitle: "",
+    image_url: "",
+    cta_text: "",
+    cta_url: "",
+    display_order: 1,
   });
 
   useEffect(() => {
@@ -164,7 +234,6 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Check admin role
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")
@@ -181,7 +250,6 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Load all data
       await loadAllData();
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -199,6 +267,9 @@ export default function AdminDashboard() {
         loadDocuments(),
         loadReports(),
         loadTransactions(),
+        loadCategories(),
+        loadBanners(),
+        loadPlatformSettings(),
       ]);
     } catch (error) {
       console.error("Error loading data:", error);
@@ -216,7 +287,6 @@ export default function AdminDashboard() {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    // Fetch counts in parallel
     const [
       { count: totalVisitors },
       { count: totalAuthors },
@@ -275,7 +345,6 @@ export default function AdminDashboard() {
       .order("created_at", { ascending: false });
 
     if (authorProfiles) {
-      // Load additional stats for each author
       const authorsWithStats = await Promise.all(
         authorProfiles.map(async (author) => {
           const [
@@ -293,7 +362,7 @@ export default function AdminDashboard() {
             total_documents: totalDocuments || 0,
             total_sales: sales?.length || 0,
             total_revenue: totalRevenue,
-            is_blocked: false, // TODO: Add blocked status to profiles table
+            is_blocked: false,
           };
         })
       );
@@ -340,7 +409,147 @@ export default function AdminDashboard() {
     if (data) setTransactions(data as unknown as Transaction[]);
   };
 
-  // Actions Utils - Visitors
+  const loadCategories = async () => {
+    const cats = await categoryService.getAllCategories();
+    const catsWithCount = await Promise.all(
+      cats.map(async (cat) => ({
+        ...cat,
+        documentCount: await categoryService.getCategoryDocumentCount(cat.id),
+      }))
+    );
+    setCategories(catsWithCount);
+  };
+
+  const loadBanners = async () => {
+    const data = await bannerService.getAllBanners();
+    setBanners(data);
+  };
+
+  const loadPlatformSettings = async () => {
+    const config = await platformSettingsService.getConfig();
+    setCommissionRate(config.commission_rate);
+    setMobileMoneyEnabled(config.mobile_money_enabled);
+    setCardPaymentEnabled(config.card_payment_enabled);
+    setPlatformName(config.platform_name);
+    setPrimaryColor(config.primary_color);
+    setTermsOfService(config.terms_of_service);
+    setPrivacyPolicy(config.privacy_policy);
+  };
+
+  // Category Actions
+  const handleCreateCategory = async () => {
+    const maxOrder = categories.reduce((max, cat) => Math.max(max, cat.display_order || 0), 0);
+    const newCategory = await categoryService.createCategory({
+      ...categoryForm,
+      display_order: maxOrder + 1,
+      is_active: true,
+    });
+
+    if (newCategory) {
+      toast({ title: "Succès", description: "Catégorie créée." });
+      loadCategories();
+      setCategoryDialog({ open: false, mode: "create", category: null });
+      setCategoryForm({ name: "", slug: "", description: "", icon: "" });
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!categoryDialog.category) return;
+    
+    const success = await categoryService.updateCategory(categoryDialog.category.id, categoryForm);
+    if (success) {
+      toast({ title: "Succès", description: "Catégorie mise à jour." });
+      loadCategories();
+      setCategoryDialog({ open: false, mode: "create", category: null });
+      setCategoryForm({ name: "", slug: "", description: "", icon: "" });
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    const success = await categoryService.deleteCategory(categoryId);
+    if (success) {
+      toast({ title: "Succès", description: "Catégorie supprimée." });
+      loadCategories();
+    }
+    setDeleteDialog({ open: false, type: null, id: null, title: "" });
+  };
+
+  const handleReorderCategory = async (categoryId: string, direction: "up" | "down") => {
+    const currentIndex = categories.findIndex(c => c.id === categoryId);
+    if (currentIndex === -1) return;
+    
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= categories.length) return;
+
+    const reorderedCategories = [...categories];
+    [reorderedCategories[currentIndex], reorderedCategories[newIndex]] = 
+    [reorderedCategories[newIndex], reorderedCategories[currentIndex]];
+
+    const categoryIds = reorderedCategories.map(c => c.id);
+    const success = await categoryService.reorderCategories(categoryIds);
+    
+    if (success) {
+      setCategories(reorderedCategories);
+      toast({ title: "Succès", description: "Ordre mis à jour." });
+    }
+  };
+
+  // Banner Actions
+  const handleCreateBanner = async () => {
+    const newBanner = await bannerService.createBanner(bannerForm);
+    if (newBanner) {
+      toast({ title: "Succès", description: "Bannière créée." });
+      loadBanners();
+      setBannerDialog({ open: false, mode: "create", banner: null });
+      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: 1 });
+    }
+  };
+
+  const handleUpdateBanner = async () => {
+    if (!bannerDialog.banner) return;
+    
+    const success = await bannerService.updateBanner(bannerDialog.banner.id, bannerForm);
+    if (success) {
+      toast({ title: "Succès", description: "Bannière mise à jour." });
+      loadBanners();
+      setBannerDialog({ open: false, mode: "create", banner: null });
+      setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: 1 });
+    }
+  };
+
+  const handleDeleteBanner = async (bannerId: string) => {
+    const success = await bannerService.deleteBanner(bannerId);
+    if (success) {
+      toast({ title: "Succès", description: "Bannière supprimée." });
+      loadBanners();
+    }
+    setDeleteDialog({ open: false, type: null, id: null, title: "" });
+  };
+
+  const handleToggleBanner = async (bannerId: string, isActive: boolean) => {
+    const success = await bannerService.updateBanner(bannerId, { is_active: !isActive });
+    if (success) {
+      toast({ title: "Succès", description: isActive ? "Bannière désactivée." : "Bannière activée." });
+      loadBanners();
+    }
+  };
+
+  // Platform Settings Actions
+  const handleSavePlatformSettings = async () => {
+    await Promise.all([
+      platformSettingsService.updateSetting("commission_rate", commissionRate, "payment"),
+      platformSettingsService.updateSetting("mobile_money_enabled", mobileMoneyEnabled, "payment"),
+      platformSettingsService.updateSetting("card_payment_enabled", cardPaymentEnabled, "payment"),
+      platformSettingsService.updateSetting("platform_name", platformName, "branding"),
+      platformSettingsService.updateSetting("primary_color", primaryColor, "branding"),
+      platformSettingsService.updateSetting("terms_of_service", termsOfService, "legal"),
+      platformSettingsService.updateSetting("privacy_policy", privacyPolicy, "legal"),
+    ]);
+
+    toast({ title: "Succès", description: "Configuration enregistrée." });
+  };
+
+  // Existing Actions
   const handleDeleteVisitor = async (visitorId: string) => {
     const { error } = await supabase.from("profiles").delete().eq("id", visitorId);
     if (!error) {
@@ -351,9 +560,7 @@ export default function AdminDashboard() {
     setDeleteDialog({ open: false, type: null, id: null, title: "" });
   };
 
-  // Actions Utils - Authors
   const handleBlockAuthor = async (authorId: string, isBlocked: boolean) => {
-    // TODO: Implement blocking logic (add is_blocked column to profiles)
     toast({ 
       title: isBlocked ? "Auteur débloqué" : "Auteur bloqué", 
       description: "Fonctionnalité en développement" 
@@ -974,6 +1181,386 @@ export default function AdminDashboard() {
     );
   };
 
+  const renderCategories = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-gold/20 shadow-lg">
+          <CardHeader className="border-b border-gold/10 pb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                  <FolderTree className="h-6 w-6 text-gold" />
+                  Gestion des catégories
+                </CardTitle>
+                <CardDescription>{categories.length} catégories configurées</CardDescription>
+              </div>
+              <Button onClick={() => {
+                setCategoryForm({ name: "", slug: "", description: "", icon: "" });
+                setCategoryDialog({ open: true, mode: "create", category: null });
+              }}>
+                <Plus className="h-4 w-4 mr-2" /> Nouvelle catégorie
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="w-12 pl-6"></TableHead>
+                  <TableHead>Catégorie</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Documents</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right pr-6">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category, index) => (
+                  <TableRow key={category.id} className="hover:bg-muted/30">
+                    <TableCell className="pl-6">
+                      <div className="flex flex-col gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => handleReorderCategory(category.id, "up")}
+                          disabled={index === 0}
+                        >
+                          <ChevronUp className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => handleReorderCategory(category.id, "down")}
+                          disabled={index === categories.length - 1}
+                        >
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {category.icon && <span className="text-xl">{category.icon}</span>}
+                        <div>
+                          <div className="font-medium">{category.name}</div>
+                          {category.description && (
+                            <div className="text-xs text-muted-foreground line-clamp-1">{category.description}</div>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm text-muted-foreground">
+                      /{category.slug}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{category.documentCount}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      {category.is_active ? (
+                        <Badge variant="default" className="bg-green-600">Actif</Badge>
+                      ) : (
+                        <Badge variant="secondary">Inactif</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => {
+                            setCategoryForm({
+                              name: category.name,
+                              slug: category.slug,
+                              description: category.description || "",
+                              icon: category.icon || "",
+                            });
+                            setCategoryDialog({ open: true, mode: "edit", category });
+                          }}>
+                            <Edit className="h-4 w-4 mr-2" /> Modifier
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-600"
+                            onClick={() => setDeleteDialog({ open: true, type: "category", id: category.id, title: category.name })}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderSettings = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-gold/20 shadow-lg">
+          <CardHeader>
+            <CardTitle className="font-serif text-2xl flex items-center gap-2">
+              <Settings className="h-6 w-6 text-gold" />
+              Configuration de la plateforme
+            </CardTitle>
+            <CardDescription>Gérez les paramètres globaux d'AfriLitt</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Payment Settings */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">💳 Paramètres de paiement</h3>
+                <p className="text-sm text-muted-foreground mb-4">Configurez les méthodes de paiement et les commissions</p>
+              </div>
+              
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="commission">Taux de commission plateforme (%)</Label>
+                  <Input
+                    id="commission"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={commissionRate}
+                    onChange={(e) => setCommissionRate(Number(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Commission prélevée sur chaque vente (actuellement {commissionRate}%)
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="mobile-money">Mobile Money</Label>
+                    <input
+                      id="mobile-money"
+                      type="checkbox"
+                      checked={mobileMoneyEnabled}
+                      onChange={(e) => setMobileMoneyEnabled(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="card-payment">Carte bancaire</Label>
+                    <input
+                      id="card-payment"
+                      type="checkbox"
+                      checked={cardPaymentEnabled}
+                      onChange={(e) => setCardPaymentEnabled(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Branding */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">🎨 Identité visuelle</h3>
+                <p className="text-sm text-muted-foreground mb-4">Personnalisez l'apparence de la plateforme</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="platform-name">Nom de la plateforme</Label>
+                  <Input
+                    id="platform-name"
+                    value={platformName}
+                    onChange={(e) => setPlatformName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="primary-color">Couleur primaire</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="primary-color"
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="flex-1 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">⚖️ Mentions légales</h3>
+                <p className="text-sm text-muted-foreground mb-4">Conditions d'utilisation et politique de confidentialité</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="terms">Conditions Générales d'Utilisation (CGU)</Label>
+                  <Textarea
+                    id="terms"
+                    rows={6}
+                    value={termsOfService}
+                    onChange={(e) => setTermsOfService(e.target.value)}
+                    placeholder="Rédigez vos CGU..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="privacy">Politique de confidentialité</Label>
+                  <Textarea
+                    id="privacy"
+                    rows={6}
+                    value={privacyPolicy}
+                    onChange={(e) => setPrivacyPolicy(e.target.value)}
+                    placeholder="Rédigez votre politique de confidentialité..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t">
+              <Button onClick={handleSavePlatformSettings} size="lg">
+                <Save className="h-4 w-4 mr-2" />
+                Enregistrer la configuration
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderAnalytics = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-gold/20 shadow-lg">
+          <CardHeader>
+            <CardTitle className="font-serif text-2xl flex items-center gap-2">
+              <BarChart3 className="h-6 w-6 text-gold" />
+              Analytics & Statistiques
+            </CardTitle>
+            <CardDescription>Tableau de bord détaillé des performances</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-16 text-muted-foreground">
+              <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-medium mb-2">Statistiques avancées à venir</p>
+              <p className="text-sm">Graphiques de ventes, top documents, top auteurs...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderBanners = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-gold/20 shadow-lg">
+          <CardHeader className="border-b border-gold/10 pb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-serif text-2xl flex items-center gap-2">
+                  <Image className="h-6 w-6 text-gold" />
+                  Gestion des bannières
+                </CardTitle>
+                <CardDescription>Personnalisez les bannières de la page d'accueil</CardDescription>
+              </div>
+              <Button onClick={() => {
+                setBannerForm({ title: "", subtitle: "", image_url: "", cta_text: "", cta_url: "", display_order: banners.length + 1 });
+                setBannerDialog({ open: true, mode: "create", banner: null });
+              }}>
+                <Plus className="h-4 w-4 mr-2" /> Nouvelle bannière
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {banners.map((banner) => (
+                <Card key={banner.id} className="border-gold/20 overflow-hidden">
+                  <div className="h-40 bg-cover bg-center relative" style={{ backgroundImage: `url(${banner.image_url})` }}>
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="text-center text-white p-4">
+                        <h3 className="text-xl font-bold mb-1">{banner.title}</h3>
+                        <p className="text-sm opacity-90">{banner.subtitle}</p>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <Badge variant={banner.is_active ? "default" : "secondary"} className={banner.is_active ? "bg-green-600" : ""}>
+                        {banner.is_active ? "Actif" : "Inactif"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        CTA: {banner.cta_text} → {banner.cta_url}
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleToggleBanner(banner.id, banner.is_active || false)}>
+                            <Eye className="h-4 w-4 mr-2" /> 
+                            {banner.is_active ? "Désactiver" : "Activer"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            setBannerForm({
+                              title: banner.title,
+                              subtitle: banner.subtitle || "",
+                              image_url: banner.image_url,
+                              cta_text: banner.cta_text || "",
+                              cta_url: banner.cta_url || "",
+                              display_order: banner.display_order || 1,
+                            });
+                            setBannerDialog({ open: true, mode: "edit", banner });
+                          }}>
+                            <Edit className="h-4 w-4 mr-2" /> Modifier
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-600"
+                            onClick={() => setDeleteDialog({ open: true, type: "banner", id: banner.id, title: banner.title })}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {banners.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Image className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Aucune bannière configurée</p>
+                <p className="text-sm">Créez votre première bannière pour personnaliser la page d'accueil</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -992,6 +1579,10 @@ export default function AdminDashboard() {
     { id: "documents", label: "Documents", icon: FileText, badge: stats?.pendingDocuments || 0 },
     { id: "reports", label: "Signalements", icon: AlertTriangle, badge: stats?.totalReports || 0, badgeColor: "bg-red-500" },
     { id: "transactions", label: "Transactions", icon: DollarSign },
+    { id: "categories", label: "Catégories", icon: FolderTree },
+    { id: "settings", label: "Configuration", icon: Settings },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "banners", label: "Bannières", icon: Image },
   ];
 
   return (
@@ -1021,7 +1612,7 @@ export default function AdminDashboard() {
       <div className="flex flex-1 overflow-hidden">
         <aside className={`
           fixed md:sticky top-16 z-30 h-[calc(100vh-4rem)] w-64 shrink-0 
-          border-r border-gold/10 bg-card transition-transform duration-300 ease-in-out
+          border-r border-gold/10 bg-card transition-transform duration-300 ease-in-out overflow-y-auto
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}>
           <div className="flex flex-col h-full py-6 px-3">
@@ -1049,7 +1640,7 @@ export default function AdminDashboard() {
                       <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-muted-foreground"}`} />
                       <span>{item.label}</span>
                     </div>
-                    {item.badge > 0 && (
+                    {item.badge && item.badge > 0 && (
                       <Badge variant="destructive" className={`h-5 px-1.5 flex items-center justify-center text-xs ${isActive ? "bg-white text-earth border-none" : item.badgeColor || "bg-orange-500"}`}>
                         {item.badge}
                       </Badge>
@@ -1085,9 +1676,14 @@ export default function AdminDashboard() {
           {activeModule === "documents" && renderDocuments()}
           {activeModule === "reports" && renderReports()}
           {activeModule === "transactions" && renderTransactions()}
+          {activeModule === "categories" && renderCategories()}
+          {activeModule === "settings" && renderSettings()}
+          {activeModule === "analytics" && renderAnalytics()}
+          {activeModule === "banners" && renderBanners()}
         </main>
       </div>
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, type: null, id: null, title: "" })}>
         <AlertDialogContent className="border-red-500/20">
           <AlertDialogHeader>
@@ -1096,7 +1692,8 @@ export default function AdminDashboard() {
               Confirmation de suppression
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base mt-2">
-              Vous êtes sur le point de supprimer définitivement {deleteDialog.type === "visitor" ? "l'utilisateur" : deleteDialog.type === "author" ? "l'auteur" : "le document"} : <br/>
+              Vous êtes sur le point de supprimer définitivement :
+              <br/>
               <strong className="text-foreground mt-2 block p-2 bg-muted rounded-md">{deleteDialog.title}</strong>
               <br/>
               Cette action est irréversible et supprimera toutes les données associées.
@@ -1112,6 +1709,10 @@ export default function AdminDashboard() {
                   handleDeleteAuthor(deleteDialog.id);
                 } else if (deleteDialog.type === "document" && deleteDialog.id) {
                   handleDocumentAction(deleteDialog.id, "delete");
+                } else if (deleteDialog.type === "category" && deleteDialog.id) {
+                  handleDeleteCategory(deleteDialog.id);
+                } else if (deleteDialog.type === "banner" && deleteDialog.id) {
+                  handleDeleteBanner(deleteDialog.id);
                 }
               }}
               className="bg-red-600 hover:bg-red-700 text-white"
@@ -1121,6 +1722,159 @@ export default function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Category Dialog */}
+      <Dialog open={categoryDialog.open} onOpenChange={(open) => !open && setCategoryDialog({ open: false, mode: "create", category: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {categoryDialog.mode === "create" ? "Créer une catégorie" : "Modifier la catégorie"}
+            </DialogTitle>
+            <DialogDescription>
+              {categoryDialog.mode === "create" 
+                ? "Ajoutez une nouvelle catégorie de documents" 
+                : "Modifiez les informations de la catégorie"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cat-name">Nom de la catégorie</Label>
+              <Input
+                id="cat-name"
+                value={categoryForm.name}
+                onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                placeholder="Ex: Romans, Essais..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cat-slug">Slug (URL)</Label>
+              <Input
+                id="cat-slug"
+                value={categoryForm.slug}
+                onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                placeholder="Ex: romans, essais..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cat-icon">Icône (emoji)</Label>
+              <Input
+                id="cat-icon"
+                value={categoryForm.icon}
+                onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value })}
+                placeholder="Ex: 📚, 📖, 📝..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cat-desc">Description (optionnel)</Label>
+              <Textarea
+                id="cat-desc"
+                value={categoryForm.description}
+                onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                placeholder="Décrivez cette catégorie..."
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCategoryDialog({ open: false, mode: "create", category: null })}>
+              Annuler
+            </Button>
+            <Button onClick={categoryDialog.mode === "create" ? handleCreateCategory : handleUpdateCategory}>
+              <Save className="h-4 w-4 mr-2" />
+              {categoryDialog.mode === "create" ? "Créer" : "Enregistrer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Banner Dialog */}
+      <Dialog open={bannerDialog.open} onOpenChange={(open) => !open && setBannerDialog({ open: false, mode: "create", banner: null })}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {bannerDialog.mode === "create" ? "Créer une bannière" : "Modifier la bannière"}
+            </DialogTitle>
+            <DialogDescription>
+              {bannerDialog.mode === "create" 
+                ? "Ajoutez une nouvelle bannière pour la page d'accueil" 
+                : "Modifiez les informations de la bannière"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="banner-title">Titre</Label>
+                <Input
+                  id="banner-title"
+                  value={bannerForm.title}
+                  onChange={(e) => setBannerForm({ ...bannerForm, title: e.target.value })}
+                  placeholder="Titre principal de la bannière"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="banner-subtitle">Sous-titre</Label>
+                <Input
+                  id="banner-subtitle"
+                  value={bannerForm.subtitle}
+                  onChange={(e) => setBannerForm({ ...bannerForm, subtitle: e.target.value })}
+                  placeholder="Sous-titre ou description"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="banner-image">URL de l'image</Label>
+              <Input
+                id="banner-image"
+                value={bannerForm.image_url}
+                onChange={(e) => setBannerForm({ ...bannerForm, image_url: e.target.value })}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="banner-cta">Texte du bouton CTA</Label>
+                <Input
+                  id="banner-cta"
+                  value={bannerForm.cta_text}
+                  onChange={(e) => setBannerForm({ ...bannerForm, cta_text: e.target.value })}
+                  placeholder="Ex: Explorer, Découvrir..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="banner-url">Lien du CTA</Label>
+                <Input
+                  id="banner-url"
+                  value={bannerForm.cta_url}
+                  onChange={(e) => setBannerForm({ ...bannerForm, cta_url: e.target.value })}
+                  placeholder="/catalogue, /categories..."
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="banner-order">Ordre d'affichage</Label>
+              <Input
+                id="banner-order"
+                type="number"
+                min="1"
+                value={bannerForm.display_order}
+                onChange={(e) => setBannerForm({ ...bannerForm, display_order: Number(e.target.value) })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBannerDialog({ open: false, mode: "create", banner: null })}>
+              Annuler
+            </Button>
+            <Button onClick={bannerDialog.mode === "create" ? handleCreateBanner : handleUpdateBanner}>
+              <Save className="h-4 w-4 mr-2" />
+              {bannerDialog.mode === "create" ? "Créer" : "Enregistrer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
