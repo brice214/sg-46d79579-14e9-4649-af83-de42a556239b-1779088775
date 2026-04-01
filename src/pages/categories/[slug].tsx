@@ -11,8 +11,8 @@ import { BookOpen, User, Tag, ArrowLeft, TrendingUp, FileText } from "lucide-rea
 import { categoryService } from "@/services/categoryService";
 import { documentService } from "@/services/documentService";
 import type { Database } from "@/integrations/supabase/types";
+import type { Category } from "@/services/categoryService";
 
-type Category = Database["public"]["Tables"]["categories"]["Row"];
 type Document = Database["public"]["Tables"]["documents"]["Row"] & {
   profiles?: { full_name: string | null } | null;
 };

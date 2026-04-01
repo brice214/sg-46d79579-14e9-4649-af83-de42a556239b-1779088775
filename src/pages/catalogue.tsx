@@ -11,13 +11,12 @@ import { Search, Filter, BookOpen, User, Tag, Eye, Download } from "lucide-react
 import { documentService } from "@/services/documentService";
 import { categoryService } from "@/services/categoryService";
 import type { Database } from "@/integrations/supabase/types";
+import type { Category } from "@/services/categoryService";
 
 type Document = Database["public"]["Tables"]["documents"]["Row"] & {
   profiles?: { full_name: string | null } | null;
   categories?: { name: string } | null;
 };
-
-type Category = Database["public"]["Tables"]["categories"]["Row"];
 
 export default function Catalogue() {
   const [documents, setDocuments] = useState<Document[]>([]);

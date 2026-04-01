@@ -18,8 +18,7 @@ import { categoryService } from "@/services/categoryService";
 import { documentService } from "@/services/documentService";
 import { Upload as UploadIcon, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
-
-type Category = Database["public"]["Tables"]["categories"]["Row"];
+import type { Category } from "@/services/categoryService";
 
 export default function Upload() {
   const router = useRouter();

@@ -7,8 +7,7 @@ import { BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import { categoryService } from "@/services/categoryService";
 import { documentService } from "@/services/documentService";
 import type { Database } from "@/integrations/supabase/types";
-
-type Category = Database["public"]["Tables"]["categories"]["Row"];
+import type { Category } from "@/services/categoryService";
 
 interface CategoryWithCount extends Category {
   documentCount: number;
