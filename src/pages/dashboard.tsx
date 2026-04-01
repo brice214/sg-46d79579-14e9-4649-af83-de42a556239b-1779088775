@@ -222,7 +222,7 @@ export default function Dashboard() {
       toast({
         variant: "destructive",
         title: "Solde insuffisant",
-        description: "Le montant minimum de retrait est de 5000 XOF."
+        description: "Le montant minimum de retrait est de 5000 XAF."
       });
       return;
     }
@@ -319,10 +319,10 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-green-600">
-                      {availableBalance.toLocaleString()} XOF
+                      {availableBalance.toLocaleString()} XAF
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      En attente: {pendingBalance.toLocaleString()} XOF
+                      En attente: {pendingBalance.toLocaleString()} XAF
                     </p>
                   </CardContent>
                 </Card>
@@ -336,7 +336,7 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-foreground">
-                      {totalEarnings.toLocaleString()} XOF
+                      {totalEarnings.toLocaleString()} XAF
                     </div>
                     <p className="text-xs text-green-600 flex items-center mt-1">
                       <TrendingUp className="h-3 w-3 mr-1" />
@@ -393,7 +393,7 @@ export default function Dashboard() {
                           <div>
                             <p className="font-medium">Retrait disponible</p>
                             <p className="text-sm text-muted-foreground">
-                              {availableBalance.toLocaleString()} XOF disponibles
+                              {availableBalance.toLocaleString()} XAF disponibles
                             </p>
                           </div>
                         </div>
@@ -514,7 +514,7 @@ export default function Dashboard() {
                                     </Badge>
                                   )}
                                   <span className="text-sm text-muted-foreground">
-                                    {doc.price === 0 ? "Gratuit" : `${doc.price} XOF`}
+                                    {doc.price === 0 ? "Gratuit" : `${doc.price} XAF`}
                                   </span>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
@@ -535,7 +535,7 @@ export default function Dashboard() {
                                   </div>
                                   <div className="flex items-center text-sm">
                                     <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
-                                    <span className="font-medium text-green-600">{doc.total_revenue.toLocaleString()} XOF</span>
+                                    <span className="font-medium text-green-600">{doc.total_revenue.toLocaleString()} XAF</span>
                                   </div>
                                 </div>
                               </div>
@@ -569,7 +569,7 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle>Demander un retrait</CardTitle>
                       <CardDescription>
-                        Minimum de retrait: 5000 XOF
+                        Minimum de retrait: 5000 XAF
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -577,16 +577,16 @@ export default function Dashboard() {
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">Solde disponible</span>
                           <span className="text-xl font-bold text-green-600">
-                            {availableBalance.toLocaleString()} XOF
+                            {availableBalance.toLocaleString()} XAF
                           </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-muted-foreground">En attente</span>
-                          <span className="font-medium">{pendingBalance.toLocaleString()} XOF</span>
+                          <span className="font-medium">{pendingBalance.toLocaleString()} XAF</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-muted-foreground">Total gagné</span>
-                          <span className="font-medium">{totalEarnings.toLocaleString()} XOF</span>
+                          <span className="font-medium">{totalEarnings.toLocaleString()} XAF</span>
                         </div>
                       </div>
 
@@ -601,7 +601,7 @@ export default function Dashboard() {
 
                       {availableBalance < 5000 && (
                         <p className="text-sm text-muted-foreground text-center">
-                          Vous devez avoir au moins 5000 XOF pour demander un retrait.
+                          Vous devez avoir au moins 5000 XAF pour demander un retrait.
                         </p>
                       )}
                     </CardContent>
@@ -625,7 +625,7 @@ export default function Dashboard() {
                           {withdrawalRequests.map((withdrawal) => (
                             <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                               <div>
-                                <p className="font-medium">{withdrawal.amount.toLocaleString()} XOF</p>
+                                <p className="font-medium">{withdrawal.amount.toLocaleString()} XAF</p>
                                 <p className="text-xs text-muted-foreground">
                                   {new Date(withdrawal.created_at).toLocaleDateString("fr-FR")}
                                 </p>

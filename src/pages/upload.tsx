@@ -193,7 +193,7 @@ export default function Upload() {
         keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
         document_type: documentType as any,
         price: parseFloat(price),
-        currency: "XOF",
+        currency: "XAF",
         page_count: pageCount ? parseInt(pageCount) : null,
         file_url: pdfUrl,
         cover_image_url: coverUrl,
@@ -335,7 +335,7 @@ export default function Upload() {
                 {/* Prix et Pages */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="price">Prix (XOF) *</Label>
+                    <Label htmlFor="price">Prix (XAF) *</Label>
                     <Input
                       id="price"
                       type="number"

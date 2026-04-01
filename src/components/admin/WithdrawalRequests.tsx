@@ -270,18 +270,18 @@ export function WithdrawalRequests() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-2">
                           <div>
                             <p className="text-xs text-muted-foreground">Montant</p>
-                            <p className="font-semibold">{Number(request.amount).toLocaleString()} XOF</p>
+                            <p className="font-semibold">{Number(request.amount).toLocaleString()} XAF</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Frais</p>
                             <p className="font-semibold text-red-500">
-                              -{Number(request.transaction_fee).toLocaleString()} XOF
+                              -{Number(request.transaction_fee).toLocaleString()} XAF
                             </p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Montant net</p>
                             <p className="font-semibold text-green-600">
-                              {Number(request.net_amount).toLocaleString()} XOF
+                              {Number(request.net_amount).toLocaleString()} XAF
                             </p>
                           </div>
                           <div>
@@ -372,7 +372,7 @@ export function WithdrawalRequests() {
                 </p>
                 <p className="text-sm mb-2">
                   <span className="font-semibold">Montant net:</span>{" "}
-                  {Number(selectedRequest.net_amount).toLocaleString()} XOF
+                  {Number(selectedRequest.net_amount).toLocaleString()} XAF
                 </p>
                 <p className="text-sm">
                   <span className="font-semibold">Méthode:</span>{" "}

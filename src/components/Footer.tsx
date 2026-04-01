@@ -61,8 +61,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-sm text-muted-foreground hover:text-gold transition-colors">
-                  Tarification
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-gold transition-colors">
+                  Contact
                 </Link>
               </li>
             </ul>
@@ -101,7 +101,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-muted-foreground">Dakar, Sénégal</span>
+                <span className="text-sm text-muted-foreground">Libreville, Gabon</span>
               </li>
             </ul>
           </div>

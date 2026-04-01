@@ -41,7 +41,7 @@ export const withdrawalService = {
 
       return {
         minimum_amount: minAmount?.amount || 10000,
-        currency: minAmount?.currency || "XOF",
+        currency: minAmount?.currency || "XAF",
         transaction_fee: fee || { type: "percentage", value: 2.5, minimum: 500 },
         methods: methods || { mobile_money: true, bank_transfer: true },
       };
@@ -61,7 +61,7 @@ export const withdrawalService = {
       if (settings.minimum_amount !== undefined) {
         updates.push({
           key: "withdrawal_minimum_amount",
-          value: { amount: settings.minimum_amount, currency: settings.currency || "XOF" },
+          value: { amount: settings.minimum_amount, currency: settings.currency || "XAF" },
         });
       }
 

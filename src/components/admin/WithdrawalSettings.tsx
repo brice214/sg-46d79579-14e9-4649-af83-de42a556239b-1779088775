@@ -45,7 +45,7 @@ export function WithdrawalSettings() {
 
     const success = await withdrawalService.updateWithdrawalSettings({
       minimum_amount: minimumAmount,
-      currency: "XOF",
+      currency: "XAF",
       transaction_fee: {
         type: feeType,
         value: feeValue,
@@ -104,7 +104,7 @@ export function WithdrawalSettings() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="min-amount">Montant minimum (XOF)</Label>
+              <Label htmlFor="min-amount">Montant minimum (XAF)</Label>
               <Input
                 id="min-amount"
                 type="number"
@@ -114,7 +114,7 @@ export function WithdrawalSettings() {
                 onChange={(e) => setMinimumAmount(Number(e.target.value))}
               />
               <p className="text-xs text-muted-foreground">
-                Les auteurs devront avoir au moins {minimumAmount.toLocaleString()} XOF pour demander un retrait
+                Les auteurs devront avoir au moins {minimumAmount.toLocaleString()} XAF pour demander un retrait
               </p>
             </div>
           </div>
@@ -138,7 +138,7 @@ export function WithdrawalSettings() {
                   className="w-full rounded-md border border-input bg-background px-3 py-2"
                 >
                   <option value="percentage">Pourcentage (%)</option>
-                  <option value="fixed">Montant fixe (XOF)</option>
+                  <option value="fixed">Montant fixe (XAF)</option>
                 </select>
               </div>
 
@@ -157,14 +157,14 @@ export function WithdrawalSettings() {
                 <p className="text-xs text-muted-foreground">
                   {feeType === "percentage"
                     ? `${feeValue}% du montant retiré`
-                    : `${feeValue.toLocaleString()} XOF par retrait`}
+                    : `${feeValue.toLocaleString()} XAF par retrait`}
                 </p>
               </div>
             </div>
 
             {feeType === "percentage" && (
               <div className="space-y-2">
-                <Label htmlFor="fee-minimum">Frais minimum (XOF)</Label>
+                <Label htmlFor="fee-minimum">Frais minimum (XAF)</Label>
                 <Input
                   id="fee-minimum"
                   type="number"
