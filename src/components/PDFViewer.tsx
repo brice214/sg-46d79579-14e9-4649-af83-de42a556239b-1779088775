@@ -11,93 +11,89 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDFViewerProps) {
+  const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [scale, setScale] = useState(1.0);
+  const [zoom, setZoom] = useState(1.0);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const canvasRefs = useRef<{ [key: number]: HTMLCanvasElement | null }>({});
-  const pdfDocRef = useRef<any>(null);
+  const canvasRefs = useRef<{ [key: number]: HTMLCanvasElement }>({});
+  const renderTaskRef = useRef<any>(null); // Track current render task
 
-  const maxPreviewPages = hasAccess ? undefined : 2;
+  const FREE_PREVIEW_PAGES = 2;
+  const isPageLocked = !hasAccess && currentPage > FREE_PREVIEW_PAGES;
 
   useEffect(() => {
     if (!fileUrl) {
-      setError("URL du document non disponible");
       setLoading(false);
       return;
     }
 
-    let isMounted = true;
-
     const loadPDF = async () => {
       try {
         setLoading(true);
-        setError(null);
-
-        // Import PDF.js dynamically
-        const pdfjsLib = await import("pdfjs-dist");
-        
-        // Set worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-
         const loadingTask = pdfjsLib.getDocument(fileUrl);
         const pdf = await loadingTask.promise;
-
-        if (!isMounted) return;
-
-        pdfDocRef.current = pdf;
-        setTotalPages(pdf.numPages);
+        setPdfDoc(pdf);
+        setNumPages(pdf.numPages);
         setLoading(false);
-
-        // Render first page
-        await renderPage(pdf, 1);
-      } catch (err) {
-        console.error("Error loading PDF:", err);
-        if (isMounted) {
-          setError("Erreur lors du chargement du PDF");
-          setLoading(false);
-        }
+      } catch (error) {
+        console.error("Error loading PDF:", error);
+        setLoading(false);
       }
     };
 
     loadPDF();
 
+    // Cleanup on unmount
     return () => {
-      isMounted = false;
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+      }
     };
   }, [fileUrl]);
 
   useEffect(() => {
-    if (pdfDocRef.current && currentPage) {
-      renderPage(pdfDocRef.current, currentPage);
-    }
-  }, [currentPage, scale]);
+    if (!pdfDoc || !canvasRefs.current[currentPage]) return;
 
-  const renderPage = async (pdf: any, pageNum: number) => {
-    try {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: scale * 1.5 });
+    const renderPage = async () => {
+      try {
+        // Cancel any ongoing render task
+        if (renderTaskRef.current) {
+          renderTaskRef.current.cancel();
+          renderTaskRef.current = null;
+        }
 
-      const canvas = canvasRefs.current[pageNum];
-      if (!canvas) return;
+        const page = await pdfDoc.getPage(currentPage);
+        const canvas = canvasRefs.current[currentPage];
+        if (!canvas) return;
 
-      const context = canvas.getContext("2d");
-      if (!context) return;
+        const context = canvas.getContext("2d");
+        if (!context) return;
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+        const viewport = page.getViewport({ scale: zoom * 1.5 });
 
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport,
-      };
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-      await page.render(renderContext).promise;
-    } catch (err) {
-      console.error("Error rendering page:", err);
-    }
-  };
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+
+        // Store the render task so we can cancel it later
+        renderTaskRef.current = page.render(renderContext);
+        await renderTaskRef.current.promise;
+        renderTaskRef.current = null;
+      } catch (error: any) {
+        // Ignore cancellation errors
+        if (error?.name !== "RenderingCancelledException") {
+          console.error("Error rendering page:", error);
+        }
+      }
+    };
+
+    renderPage();
+  }, [pdfDoc, currentPage, zoom]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -106,20 +102,20 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < numPages) {
       setCurrentPage(currentPage + 1);
     }
   };
 
   const handleZoomIn = () => {
-    if (scale < 2.0) {
-      setScale(scale + 0.25);
+    if (zoom < 2.0) {
+      setZoom(zoom + 0.25);
     }
   };
 
   const handleZoomOut = () => {
-    if (scale > 0.5) {
-      setScale(scale - 0.25);
+    if (zoom > 0.5) {
+      setZoom(zoom - 0.25);
     }
   };
 
@@ -127,20 +123,10 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
     window.open(fileUrl, "_blank");
   };
 
-  const isPageLocked = !hasAccess && maxPreviewPages && currentPage > maxPreviewPages;
-
   if (!fileUrl) {
     return (
       <div className="bg-white/50 backdrop-blur rounded-lg p-8 border-2 border-dashed border-terre/30 text-center">
         <p className="text-noir/60">URL du document non disponible</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-white/50 backdrop-blur rounded-lg p-8 border-2 border-dashed border-red-300 text-center">
-        <p className="text-red-600">{error}</p>
       </div>
     );
   }
@@ -168,11 +154,11 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium text-noir px-2">
-            Page {currentPage} / {totalPages}
+            Page {currentPage} / {numPages}
           </span>
           <Button
             onClick={handleNextPage}
-            disabled={currentPage >= totalPages}
+            disabled={currentPage >= numPages}
             variant="outline"
             size="sm"
             className="border-terre/30"
@@ -182,11 +168,11 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={handleZoomOut} disabled={scale <= 0.5} variant="outline" size="sm" className="border-terre/30">
+          <Button onClick={handleZoomOut} disabled={zoom <= 0.5} variant="outline" size="sm" className="border-terre/30">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium text-noir px-2">{Math.round(scale * 100)}%</span>
-          <Button onClick={handleZoomIn} disabled={scale >= 2.0} variant="outline" size="sm" className="border-terre/30">
+          <span className="text-sm font-medium text-noir px-2">{Math.round(zoom * 100)}%</span>
+          <Button onClick={handleZoomIn} disabled={zoom >= 2.0} variant="outline" size="sm" className="border-terre/30">
             <ZoomIn className="h-4 w-4" />
           </Button>
           <Button onClick={handleFullscreen} variant="outline" size="sm" className="border-terre/30">
@@ -196,14 +182,14 @@ export function PDFViewer({ fileUrl, hasAccess, onPurchase, documentTitle }: PDF
       </div>
 
       {/* Preview Badge */}
-      {!hasAccess && maxPreviewPages && (
+      {!hasAccess && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="bg-amber-500 text-white">
               Aperçu Limité
             </Badge>
             <p className="text-sm text-amber-900">
-              Les {maxPreviewPages} premières pages sont visibles. Achetez pour voir l'intégralité.
+              Les {FREE_PREVIEW_PAGES} premières pages sont visibles. Achetez pour voir l'intégralité.
             </p>
           </div>
         </div>
