@@ -50,7 +50,7 @@ export function WithdrawalRequests() {
       withdrawalService.getWithdrawalStats(),
     ]);
 
-    setRequests(requestsData as WithdrawalRequestData[]);
+    setRequests(requestsData as unknown as WithdrawalRequestData[]);
     setStats(statsData);
     setLoading(false);
   };

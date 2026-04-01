@@ -20,7 +20,7 @@ import {
   TrendingUp, Eye, CheckCircle, XCircle, Clock, 
   Search, MoreVertical, ShieldAlert, ArrowUpRight,
   UserCheck, UserX, Edit, Trash2, Ban, X, Menu, LogOut, Check, PenTool, Lock,
-  Settings, BarChart3, Image, FolderTree, Plus, Save, GripVertical, ChevronUp, ChevronDown
+  Settings, BarChart3, Image, FolderTree, Plus, Save, GripVertical, ChevronUp, ChevronDown, Wallet
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -231,7 +231,8 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState<
     | "overview"
-    | "users"
+    | "visitors"
+    | "authors"
     | "documents"
     | "reports"
     | "transactions"
