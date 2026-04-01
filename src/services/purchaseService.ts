@@ -5,6 +5,47 @@ type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
 type TransactionInsert = Database["public"]["Tables"]["transactions"]["Insert"];
 
 export const purchaseService = {
+  async createPurchase(documentId: string, userId: string) {
+    try {
+      // 1. Get document details
+      const { data: doc, error: docError } = await supabase
+        .from("documents")
+        .select("price, author_id")
+        .eq("id", documentId)
+        .single();
+        
+      if (docError || !doc) {
+        return { success: false, error: "Document introuvable" };
+      }
+      
+      // Calculate author earnings (e.g., 80% to author, 20% commission)
+      const authorEarnings = Number(doc.price) * 0.8;
+      const commission = Number(doc.price) * 0.2;
+      
+      // 2. Create and complete transaction automatically for this demo
+      const transaction = await this.createTransaction({
+        document_id: documentId,
+        buyer_id: userId,
+        author_id: doc.author_id,
+        amount: doc.price,
+        author_earnings: authorEarnings,
+        commission_amount: commission,
+        status: "completed",
+        payment_method: "mobile_money",
+        transaction_reference: `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        completed_at: new Date().toISOString()
+      });
+      
+      // 3. Grant access
+      await this.grantAccess(documentId, userId, transaction.id);
+      
+      return { success: true };
+    } catch (error: any) {
+      console.error("Purchase process error:", error);
+      return { success: false, error: error.message || "Erreur lors de l'achat" };
+    }
+  },
+
   async createTransaction(transaction: TransactionInsert) {
     const { data, error } = await supabase
       .from("transactions")
