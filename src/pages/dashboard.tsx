@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, DollarSign, Upload, Eye, Download, FileText, Settings, User,
   TrendingUp, Clock, CheckCircle, XCircle, Edit, Wallet, BarChart3,
-  AlertCircle, ArrowUpRight, ChevronRight, ShoppingCart, Lock
+  AlertCircle, ArrowUpRight, ChevronRight, ShoppingCart, Lock, Check
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -808,9 +808,9 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Right: Latest Paid Documents Carousel */}
-                <Card className="bg-gradient-to-br from-terre/5 to-orange-50">
+                <Card className="bg-gradient-to-br from-terre/5 to-orange-50 border-terre/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-noir">
                       <TrendingUp className="h-5 w-5 text-terre" />
                       Dernières parutions payantes
                     </CardTitle>
@@ -844,66 +844,98 @@ export default function Dashboard() {
                             return (
                               <CarouselItem key={doc.id}>
                                 <div className="p-1">
-                                  <Card className="border-terre/20 hover:shadow-lg transition-shadow">
-                                    <CardContent className="p-6 space-y-4">
-                                      {/* Document Title */}
-                                      <div>
-                                        <Link 
-                                          href={`/documents/${doc.slug}`}
-                                          className="text-lg font-bold text-noir hover:text-terre transition-colors line-clamp-2"
-                                        >
-                                          {doc.title}
-                                        </Link>
-                                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                          {doc.description}
-                                        </p>
-                                      </div>
+                                  <Card className="border-terre/30 hover:border-terre hover:shadow-xl transition-all duration-300 overflow-hidden bg-white">
+                                    <CardContent className="p-0">
+                                      {/* Cover Image */}
+                                      <div className="relative h-48 w-full bg-gradient-to-br from-terre/10 to-orange-50 overflow-hidden group">
+                                        {doc.cover_image_url ? (
+                                          <>
+                                            <img
+                                              src={doc.cover_image_url}
+                                              alt={doc.title}
+                                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-noir/80 via-noir/20 to-transparent" />
+                                          </>
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center">
+                                            <FileText className="h-16 w-16 text-terre/30" />
+                                          </div>
+                                        )}
+                                        
+                                        {/* Category Badge on Image */}
+                                        {doc.categories?.name && (
+                                          <div className="absolute top-3 left-3">
+                                            <Badge className="bg-gold text-noir font-semibold shadow-lg">
+                                              {doc.categories.name}
+                                            </Badge>
+                                          </div>
+                                        )}
 
-                                      {/* Metadata */}
-                                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                        <div className="flex items-center gap-1">
-                                          <User className="h-3 w-3" />
-                                          <span>{doc.profiles?.full_name || "Auteur"}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <Eye className="h-3 w-3" />
-                                          <span>{doc.views || 0}</span>
-                                        </div>
-                                      </div>
+                                        {/* Purchase Status Badge */}
+                                        {hasPurchased && (
+                                          <div className="absolute top-3 right-3">
+                                            <Badge className="bg-foret text-white font-semibold shadow-lg">
+                                              <Check className="h-3 w-3 mr-1" />
+                                              Acheté
+                                            </Badge>
+                                          </div>
+                                        )}
 
-                                      <Separator />
-
-                                      {/* Price & Action */}
-                                      <div className="flex items-center justify-between">
-                                        <div>
-                                          <p className="text-2xl font-bold text-terre">
+                                        {/* Price Badge */}
+                                        <div className="absolute bottom-3 right-3">
+                                          <div className="bg-terre text-white px-4 py-2 rounded-full font-bold text-lg shadow-lg">
                                             {doc.price} XAF
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* Content */}
+                                      <div className="p-5 space-y-4">
+                                        {/* Document Title */}
+                                        <div>
+                                          <Link 
+                                            href={`/documents/${doc.slug}`}
+                                            className="text-lg font-bold text-noir hover:text-terre transition-colors line-clamp-2 block"
+                                          >
+                                            {doc.title}
+                                          </Link>
+                                          <p className="text-sm text-noir/60 mt-2 line-clamp-2">
+                                            {doc.description}
                                           </p>
                                         </div>
-                                        
-                                        {hasPurchased ? (
-                                          <Link href={`/documents/${doc.slug}`}>
-                                            <Button size="sm" className="bg-foret hover:bg-foret/90">
-                                              <Download className="h-4 w-4 mr-2" />
-                                              Télécharger
-                                            </Button>
-                                          </Link>
-                                        ) : (
-                                          <Link href={`/documents/${doc.slug}`}>
-                                            <Button size="sm" className="bg-gradient-to-r from-terre to-orange-600 hover:from-terre/90 hover:to-orange-700">
-                                              <ShoppingCart className="h-4 w-4 mr-2" />
-                                              Acheter
-                                            </Button>
-                                          </Link>
-                                        )}
-                                      </div>
 
-                                      {/* Category Badge */}
-                                      {doc.categories?.name && (
-                                        <Badge variant="outline" className="text-xs">
-                                          {doc.categories.name}
-                                        </Badge>
-                                      )}
+                                        {/* Metadata */}
+                                        <div className="flex items-center gap-4 text-xs text-noir/50 pt-2 border-t border-terre/10">
+                                          <div className="flex items-center gap-1.5">
+                                            <User className="h-3.5 w-3.5 text-terre" />
+                                            <span className="font-medium">{doc.profiles?.full_name || "Auteur"}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1.5">
+                                            <Eye className="h-3.5 w-3.5 text-terre" />
+                                            <span>{doc.views || 0} vues</span>
+                                          </div>
+                                        </div>
+
+                                        {/* Action Button */}
+                                        <div className="pt-2">
+                                          {hasPurchased ? (
+                                            <Link href={`/documents/${doc.slug}`} className="block">
+                                              <Button size="lg" className="w-full bg-foret hover:bg-foret/90 text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                                <Download className="h-4 w-4 mr-2" />
+                                                Télécharger maintenant
+                                              </Button>
+                                            </Link>
+                                          ) : (
+                                            <Link href={`/documents/${doc.slug}`} className="block">
+                                              <Button size="lg" className="w-full bg-gradient-to-r from-terre to-orange-600 hover:from-terre/90 hover:to-orange-700 text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                                Acheter ce document
+                                              </Button>
+                                            </Link>
+                                          )}
+                                        </div>
+                                      </div>
                                     </CardContent>
                                   </Card>
                                 </div>
@@ -911,8 +943,8 @@ export default function Dashboard() {
                             );
                           })}
                         </CarouselContent>
-                        <CarouselPrevious className="-left-4" />
-                        <CarouselNext className="-right-4" />
+                        <CarouselPrevious className="-left-4 bg-white border-terre/30 text-terre hover:bg-terre hover:text-white" />
+                        <CarouselNext className="-right-4 bg-white border-terre/30 text-terre hover:bg-terre hover:text-white" />
                       </Carousel>
                     )}
                   </CardContent>
