@@ -165,11 +165,42 @@ export default function AdminDashboard() {
   // Platform Settings States
   const [commissionRate, setCommissionRate] = useState(15);
   const [mobileMoneyEnabled, setMobileMoneyEnabled] = useState(true);
-  const [cardPaymentEnabled, setCardPaymentEnabled] = useState(true);
+  const [cardPaymentEnabled, setCardPaymentEnabled] = useState(false);
   const [platformName, setPlatformName] = useState("AfriLitt");
   const [primaryColor, setPrimaryColor] = useState("#D4AF37");
   const [termsOfService, setTermsOfService] = useState("");
   const [privacyPolicy, setPrivacyPolicy] = useState("");
+
+  // SEO Settings
+  const [siteTitle, setSiteTitle] = useState("AfriLitt - Plateforme de Documents Africains");
+  const [siteDescription, setSiteDescription] = useState("Découvrez et partagez des documents, livres et ressources de la culture africaine");
+  const [siteKeywords, setSiteKeywords] = useState("afrique, littérature, documents, culture, livres");
+  const [ogImage, setOgImage] = useState("");
+  const [twitterHandle, setTwitterHandle] = useState("@afrilitt");
+
+  // SMTP Settings
+  const [smtpHost, setSmtpHost] = useState("");
+  const [smtpPort, setSmtpPort] = useState("587");
+  const [smtpUser, setSmtpUser] = useState("");
+  const [smtpPassword, setSmtpPassword] = useState("");
+  const [smtpFromEmail, setSmtpFromEmail] = useState("");
+  const [smtpFromName, setSmtpFromName] = useState("AfriLitt");
+
+  // Payment Settings
+  const [mtnApiKey, setMtnApiKey] = useState("");
+  const [orangeApiKey, setOrangeApiKey] = useState("");
+  const [moovApiKey, setMoovApiKey] = useState("");
+  const [stripePublicKey, setStripePublicKey] = useState("");
+  const [stripeSecretKey, setStripeSecretKey] = useState("");
+  const [paymentTestMode, setPaymentTestMode] = useState(true);
+
+  // Security Settings
+  const [captchaEnabled, setCaptchaEnabled] = useState(false);
+  const [captchaSiteKey, setCaptchaSiteKey] = useState("");
+  const [captchaSecretKey, setCaptchaSecretKey] = useState("");
+  const [rateLimitEnabled, setRateLimitEnabled] = useState(true);
+  const [maxRequestsPerMinute, setMaxRequestsPerMinute] = useState(60);
+  const [sessionTimeout, setSessionTimeout] = useState(30);
 
   // Filters
   const [visitorsSearch, setVisitorsSearch] = useState("");
@@ -244,6 +275,7 @@ export default function AdminDashboard() {
   >("overview");
   
   const [withdrawalSubTab, setWithdrawalSubTab] = useState<"settings" | "requests">("settings");
+  const [settingsSubTab, setSettingsSubTab] = useState<"general" | "seo" | "smtp" | "payment" | "security">("general");
 
   useEffect(() => {
     checkAuthAndLoadData();
