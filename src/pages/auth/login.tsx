@@ -20,25 +20,35 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      const { user } = await authService.signIn(email, password);
+      
+      // Get user role from profiles
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
 
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue sur AfriLitt.",
+        description: "Bienvenue sur AfriLitt !",
       });
-      router.push("/dashboard");
-    } catch (error: any) {
+
+      // Redirect based on role
+      if (profile?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "Identifiants incorrects");
       toast({
-        variant: "destructive",
         title: "Erreur de connexion",
-        description: error.message === "Invalid login credentials" ? "Identifiants invalides." : error.message,
+        description: err.message || "Vérifiez vos identifiants",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
