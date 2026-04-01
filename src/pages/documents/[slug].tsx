@@ -134,11 +134,22 @@ export default function DocumentPage() {
 
       // Load PDF URL for viewer (admin always has access)
       if (currentUser && (isAdmin || userHasAccess || doc.price === 0)) {
-        const { data } = await supabase.storage
-          .from("documents")
-          .createSignedUrl(doc.file_url, 3600); // 1 hour expiry
+        // Extract relative path from full URL if needed
+        let filePath = doc.file_url;
         
-        if (data?.signedUrl) {
+        // If file_url contains full URL, extract the path after /documents/
+        if (filePath.includes("/storage/v1/object/public/documents/")) {
+          const parts = filePath.split("/storage/v1/object/public/documents/");
+          filePath = parts[1];
+        }
+        
+        const { data, error } = await supabase.storage
+          .from("documents")
+          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        
+        if (error) {
+          console.error("Error creating signed URL:", error);
+        } else if (data?.signedUrl) {
           setPdfUrl(data.signedUrl);
         }
       }
