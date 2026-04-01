@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -421,6 +421,69 @@ export type Database = {
             columns: ["document_id"]
             isOneToOne: false
             referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawal_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          author_id: string
+          created_at: string | null
+          id: string
+          net_amount: number
+          payment_details: Json
+          payment_method: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          transaction_fee: number
+          transaction_reference: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          author_id: string
+          created_at?: string | null
+          id?: string
+          net_amount: number
+          payment_details?: Json
+          payment_method: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          transaction_fee?: number
+          transaction_reference?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          author_id?: string
+          created_at?: string | null
+          id?: string
+          net_amount?: number
+          payment_details?: Json
+          payment_method?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          transaction_fee?: number
+          transaction_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_requests_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "withdrawal_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
