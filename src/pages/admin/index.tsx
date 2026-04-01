@@ -1607,17 +1607,6 @@ export default function AdminDashboard() {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
-          <p className="text-muted-foreground font-serif">Chargement de l'espace administrateur...</p>
-        </div>
-      </div>
-    );
-  }
-
   const navItems = [
     { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
     { id: "visitors", label: "Utilisateurs", icon: Users },
@@ -1626,6 +1615,7 @@ export default function AdminDashboard() {
     { id: "reports", label: "Signalements", icon: AlertTriangle, badge: stats?.totalReports || 0, badgeColor: "bg-red-500" },
     { id: "transactions", label: "Transactions", icon: DollarSign },
     { id: "categories", label: "Catégories", icon: FolderTree },
+    { id: "withdrawals", label: "Retraits", icon: Wallet },
     { id: "settings", label: "Configuration", icon: Settings },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "banners", label: "Bannières", icon: Image },
