@@ -538,15 +538,14 @@ export default function AdminDashboard() {
   // Platform Settings Actions
   const handleSavePlatformSettings = async () => {
     await Promise.all([
-      platformSettingsService.updateSetting("commission_rate", commissionRate, "payment"),
-      platformSettingsService.updateSetting("mobile_money_enabled", mobileMoneyEnabled, "payment"),
-      platformSettingsService.updateSetting("card_payment_enabled", cardPaymentEnabled, "payment"),
-      platformSettingsService.updateSetting("platform_name", platformName, "branding"),
-      platformSettingsService.updateSetting("primary_color", primaryColor, "branding"),
-      platformSettingsService.updateSetting("terms_of_service", termsOfService, "legal"),
-      platformSettingsService.updateSetting("privacy_policy", privacyPolicy, "legal"),
+      platformSettingsService.updateSetting("commission_rate", commissionRate),
+      platformSettingsService.updateSetting("mobile_money_enabled", mobileMoneyEnabled),
+      platformSettingsService.updateSetting("card_payment_enabled", cardPaymentEnabled),
+      platformSettingsService.updateSetting("platform_name", platformName),
+      platformSettingsService.updateSetting("primary_color", primaryColor),
+      platformSettingsService.updateSetting("terms_of_service", termsOfService),
+      platformSettingsService.updateSetting("privacy_policy", privacyPolicy),
     ]);
-
     toast({ title: "Succès", description: "Configuration enregistrée." });
   };
 
