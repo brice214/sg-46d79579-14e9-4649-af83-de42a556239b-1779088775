@@ -7,15 +7,15 @@ import { BookOpen, Upload, TrendingUp, Shield, Globe, Users, ArrowRight, Sparkle
 
 export default function Home() {
   const categories = [
-    { id: 1, name: "Littérature", icon: "📚", description: "Des romans, essais, poésie et plus encore." },
-    { id: 2, name: "Sciences", icon: "🔬", description: "Médecine, physique, informatique et autres sciences." },
-    { id: 3, name: "Histoire", icon: "📜", description: "Histoire africaine, mondiale et culturelle." },
-    { id: 4, name: "Philosophie", icon: "💭", description: "Études philosophiques et réflexions sur la société." },
-    { id: 5, name: "Économie", icon: "📊", description: "Économie, finance et gestion." },
-    { id: 6, name: "Éducation", icon: "🎓", description: "Manuels scolaires, cours et ressources pédagogiques." },
-    { id: 7, name: "Arts", icon: "🎨", description: "Peinture, musique, cinéma et autres arts." },
-    { id: 8, name: "Droit", icon: "⚖️", description: "Droit international, droit africain et droit comparé." },
-    { id: 9, name: "Technologie", icon: "💻", description: "Informatique, cyber-sécurité et nouvelles technologies." }
+    { id: 1, name: "Littérature", slug: "litterature", icon: "📚", description: "Des romans, essais, poésie et plus encore." },
+    { id: 2, name: "Sciences", slug: "sciences", icon: "🔬", description: "Médecine, physique, informatique et autres sciences." },
+    { id: 3, name: "Histoire", slug: "histoire", icon: "📜", description: "Histoire africaine, mondiale et culturelle." },
+    { id: 4, name: "Philosophie", slug: "philosophie", icon: "💭", description: "Études philosophiques et réflexions sur la société." },
+    { id: 5, name: "Économie", slug: "economie", icon: "📊", description: "Économie, finance et gestion." },
+    { id: 6, name: "Éducation", slug: "education", icon: "🎓", description: "Manuels scolaires, cours et ressources pédagogiques." },
+    { id: 7, name: "Arts", slug: "arts", icon: "🎨", description: "Peinture, musique, cinéma et autres arts." },
+    { id: 8, name: "Droit", slug: "droit", icon: "⚖️", description: "Droit international, droit africain et droit comparé." },
+    { id: 9, name: "Affaires", slug: "affaires", icon: "💼", description: "Entrepreneuriat, gestion et développement des entreprises africaines." }
   ];
 
   return (

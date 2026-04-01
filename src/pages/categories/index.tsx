@@ -54,7 +54,8 @@ export default function Categories() {
       "Économie": "📊",
       "Éducation": "🎓",
       "Arts": "🎨",
-      "Droit": "⚖️"
+      "Droit": "⚖️",
+      "Affaires": "💼"
     };
     return iconMap[name] || "📖";
   };
