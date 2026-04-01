@@ -1655,13 +1655,13 @@ export default function AdminDashboard() {
             <div className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeModule === item.id;
+                const isActive = activeTab === item.id;
                 
                 return (
                   <button
                     key={item.id}
                     onClick={() => {
-                      setActiveModule(item.id);
+                      setActiveTab(item.id as any);
                       if (window.innerWidth < 768) setIsSidebarOpen(false);
                     }}
                     className={`
