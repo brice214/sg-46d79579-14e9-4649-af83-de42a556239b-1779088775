@@ -152,6 +152,7 @@ export type Database = {
           is_active: boolean | null
           subtitle: string | null
           title: string
+          updated_at: string | null
         }
         Insert: {
           created_at?: string | null
@@ -163,6 +164,7 @@ export type Database = {
           is_active?: boolean | null
           subtitle?: string | null
           title: string
+          updated_at?: string | null
         }
         Update: {
           created_at?: string | null
@@ -174,12 +176,14 @@ export type Database = {
           is_active?: boolean | null
           subtitle?: string | null
           title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       platform_settings: {
         Row: {
           category: string
+          created_at: string | null
           description: string | null
           id: string
           key: string
@@ -188,6 +192,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          created_at?: string | null
           description?: string | null
           id?: string
           key: string
@@ -196,6 +201,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          created_at?: string | null
           description?: string | null
           id?: string
           key?: string
@@ -349,6 +355,7 @@ export type Database = {
           author_earnings: number
           author_id: string
           buyer_id: string
+          commission_amount: number | null
           completed_at: string | null
           created_at: string | null
           currency: string | null
@@ -365,6 +372,7 @@ export type Database = {
           author_earnings: number
           author_id: string
           buyer_id: string
+          commission_amount?: number | null
           completed_at?: string | null
           created_at?: string | null
           currency?: string | null
@@ -381,6 +389,7 @@ export type Database = {
           author_earnings?: number
           author_id?: string
           buyer_id?: string
+          commission_amount?: number | null
           completed_at?: string | null
           created_at?: string | null
           currency?: string | null

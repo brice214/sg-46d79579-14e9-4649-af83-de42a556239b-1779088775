@@ -4,8 +4,8 @@ export interface PlatformSetting {
   id: string;
   key: string;
   value: any;
-  label: string;
-  category: "payment" | "legal" | "branding" | "email" | "general";
+  description?: string;
+  category: string;
   created_at: string;
   updated_at: string;
 }
@@ -48,22 +48,22 @@ class PlatformSettingsService {
       return [];
     }
 
-    return data || [];
+    return data as any[] || [];
   }
 
-  async getSettingsByCategory(category: PlatformSetting["category"]): Promise<PlatformSetting[]> {
+  async getSettingsByCategory(category: string): Promise<PlatformSetting[]> {
     const { data, error } = await supabase
       .from("platform_settings")
       .select("*")
       .eq("category", category)
-      .order("label", { ascending: true });
+      .order("key", { ascending: true });
 
     if (error) {
       console.error("Error fetching settings by category:", error);
       return [];
     }
 
-    return data || [];
+    return data as any[] || [];
   }
 
   async updateSetting(key: string, value: any): Promise<boolean> {
