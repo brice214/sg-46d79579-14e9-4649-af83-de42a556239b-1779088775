@@ -25,8 +25,12 @@ export default function Login() {
     setError("");
 
     try {
-      const { user } = await authService.signIn(email, password);
+      const { user, error: signInError } = await authService.signIn(email, password);
       
+      if (signInError || !user) {
+        throw new Error(signInError?.message || "Échec de la connexion");
+      }
+
       // Get user role from profiles
       const { data: profile } = await supabase
         .from("profiles")
