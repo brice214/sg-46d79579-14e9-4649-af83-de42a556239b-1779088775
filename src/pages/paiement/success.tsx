@@ -22,19 +22,11 @@ export default function PaymentSuccessPage() {
         if (user) {
           const { data: purchases } = await supabase
             .from("purchases")
-            .select(`
-              *,
-              documents (
-                id,
-                slug,
-                title,
-                price
-              )
-            `)
+            .select(`*, documents(id, slug, title, price)`)
             .eq("user_id", user.id)
             .eq("payment_method", "ebilling")
             .order("created_at", { ascending: false })
-            .limit(1);
+            .limit(1) as any;
 
           if (purchases && purchases.length > 0) {
             setDocumentInfo(purchases[0]);
