@@ -491,6 +491,15 @@ export default function AdminDashboard() {
     setPrimaryColor(config.primary_color);
     setTermsOfService(config.terms_of_service);
     setPrivacyPolicy(config.privacy_policy);
+    
+    // Load eBilling settings
+    const ebillingUsernameValue = await platformSettingsService.getSetting("ebilling_username");
+    const ebillingSharedkeyValue = await platformSettingsService.getSetting("ebilling_sharedkey");
+    const ebillingModeValue = await platformSettingsService.getSetting("ebilling_mode");
+    
+    if (ebillingUsernameValue) setEbillingUsername(ebillingUsernameValue);
+    if (ebillingSharedkeyValue) setEbillingSharedkey(ebillingSharedkeyValue);
+    if (ebillingModeValue) setEbillingMode(ebillingModeValue);
   };
 
   // Category Actions
@@ -601,6 +610,9 @@ export default function AdminDashboard() {
       platformSettingsService.updateSetting("primary_color", primaryColor),
       platformSettingsService.updateSetting("terms_of_service", termsOfService),
       platformSettingsService.updateSetting("privacy_policy", privacyPolicy),
+      platformSettingsService.updateSetting("ebilling_username", ebillingUsername),
+      platformSettingsService.updateSetting("ebilling_sharedkey", ebillingSharedkey),
+      platformSettingsService.updateSetting("ebilling_mode", ebillingMode),
     ]);
     toast({ title: "Succès", description: "Configuration enregistrée." });
   };
