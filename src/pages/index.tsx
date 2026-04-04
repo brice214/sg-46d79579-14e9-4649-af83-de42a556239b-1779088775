@@ -88,7 +88,7 @@ export default function Home() {
     try {
       const { data: categoriesData } = await supabase
         .from("categories")
-        .select("*")
+        .select("id, name, slug, icon, color, description, is_active")
         .eq("is_active", true)
         .order("name");
 
