@@ -20,13 +20,14 @@ export default function PaymentSuccessPage() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          const { data: purchases } = await supabase
+          // Requête simplifiée pour éviter l'erreur TypeScript
+          const { data: purchases }: { data: any } = await supabase
             .from("purchases")
             .select(`*, documents(id, slug, title, price)`)
             .eq("user_id", user.id)
             .eq("payment_method", "ebilling")
             .order("created_at", { ascending: false })
-            .limit(1) as any;
+            .limit(1);
 
           if (purchases && purchases.length > 0) {
             setDocumentInfo(purchases[0]);
