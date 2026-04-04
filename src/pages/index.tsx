@@ -55,11 +55,11 @@ export default function Home() {
 
   const loadBanners = async () => {
     try {
-      const { data } = await supabase
-        .from("banners")
+      const { data } = (await supabase
+        .from("homepage_banners")
         .select("*")
         .eq("is_active", true)
-        .order("order_index", { ascending: true });
+        .order("order_index", { ascending: true })) as any;
         
       setBanners(data || []);
     } catch (error) {
@@ -98,22 +98,22 @@ export default function Home() {
 
   const loadCategoriesWithCounts = async () => {
     try {
-      const { data: categoriesData } = await supabase
+      const { data: categoriesData } = (await supabase
         .from("categories")
         .select("id, name, slug, icon, description, is_active")
         .eq("is_active", true)
-        .order("name");
+        .order("name")) as any;
 
       if (!categoriesData) return;
 
       const categoriesWithCounts = await Promise.all(
-        categoriesData.map(async (category) => {
-          const { count } = await supabase
+        categoriesData.map(async (category: any) => {
+          const { count } = (await supabase
             .from("documents")
             .select("id", { count: "exact", head: true })
             .eq("category_id", category.id)
             .eq("is_published", true)
-            .eq("is_approved", true);
+            .eq("is_approved", true)) as any;
 
           return {
             ...category,
