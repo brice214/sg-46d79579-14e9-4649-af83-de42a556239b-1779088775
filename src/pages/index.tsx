@@ -54,6 +54,17 @@ export default function Home() {
   };
 
   const loadBanners = async () => {
+    try {
+      const { data } = await supabase
+        .from("banners")
+        .select("*")
+        .eq("is_active", true)
+        .order("order_index", { ascending: true });
+        
+      setBanners(data || []);
+    } catch (error) {
+      console.error("Error loading banners:", error);
+    }
   };
 
   const loadFeaturedDocuments = async () => {
