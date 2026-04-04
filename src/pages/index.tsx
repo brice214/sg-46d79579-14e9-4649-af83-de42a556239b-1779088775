@@ -34,10 +34,10 @@ export default function Home() {
         { count: categoriesCount },
         { count: downloadsCount }
       ] = await Promise.all([
-        supabase.from("documents").select("*", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "author"),
-        supabase.from("categories").select("*", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("purchases").select("*", { count: "exact", head: true })
+        supabase.from("documents").select("id", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "author"),
+        supabase.from("categories").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("purchases").select("id", { count: "exact", head: true })
       ]);
 
       setStats({
@@ -98,7 +98,7 @@ export default function Home() {
         categoriesData.map(async (category) => {
           const { count } = await supabase
             .from("documents")
-            .select("*", { count: "exact", head: true })
+            .select("id", { count: "exact", head: true })
             .eq("category_id", category.id)
             .eq("is_published", true)
             .eq("is_approved", true);
