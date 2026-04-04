@@ -1,183 +1,174 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { authService } from "@/services/authService";
-import { Eye, EyeOff } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Register() {
-  const router = useRouter();
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<"reader" | "author">("reader");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState("visitor");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-
-    if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      await authService.signUp(email, password, fullName, role);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: role,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        await supabase.from("profiles").update({ role: role }).eq("id", data.user.id);
+      }
+
+      toast({
+        title: "Inscription réussie",
+        description: "Votre compte a été créé avec succès.",
+      });
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la création du compte");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur d'inscription",
+        description: error.message || "Une erreur est survenue.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-cream via-white to-gold/5 py-12 px-4">
-        <Card className="w-full max-w-md p-8 shadow-xl border-terre/20">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-noir mb-2">Créer un compte</h1>
-            <p className="text-muted-foreground">Rejoignez la communauté AfriLitt</p>
-          </div>
-
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg mb-6">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleRegister} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Nom complet</label>
-              <Input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Doe"
-                required
-                className="border-terre/20 focus:border-terre"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre@email.com"
-                required
-                className="border-terre/20 focus:border-terre"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Mot de passe</label>
-              <div className="relative">
+      <main className="flex-1 flex items-center justify-center p-4 py-12 relative overflow-hidden">
+        {/* Background image avec overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-forest/60 to-black/80 backdrop-blur-sm"></div>
+        </div>
+        
+        {/* Motifs décoratifs */}
+        <div className="absolute inset-0 bg-adinkra opacity-10"></div>
+        
+        <Card className="w-full max-w-lg relative z-10 border-gold/30 shadow-2xl backdrop-blur-md bg-card/95">
+          <CardHeader className="space-y-2 text-center border-b border-gold/20 pb-6">
+            <CardTitle className="font-serif text-3xl text-transparent bg-clip-text bg-gradient-to-r from-earth via-gold to-forest">
+              Créer un compte
+            </CardTitle>
+            <CardDescription className="text-base">
+              Rejoignez la communauté AfriLitt
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <form onSubmit={handleRegister} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-sm font-medium">Nom complet</Label>
                 <Input
-                  type={showPassword ? "text" : "password"}
+                  id="fullName"
+                  placeholder="Ex: Amadou Hampâté Bâ"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                  className="border-border/50 focus:border-gold/50 transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="nom@exemple.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border-border/50 focus:border-gold/50 transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
-                  className="border-terre/20 focus:border-terre pr-10"
+                  minLength={6}
+                  className="border-border/50 focus:border-gold/50 transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-noir"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Confirmer le mot de passe</label>
-              <div className="relative">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="border-terre/20 focus:border-terre pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-noir"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+              
+              <div className="space-y-3 pt-2">
+                <Label className="text-sm font-medium">Type de compte</Label>
+                <RadioGroup value={role} onValueChange={setRole} className="grid grid-cols-2 gap-4">
+                  <div>
+                    <RadioGroupItem value="visitor" id="visitor" className="peer sr-only" />
+                    <Label
+                      htmlFor="visitor"
+                      className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover/50 backdrop-blur-sm p-4 hover:bg-accent/50 hover:text-accent-foreground peer-data-[state=checked]:border-gold peer-data-[state=checked]:bg-gold/10 [&:has([data-state=checked])]:border-gold cursor-pointer transition-all"
+                    >
+                      <span className="font-semibold mb-1">Lecteur</span>
+                      <span className="text-xs text-muted-foreground text-center">Découvrir et lire des documents</span>
+                    </Label>
+                  </div>
+                  <div>
+                    <RadioGroupItem value="author" id="author" className="peer sr-only" />
+                    <Label
+                      htmlFor="author"
+                      className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover/50 backdrop-blur-sm p-4 hover:bg-accent/50 hover:text-accent-foreground peer-data-[state=checked]:border-gold peer-data-[state=checked]:bg-gold/10 [&:has([data-state=checked])]:border-gold cursor-pointer transition-all"
+                    >
+                      <span className="font-semibold mb-1">Auteur</span>
+                      <span className="text-xs text-muted-foreground text-center">Publier et vendre mes œuvres</span>
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Type de compte</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole("reader")}
-                  className={`p-4 border-2 rounded-lg text-center transition-all ${
-                    role === "reader"
-                      ? "border-terre bg-terre/10 text-terre font-medium"
-                      : "border-gray-200 hover:border-terre/30"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">👤</div>
-                  <div className="text-sm">Lecteur</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("author")}
-                  className={`p-4 border-2 rounded-lg text-center transition-all ${
-                    role === "author"
-                      ? "border-terre bg-terre/10 text-terre font-medium"
-                      : "border-gray-200 hover:border-terre/30"
-                  }`}
-                >
-                  <div className="text-2xl mb-1">✍️</div>
-                  <div className="text-sm">Auteur</div>
-                </button>
+              <div className="text-xs text-muted-foreground pt-2">
+                En créant un compte, vous acceptez nos <Link href="/terms" className="text-gold hover:text-gold/80 transition-colors font-medium">conditions d'utilisation</Link>.
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-terre to-gold hover:from-terre/90 hover:to-gold/90 text-white"
-            >
-              {loading ? "Création du compte..." : "Créer mon compte"}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-earth via-gold to-forest text-white hover:opacity-90 shadow-lg hover:shadow-xl transition-all" 
+                disabled={loading}
+              >
+                {loading ? "Création..." : "Créer mon compte"}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center border-t border-gold/20 p-4 mt-4">
             <p className="text-sm text-muted-foreground">
               Déjà un compte ?{" "}
-              <a href="/auth/connexion" className="text-terre hover:text-terre/80 font-medium">
+              <Link href="/auth/connexion" className="text-gold hover:text-gold/80 font-medium transition-colors">
                 Se connecter
-              </a>
+              </Link>
             </p>
-          </div>
+          </CardFooter>
         </Card>
-      </div>
+      </main>
       <Footer />
     </div>
   );

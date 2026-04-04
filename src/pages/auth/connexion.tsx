@@ -1,105 +1,139 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
-import { Eye, EyeOff } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function Login() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
-      await authService.signIn(email, password);
-      router.push("/dashboard");
+      const { user, error: signInError } = await authService.signIn(email, password);
+      
+      if (signInError || !user) {
+        throw new Error(signInError?.message || "Échec de la connexion");
+      }
+
+      // Get user role from profiles
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue sur AfriLitt !",
+      });
+
+      // Redirect based on role
+      if (profile?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
-      setError(err.message || "Erreur lors de la connexion");
+      setError(err.message || "Identifiants incorrects");
+      toast({
+        title: "Erreur de connexion",
+        description: err.message || "Vérifiez vos identifiants",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-cream via-white to-gold/5 py-12 px-4">
-        <Card className="w-full max-w-md p-8 shadow-xl border-terre/20">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-noir mb-2">Connexion</h1>
-            <p className="text-muted-foreground">Accédez à votre compte AfriLitt</p>
-          </div>
-
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg mb-6">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre@email.com"
-                required
-                className="border-terre/20 focus:border-terre"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-noir mb-2">Mot de passe</label>
-              <div className="relative">
+      <main className="flex-1 flex items-center justify-center p-4 py-12 relative overflow-hidden">
+        {/* Background image avec overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/afrilitt-background.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-earth/60 to-black/80 backdrop-blur-sm"></div>
+        </div>
+        
+        {/* Motifs décoratifs */}
+        <div className="absolute inset-0 bg-adinkra opacity-10"></div>
+        
+        <Card className="w-full max-w-md relative z-10 border-gold/30 shadow-2xl backdrop-blur-md bg-card/95">
+          <CardHeader className="space-y-2 text-center border-b border-gold/20 pb-6">
+            <CardTitle className="font-serif text-3xl text-transparent bg-clip-text bg-gradient-to-r from-earth via-gold to-forest">
+              Connexion
+            </CardTitle>
+            <CardDescription className="text-base">
+              Accédez à votre compte AfriLitt
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <Input
-                  type={showPassword ? "text" : "password"}
+                  id="email"
+                  type="email"
+                  placeholder="nom@exemple.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border-border/50 focus:border-gold/50 transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                  <Link href="#" className="text-sm text-gold hover:text-gold/80 transition-colors font-medium">
+                    Oublié ?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
-                  className="border-terre/20 focus:border-terre pr-10"
+                  className="border-border/50 focus:border-gold/50 transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-noir"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-terre to-gold hover:from-terre/90 hover:to-gold/90 text-white"
-            >
-              {loading ? "Connexion..." : "Se connecter"}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-earth via-gold to-forest text-white hover:opacity-90 shadow-lg hover:shadow-xl transition-all" 
+                disabled={loading}
+              >
+                {loading ? "Connexion..." : "Se connecter"}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center border-t border-gold/20 p-4 mt-4">
             <p className="text-sm text-muted-foreground">
               Pas encore de compte ?{" "}
-              <a href="/auth/compte" className="text-terre hover:text-terre/80 font-medium">
-                Créer un compte
-              </a>
+              <Link href="/auth/compte" className="text-gold hover:text-gold/80 font-medium transition-colors">
+                S'inscrire
+              </Link>
             </p>
-          </div>
+          </CardFooter>
         </Card>
-      </div>
+      </main>
       <Footer />
     </div>
   );
