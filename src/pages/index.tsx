@@ -65,7 +65,6 @@ export default function Home() {
             name,
             slug,
             icon,
-            color,
             description
           ),
           profiles (
@@ -88,7 +87,7 @@ export default function Home() {
     try {
       const { data: categoriesData } = await supabase
         .from("categories")
-        .select("id, name, slug, icon, color, description, is_active")
+        .select("id, name, slug, icon, description, is_active")
         .eq("is_active", true)
         .order("name");
 
@@ -212,7 +211,7 @@ export default function Home() {
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className={`p-3 rounded-xl ${category.color || 'bg-terre/10'}`}>
+                    <div className="p-3 rounded-xl bg-terre/10">
                       <span className="text-2xl">{category.icon || '📚'}</span>
                     </div>
                     <div className="flex-1">
