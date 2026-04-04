@@ -28,17 +28,19 @@ export default function Home() {
 
   const loadStats = async () => {
     try {
+      const results = await Promise.all([
+        supabase.from("documents").select("id", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "author"),
+        supabase.from("categories").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("purchases").select("id", { count: "exact", head: true })
+      ]) as any;
+
       const [
         { count: documentsCount },
         { count: authorsCount },
         { count: categoriesCount },
         { count: downloadsCount }
-      ] = await Promise.all([
-        supabase.from("documents").select("id", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true) as any,
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "author") as any,
-        supabase.from("categories").select("id", { count: "exact", head: true }).eq("is_active", true) as any,
-        supabase.from("purchases").select("id", { count: "exact", head: true }) as any
-      ]);
+      ] = results;
 
       setStats({
         documents: documentsCount || 0,
