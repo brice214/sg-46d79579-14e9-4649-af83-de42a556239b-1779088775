@@ -117,14 +117,14 @@ export default function Home() {
             <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <Users className="h-6 w-6 text-gold" />
-                <div className="text-3xl font-bold text-white">1,200+</div>
+                <div className="text-3xl font-bold text-white">{stats.authors}+</div>
               </div>
               <p className="text-white/80 text-sm">Auteurs africains</p>
             </div>
             <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <FileText className="h-6 w-6 text-gold" />
-                <div className="text-3xl font-bold text-white">5,400+</div>
+                <div className="text-3xl font-bold text-white">{stats.documents}+</div>
               </div>
               <p className="text-white/80 text-sm">Documents publiés</p>
             </div>
