@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Users, FileText, TrendingUp, ArrowRight, Sparkles, Award, Shield } from "lucide-react";
+import * as Icons from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,10 +34,10 @@ export default function Home() {
         { count: categoriesCount },
         { count: downloadsCount }
       ] = await Promise.all([
-        supabase.from("documents").select("id", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "author"),
-        supabase.from("categories").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("purchases").select("id", { count: "exact", head: true })
+        supabase.from("documents").select("id", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true) as any,
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "author") as any,
+        supabase.from("categories").select("id", { count: "exact", head: true }).eq("is_active", true) as any,
+        supabase.from("purchases").select("id", { count: "exact", head: true }) as any
       ]);
 
       setStats({
@@ -115,6 +115,23 @@ export default function Home() {
     }
   };
 
+  const renderCategoryIcon = (iconName: string) => {
+    if (!iconName) return <span className="text-2xl">📚</span>;
+    
+    // Si c'est un emoji (longueur courte ou contient des caractères emoji)
+    if (iconName.length <= 4 || /[\u{1F300}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(iconName)) {
+      return <span className="text-2xl">{iconName}</span>;
+    }
+    
+    // Si c'est un nom d'icône Lucide
+    const IconComponent = (Icons as any)[iconName];
+    if (IconComponent) {
+      return <IconComponent className="h-6 w-6 text-terre" />;
+    }
+    
+    return <span className="text-2xl">📚</span>;
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -130,7 +147,7 @@ export default function Home() {
 
         <div className="container relative z-10 text-center py-20 px-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/20 backdrop-blur-sm border border-gold/30 mb-6">
-            <Sparkles className="h-4 w-4 text-gold" />
+            <Icons.Sparkles className="h-4 w-4 text-gold" />
             <span className="text-sm font-medium text-gold">La bibliothèque numérique africaine</span>
           </div>
 
@@ -148,13 +165,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:from-earth/90 hover:to-gold/90 text-white shadow-2xl hover:shadow-gold/20 hover:scale-105 transition-all border-none text-lg px-8">
               <Link href="/catalogue">
-                <BookOpen className="h-5 w-5 mr-2" />
+                <Icons.BookOpen className="h-5 w-5 mr-2" />
                 Explorer le catalogue
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 shadow-xl text-lg px-8">
               <Link href="/auth/register">
-                <TrendingUp className="h-5 w-5 mr-2" />
+                <Icons.TrendingUp className="h-5 w-5 mr-2" />
                 Commencer à publier
               </Link>
             </Button>
@@ -164,21 +181,21 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <Users className="h-6 w-6 text-gold" />
+                <Icons.Users className="h-6 w-6 text-gold" />
                 <div className="text-3xl font-bold text-white">{stats.authors}+</div>
               </div>
               <p className="text-white/80 text-sm">Auteurs africains</p>
             </div>
             <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <FileText className="h-6 w-6 text-gold" />
+                <Icons.FileText className="h-6 w-6 text-gold" />
                 <div className="text-3xl font-bold text-white">{stats.documents}+</div>
               </div>
               <p className="text-white/80 text-sm">Documents publiés</p>
             </div>
             <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <Award className="h-6 w-6 text-gold" />
+                <Icons.Award className="h-6 w-6 text-gold" />
                 <div className="text-3xl font-bold text-white">100%</div>
               </div>
               <p className="text-white/80 text-sm">Contenu africain</p>
@@ -212,7 +229,7 @@ export default function Home() {
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-3">
                     <div className="p-3 rounded-xl bg-terre/10">
-                      <span className="text-2xl">{category.icon || '📚'}</span>
+                      {renderCategoryIcon(category.icon)}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-lg text-noir group-hover:text-terre transition-colors">
@@ -237,7 +254,7 @@ export default function Home() {
             <Button asChild size="lg" variant="outline" className="border-gold/30 hover:bg-gold/10 hover:border-gold/50">
               <Link href="/categories">
                 Voir toutes les catégories
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <Icons.ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>
           </div>
@@ -316,7 +333,7 @@ export default function Home() {
 
         <div className="container max-w-4xl text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/20 backdrop-blur-sm border border-gold/30 mb-6">
-            <Shield className="h-4 w-4 text-gold" />
+            <Icons.Shield className="h-4 w-4 text-gold" />
             <span className="text-sm font-medium text-gold">Plateforme 100% sécurisée</span>
           </div>
 
@@ -332,7 +349,7 @@ export default function Home() {
             <Button asChild size="lg" className="bg-gradient-to-r from-gold to-amber-500 hover:from-gold/90 hover:to-amber-500/90 text-black font-semibold shadow-2xl hover:shadow-gold/30 hover:scale-105 transition-all border-none text-lg px-10">
               <Link href="/auth/register">
                 Commencer gratuitement
-                <ArrowRight className="h-5 w-5 ml-2" />
+                <Icons.ArrowRight className="h-5 w-5 ml-2" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 shadow-xl text-lg px-10">
