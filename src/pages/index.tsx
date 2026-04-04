@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function Home() {
   const [featuredDocuments, setFeaturedDocuments] = useState<any[]>([]);
   const [banners, setBanners] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [stats, setStats] = useState({
     documents: 150,
     authors: 45,
@@ -22,6 +23,7 @@ export default function Home() {
     loadBanners();
     loadFeaturedDocuments();
     loadStats();
+    loadCategoriesWithCounts();
   }, []);
 
   const loadStats = async () => {
@@ -53,9 +55,68 @@ export default function Home() {
   };
 
   const loadFeaturedDocuments = async () => {
+    try {
+      const { data: documents } = await supabase
+        .from("documents")
+        .select(`
+          *,
+          categories (
+            id,
+            name,
+            slug,
+            icon,
+            color,
+            description
+          ),
+          profiles (
+            full_name
+          )
+        `)
+        .eq("is_featured", true)
+        .eq("is_published", true)
+        .eq("is_approved", true)
+        .order("created_at", { ascending: false })
+        .limit(6);
+
+      setFeaturedDocuments(documents || []);
+    } catch (error) {
+      console.error("Error loading featured documents:", error);
+    }
   };
 
-  const categories = [
+  const loadCategoriesWithCounts = async () => {
+    try {
+      const { data: categoriesData } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("is_active", true)
+        .order("name");
+
+      if (!categoriesData) return;
+
+      const categoriesWithCounts = await Promise.all(
+        categoriesData.map(async (category) => {
+          const { count } = await supabase
+            .from("documents")
+            .select("*", { count: "exact", head: true })
+            .eq("category_id", category.id)
+            .eq("is_published", true)
+            .eq("is_approved", true);
+
+          return {
+            ...category,
+            document_count: count || 0
+          };
+        })
+      );
+
+      setCategories(categoriesWithCounts);
+    } catch (error) {
+      console.error("Error loading categories:", error);
+    }
+  };
+
+  const categoriesList = [
     { id: 1, name: "Littérature", slug: "litterature", icon: "📚", description: "Romans, nouvelles, poésie africaine", color: "from-amber-500/20 to-orange-600/20", iconBg: "bg-gradient-to-br from-amber-500 to-orange-600" },
     { id: 2, name: "Sciences", slug: "sciences", icon: "🔬", description: "Recherches scientifiques et techniques", color: "from-blue-500/20 to-cyan-600/20", iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600" },
     { id: 3, name: "Histoire", slug: "histoire", icon: "📜", description: "Histoire africaine et mondiale", color: "from-yellow-600/20 to-amber-700/20", iconBg: "bg-gradient-to-br from-yellow-600 to-amber-700" },
@@ -154,43 +215,34 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {categories.map((category) => (
-              <Link
+          <div className="grid md:grid-cols-3 gap-6">
+            {categories.slice(0, 9).map((category) => (
+              <Card 
                 key={category.id}
-                href={`/categories/${category.slug}`}
-                className="group relative overflow-hidden rounded-2xl border-2 border-gold/20 bg-gradient-to-br from-card via-card to-card/80 hover:border-gold/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gold/20"
+                className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-terre/20 hover:border-terre/40 overflow-hidden"
+                onClick={() => window.location.href = `/categories/${category.slug}`}
               >
-                {/* Background gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                
-                {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl group-hover:bg-gold/10 transition-colors"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-earth/5 rounded-full blur-2xl group-hover:bg-earth/10 transition-colors"></div>
-
-                <div className="relative p-6">
-                  {/* Icon with gradient background */}
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${category.iconBg} shadow-lg mb-4 transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
-                    <span className="text-3xl drop-shadow-lg">{category.icon}</span>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className={`p-3 rounded-xl ${category.color || 'bg-terre/10'}`}>
+                      <span className="text-2xl">{category.icon || '📚'}</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-noir group-hover:text-terre transition-colors">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {category.document_count} document{category.document_count !== 1 ? 's' : ''}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="font-serif text-2xl font-bold mb-2 group-hover:text-gold transition-colors">
-                    {category.name}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
-                    {category.description}
-                  </p>
-
-                  {/* Footer with arrow */}
-                  <div className="flex items-center justify-between pt-3 border-t border-gold/10">
-                    <span className="text-xs font-medium text-muted-foreground">0 document</span>
-                    <ArrowRight className="h-5 w-5 text-gold transform group-hover:translate-x-2 transition-transform" />
-                  </div>
+                  {category.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {category.description}
+                    </p>
+                  )}
                 </div>
-              </Link>
+              </Card>
             ))}
           </div>
 
