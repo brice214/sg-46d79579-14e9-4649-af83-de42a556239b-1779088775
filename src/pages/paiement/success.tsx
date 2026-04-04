@@ -20,8 +20,8 @@ export default function PaymentSuccessPage() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Requête simplifiée pour éviter l'erreur TypeScript
-          const { data: purchases }: { data: any } = await supabase
+          // Requête simplifiée avec (supabase as any) pour éviter l'erreur TypeScript d'inférence profonde
+          const { data: purchases } = await (supabase as any)
             .from("purchases")
             .select(`*, documents(id, slug, title, price)`)
             .eq("user_id", user.id)
