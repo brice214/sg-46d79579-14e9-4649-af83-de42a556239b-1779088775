@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
@@ -6,55 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Users, FileText, TrendingUp, ArrowRight, Sparkles, Award, Shield } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function Home() {
-  const [featuredDocuments, setFeaturedDocuments] = useState<any[]>([]);
-  const [banners, setBanners] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    documents: 0,
-    authors: 0,
-    categories: 0,
-    downloads: 0
-  });
-
-  useEffect(() => {
-    loadBanners();
-    loadFeaturedDocuments();
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
-    try {
-      const [
-        { count: documentsCount },
-        { count: authorsCount },
-        { count: categoriesCount },
-        { count: downloadsCount }
-      ] = await Promise.all([
-        supabase.from("documents").select("*", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "author"),
-        supabase.from("categories").select("*", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("purchases").select("*", { count: "exact", head: true })
-      ]);
-
-      setStats({
-        documents: documentsCount || 0,
-        authors: authorsCount || 0,
-        categories: categoriesCount || 0,
-        downloads: downloadsCount || 0
-      });
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
-  };
-
-  const loadBanners = async () => {
-  };
-
-  const loadFeaturedDocuments = async () => {
-  };
-
   const categories = [
     { id: 1, name: "Littérature", slug: "litterature", icon: "📚", description: "Romans, nouvelles, poésie africaine", color: "from-amber-500/20 to-orange-600/20", iconBg: "bg-gradient-to-br from-amber-500 to-orange-600" },
     { id: 2, name: "Sciences", slug: "sciences", icon: "🔬", description: "Recherches scientifiques et techniques", color: "from-blue-500/20 to-cyan-600/20", iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600" },
@@ -113,22 +65,27 @@ export default function Home() {
           </div>
 
           {/* Stats cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-terre mb-2">{stats.documents.toLocaleString()}+</div>
-              <div className="text-sm md:text-base text-noir/70">Documents</div>
+          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <Users className="h-6 w-6 text-gold" />
+                <div className="text-3xl font-bold text-white">1,200+</div>
+              </div>
+              <p className="text-white/80 text-sm">Auteurs africains</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-terre mb-2">{stats.authors.toLocaleString()}+</div>
-              <div className="text-sm md:text-base text-noir/70">Auteurs</div>
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <FileText className="h-6 w-6 text-gold" />
+                <div className="text-3xl font-bold text-white">5,400+</div>
+              </div>
+              <p className="text-white/80 text-sm">Documents publiés</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-terre mb-2">{stats.categories.toLocaleString()}+</div>
-              <div className="text-sm md:text-base text-noir/70">Catégories</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-terre mb-2">{stats.downloads.toLocaleString()}+</div>
-              <div className="text-sm md:text-base text-noir/70">Téléchargements</div>
+            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <Award className="h-6 w-6 text-gold" />
+                <div className="text-3xl font-bold text-white">100%</div>
+              </div>
+              <p className="text-white/80 text-sm">Contenu africain</p>
             </div>
           </div>
         </div>
