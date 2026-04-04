@@ -804,6 +804,7 @@ export default function DocumentPage() {
               amount={document.price}
               description={`Achat du document: ${document.title}`}
               documentId={document.id}
+              documentSlug={document.slug}
               userId={currentUser?.id || ""}
               documentTitle={document.title}
               clientInfo={currentUser ? {

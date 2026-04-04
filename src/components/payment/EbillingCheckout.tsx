@@ -12,6 +12,13 @@ interface EbillingCheckoutProps {
   documentSlug: string;
   documentTitle: string;
   amount: number;
+  description?: string;
+  userId?: string;
+  clientInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
   onSuccess?: () => void;
   onError?: (error: Error) => void;
 }
@@ -21,15 +28,18 @@ export function EbillingCheckout({
   documentSlug,
   documentTitle,
   amount,
+  description,
+  userId,
+  clientInfo,
   onSuccess,
   onError
 }: EbillingCheckoutProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: clientInfo?.name || "",
+    email: clientInfo?.email || "",
+    phone: clientInfo?.phone || "",
     address: "Libreville, Gabon"
   });
 
@@ -66,7 +76,7 @@ export function EbillingCheckout({
       const response = await initiateDocumentCheckout({
         document_id: documentId,
         amount,
-        short_description: `Achat: ${documentTitle}`,
+        short_description: description || `Achat: ${documentTitle}`,
         client_name: formData.name,
         client_email: formData.email,
         client_phone: formData.phone,
