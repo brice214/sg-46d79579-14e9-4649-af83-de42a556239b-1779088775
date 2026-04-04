@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -137,6 +137,71 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ebilling_transactions: {
+        Row: {
+          amount: number
+          client_email: string
+          client_name: string
+          client_phone: string
+          created_at: string | null
+          document_id: string
+          ebilling_id: string | null
+          id: string
+          metadata: Json | null
+          operator: string | null
+          paid_at: string | null
+          reference: string
+          status: string
+          transaction_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          client_email: string
+          client_name: string
+          client_phone: string
+          created_at?: string | null
+          document_id: string
+          ebilling_id?: string | null
+          id?: string
+          metadata?: Json | null
+          operator?: string | null
+          paid_at?: string | null
+          reference: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          client_email?: string
+          client_name?: string
+          client_phone?: string
+          created_at?: string | null
+          document_id?: string
+          ebilling_id?: string | null
+          id?: string
+          metadata?: Json | null
+          operator?: string | null
+          paid_at?: string | null
+          reference?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ebilling_transactions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
             referencedColumns: ["id"]
           },
         ]
