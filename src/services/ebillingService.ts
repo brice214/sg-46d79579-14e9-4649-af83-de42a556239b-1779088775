@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 import { 
   TransactionEbilling, 
   EbillingCheckoutRequest, 
@@ -28,51 +27,11 @@ export async function initiateDocumentCheckout(
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Erreur lors de l'initialisation du paiement");
+    const errorData = await response.json().catch(() => ({ error: "Erreur serveur" }));
+    throw new Error(errorData.error || errorData.message || "Erreur lors de l'initialisation du paiement");
   }
 
   return response.json();
-}
-
-/**
- * Vérifie le statut d'une transaction
- */
-export async function checkTransactionStatus(
-  reference: string
-): Promise<TransactionEbilling | null> {
-  const { data, error } = await supabase
-    .from("ebilling_transactions")
-    .select("*")
-    .eq("reference", reference)
-    .single();
-
-  if (error) {
-    console.error("Erreur vérification transaction:", error);
-    return null;
-  }
-
-  return data as TransactionEbilling;
-}
-
-/**
- * Récupère l'historique des transactions d'un utilisateur
- */
-export async function getUserTransactions(
-  userId: string
-): Promise<TransactionEbilling[]> {
-  const { data, error } = await supabase
-    .from("ebilling_transactions")
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Erreur récupération transactions:", error);
-    return [];
-  }
-
-  return (data || []) as TransactionEbilling[];
 }
 
 /**
