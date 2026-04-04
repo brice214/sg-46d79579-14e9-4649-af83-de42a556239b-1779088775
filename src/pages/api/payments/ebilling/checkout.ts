@@ -42,9 +42,27 @@ export default async function handler(
     // ═════════════════════════════════════════════════════════
     // ÉTAPE 2 : CHARGER CONFIGURATION eBILLING
     // ═════════════════════════════════════════════════════════
-    const username = await platformSettingsService.getSetting("ebilling_username");
-    const sharedKey = await platformSettingsService.getSetting("ebilling_sharedkey");
-    const environment = await platformSettingsService.getSetting("ebilling_mode") || "LAB";
+    const { data: usernameData } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "ebilling_username")
+      .single();
+
+    const { data: sharedKeyData } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "ebilling_sharedkey")
+      .single();
+
+    const { data: modeData } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "ebilling_mode")
+      .single();
+
+    const username = usernameData?.value;
+    const sharedKey = sharedKeyData?.value;
+    const environment = modeData?.value || "LAB";
 
     if (!username || !sharedKey) {
       return res.status(500).json({
