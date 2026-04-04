@@ -176,18 +176,18 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button asChild size="lg" className="bg-gradient-to-r from-earth to-gold hover:from-earth/90 hover:to-gold/90 text-white shadow-2xl hover:shadow-gold/20 hover:scale-105 transition-all border-none text-lg px-8">
-              <Link href="/catalogue">
-                <Icons.BookOpen className="h-5 w-5 mr-2" />
+            <Link href="/catalogue">
+              <Button size="lg" variant="outline" className="text-noir border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-sm">
+                <Icons.BookOpen className="mr-2 h-5 w-5" />
                 Explorer le catalogue
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 shadow-xl text-lg px-8">
-              <Link href="/auth/register">
-                <Icons.TrendingUp className="h-5 w-5 mr-2" />
+              </Button>
+            </Link>
+            <Link href="/auth/compte">
+              <Button size="lg" className="bg-gradient-to-r from-terre to-gold hover:from-terre/90 hover:to-gold/90 text-white shadow-xl">
+                <Icons.Sparkles className="mr-2 h-5 w-5" />
                 Commencer à publier
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
 
           {/* Stats cards */}
@@ -358,18 +358,13 @@ export default function Home() {
             Des milliers d'auteurs africains publient et monétisent leur savoir. Pourquoi pas vous ?
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-gold to-amber-500 hover:from-gold/90 hover:to-amber-500/90 text-black font-semibold shadow-2xl hover:shadow-gold/30 hover:scale-105 transition-all border-none text-lg px-10">
-              <Link href="/auth/register">
-                Commencer gratuitement
-                <Icons.ArrowRight className="h-5 w-5 ml-2" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 shadow-xl text-lg px-10">
-              <Link href="/catalogue">
-                Découvrir le catalogue
-              </Link>
-            </Button>
+          <div className="text-center">
+            <Link href="/auth/compte">
+              <Button size="lg" className="bg-gradient-to-r from-terre to-gold hover:from-terre/90 hover:to-gold/90 text-white">
+                Rejoindre la communauté
+                <Icons.ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

@@ -231,7 +231,7 @@ export default function DocumentPage() {
 
   const handlePaymentMethodSelect = async (method: "mobile_money" | "stripe" | "paypal") => {
     if (!currentUser) {
-      router.push("/auth/login");
+      router.push("/auth/connexion");
       return;
     }
 

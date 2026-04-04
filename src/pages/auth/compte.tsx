@@ -162,7 +162,7 @@ export default function Register() {
           <CardFooter className="flex justify-center border-t border-gold/20 p-4 mt-4">
             <p className="text-sm text-muted-foreground">
               Déjà un compte ?{" "}
-              <Link href="/auth/login" className="text-gold hover:text-gold/80 font-medium transition-colors">
+              <Link href="/auth/connexion" className="text-gold hover:text-gold/80 font-medium transition-colors">
                 Se connecter
               </Link>
             </p>

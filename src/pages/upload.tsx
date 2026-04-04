@@ -61,11 +61,11 @@ export default function Upload() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
       toast({
-        variant: "destructive",
         title: "Connexion requise",
-        description: "Vous devez être connecté pour publier un document"
+        description: "Vous devez être connecté pour uploader un document.",
+        variant: "destructive",
       });
-      router.push("/auth/login");
+      router.push("/auth/connexion");
       return;
     }
 

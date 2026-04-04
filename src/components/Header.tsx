@@ -139,12 +139,9 @@ export function Header() {
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm" className="hover:bg-gold/10">
-                <Link href="/auth/login">Connexion</Link>
-              </Button>
-              <Button asChild size="sm" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white shadow-lg">
-                <Link href="/auth/register">S'inscrire</Link>
-              </Button>
+              <Link href="/auth/connexion">Connexion</Link>
+              <span className="text-muted-foreground">|</span>
+              <Link href="/auth/compte">S'inscrire</Link>
             </>
           )}
         </div>

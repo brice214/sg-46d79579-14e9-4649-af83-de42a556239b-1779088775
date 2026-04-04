@@ -285,7 +285,12 @@ export default function AdminDashboard() {
     try {
       const session = await authService.getCurrentSession();
       if (!session) {
-        router.push("/auth/login");
+        toast({
+          title: "Accès refusé",
+          description: "Vous devez être administrateur pour accéder à cette page.",
+          variant: "destructive",
+        });
+        router.push("/auth/connexion");
         return;
       }
 
@@ -741,7 +746,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border-gold/20 shadow-md">
+          <Card className="border-gold/20">
             <CardHeader>
               <CardTitle className="font-serif text-2xl">Actions Rapides</CardTitle>
               <CardDescription>Gérez les urgences de la plateforme</CardDescription>
