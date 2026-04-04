@@ -5,8 +5,56 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Users, FileText, TrendingUp, ArrowRight, Sparkles, Award, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Home() {
+  const [featuredDocuments, setFeaturedDocuments] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    documents: 150,
+    authors: 45,
+    categories: 12,
+    downloads: 2500
+  });
+
+  useEffect(() => {
+    loadBanners();
+    loadFeaturedDocuments();
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const [
+        { count: documentsCount },
+        { count: authorsCount },
+        { count: categoriesCount },
+        { count: downloadsCount }
+      ] = await Promise.all([
+        supabase.from("documents").select("*", { count: "exact", head: true }).eq("is_published", true).eq("is_approved", true),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "author"),
+        supabase.from("categories").select("*", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("purchases").select("*", { count: "exact", head: true })
+      ]);
+
+      setStats({
+        documents: documentsCount || 0,
+        authors: authorsCount || 0,
+        categories: categoriesCount || 0,
+        downloads: downloadsCount || 0
+      });
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
+  };
+
+  const loadBanners = async () => {
+  };
+
+  const loadFeaturedDocuments = async () => {
+  };
+
   const categories = [
     { id: 1, name: "Littérature", slug: "litterature", icon: "📚", description: "Romans, nouvelles, poésie africaine", color: "from-amber-500/20 to-orange-600/20", iconBg: "bg-gradient-to-br from-amber-500 to-orange-600" },
     { id: 2, name: "Sciences", slug: "sciences", icon: "🔬", description: "Recherches scientifiques et techniques", color: "from-blue-500/20 to-cyan-600/20", iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600" },
