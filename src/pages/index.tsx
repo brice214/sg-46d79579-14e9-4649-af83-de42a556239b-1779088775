@@ -236,12 +236,12 @@ export default function Home() {
             {categories.slice(0, 9).map((category) => (
               <Card 
                 key={category.id}
-                className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-terre/20 hover:border-terre/40 overflow-hidden"
+                className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-terre/20 hover:border-terre/40 overflow-hidden bg-gradient-to-br from-cream via-white to-gold/10"
                 onClick={() => window.location.href = `/categories/${category.slug}`}
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 rounded-xl bg-terre/10">
+                    <div className="p-3 rounded-xl bg-terre/10 group-hover:bg-terre/20 transition-colors">
                       {renderCategoryIcon(category.icon)}
                     </div>
                     <div className="flex-1">
