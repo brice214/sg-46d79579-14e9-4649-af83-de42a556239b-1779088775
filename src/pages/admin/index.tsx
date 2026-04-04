@@ -187,12 +187,9 @@ export default function AdminDashboard() {
   const [smtpFromName, setSmtpFromName] = useState("AfriLitt");
 
   // Payment Settings
-  const [mtnApiKey, setMtnApiKey] = useState("");
-  const [orangeApiKey, setOrangeApiKey] = useState("");
-  const [moovApiKey, setMoovApiKey] = useState("");
-  const [stripePublicKey, setStripePublicKey] = useState("");
-  const [stripeSecretKey, setStripeSecretKey] = useState("");
-  const [paymentTestMode, setPaymentTestMode] = useState(true);
+  const [ebillingUsername, setEbillingUsername] = useState("");
+  const [ebillingSharedkey, setEbillingSharedkey] = useState("");
+  const [ebillingMode, setEbillingMode] = useState<"LAB" | "PROD">("LAB");
 
   // Security Settings
   const [captchaEnabled, setCaptchaEnabled] = useState(false);
@@ -1870,217 +1867,101 @@ export default function AdminDashboard() {
               <CardDescription>Clés API des prestataires de paiement</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              {/* Mobile Money */}
+              {/* eBilling Mobile Money */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">📱 Mobile Money</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Clés API pour les opérateurs africains</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="mtn-api">MTN Mobile Money API Key</Label>
-                    <Input
-                      id="mtn-api"
-                      type="password"
-                      value={String(mtnApiKey)}
-                      onChange={(e) => setMtnApiKey(e.target.value)}
-                      placeholder="mtn_live_xxxxxxxxxxxx"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="orange-api">Orange Money API Key</Label>
-                    <Input
-                      id="orange-api"
-                      type="password"
-                      value={String(orangeApiKey)}
-                      onChange={(e) => setOrangeApiKey(e.target.value)}
-                      placeholder="orange_live_xxxxxxxxxxxx"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="moov-api">Moov Money API Key</Label>
-                    <Input
-                      id="moov-api"
-                      type="password"
-                      value={String(moovApiKey)}
-                      onChange={(e) => setMoovApiKey(e.target.value)}
-                      placeholder="moov_live_xxxxxxxxxxxx"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Payment */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">💳 Paiement par carte</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Configuration Stripe</p>
+                  <h3 className="text-lg font-semibold mb-2">📱 Mobile Money (eBilling)</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Agrégateur de paiement supportant Airtel Money et Moov Money au Gabon
+                  </p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="stripe-public">Clé publique Stripe</Label>
+                    <Label htmlFor="ebilling-username">Username</Label>
                     <Input
-                      id="stripe-public"
-                      value={String(stripePublicKey)}
-                      onChange={(e) => setStripePublicKey(e.target.value)}
-                      placeholder="pk_live_xxxxxxxxxxxx"
+                      id="ebilling-username"
+                      value={ebillingUsername}
+                      onChange={(e) => setEbillingUsername(e.target.value)}
+                      placeholder="Votre nom d'utilisateur eBilling"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="stripe-secret">Clé secrète Stripe</Label>
+                    <Label htmlFor="ebilling-sharedkey">Sharedkey</Label>
                     <Input
-                      id="stripe-secret"
+                      id="ebilling-sharedkey"
                       type="password"
-                      value={String(stripeSecretKey)}
-                      onChange={(e) => setStripeSecretKey(e.target.value)}
-                      placeholder="sk_live_xxxxxxxxxxxx"
+                      value={ebillingSharedkey}
+                      onChange={(e) => setEbillingSharedkey(e.target.value)}
+                      placeholder="Votre clé partagée eBilling"
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                   <div>
-                    <Label htmlFor="test-mode">Mode Test</Label>
-                    <p className="text-xs text-muted-foreground">Utilisez les clés de test pour les essais</p>
+                    <Label htmlFor="ebilling-mode">Mode d'environnement</Label>
+                    <p className="text-xs text-muted-foreground">
+                      LAB pour les tests, PROD pour la production
+                    </p>
                   </div>
-                  <input
-                    id="test-mode"
-                    type="checkbox"
-                    checked={Boolean(paymentTestMode)}
-                    onChange={(e) => setPaymentTestMode(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-4 border-t">
-                <Button onClick={handleSavePlatformSettings} size="lg">
-                  <Save className="h-4 w-4 mr-2" />
-                  Enregistrer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Security Settings */}
-        {settingsSubTab === "security" && (
-          <Card className="border-gold/20 shadow-lg">
-            <CardHeader>
-              <CardTitle className="font-serif text-2xl flex items-center gap-2">
-                <ShieldAlert className="h-6 w-6 text-gold" />
-                Configuration de Sécurité
-              </CardTitle>
-              <CardDescription>Protégez votre plateforme contre les abus</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* CAPTCHA */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">🤖 Protection Anti-Bot (CAPTCHA)</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Google reCAPTCHA v3</p>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-muted rounded-lg mb-4">
-                  <div>
-                    <Label htmlFor="captcha-enabled">Activer CAPTCHA</Label>
-                    <p className="text-xs text-muted-foreground">Protection sur les formulaires sensibles</p>
-                  </div>
-                  <input
-                    id="captcha-enabled"
-                    type="checkbox"
-                    checked={Boolean(captchaEnabled)}
-                    onChange={(e) => setCaptchaEnabled(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                </div>
-
-                {captchaEnabled && (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="captcha-site">Site Key (publique)</Label>
-                      <Input
-                        id="captcha-site"
-                        value={String(captchaSiteKey)}
-                        onChange={(e) => setCaptchaSiteKey(e.target.value)}
-                        placeholder="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm font-medium ${ebillingMode === "LAB" ? "text-orange-600" : "text-muted-foreground"}`}>
+                      LAB
+                    </span>
+                    <button
+                      onClick={() => setEbillingMode(ebillingMode === "LAB" ? "PROD" : "LAB")}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        ebillingMode === "PROD" ? "bg-green-600" : "bg-orange-500"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          ebillingMode === "PROD" ? "translate-x-6" : "translate-x-1"
+                        }`}
                       />
+                    </button>
+                    <span className={`text-sm font-medium ${ebillingMode === "PROD" ? "text-green-600" : "text-muted-foreground"}`}>
+                      PROD
+                    </span>
+                  </div>
+                </div>
+
+                {/* Callback URL Info */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg space-y-3">
+                  <div className="flex items-start gap-2">
+                    <div className="mt-0.5">
+                      <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="captcha-secret">Secret Key</Label>
-                      <Input
-                        id="captcha-secret"
-                        type="password"
-                        value={String(captchaSecretKey)}
-                        onChange={(e) => setCaptchaSecretKey(e.target.value)}
-                        placeholder="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
-                      />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                        URL de Callback eBilling
+                      </h4>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mb-2">
+                        Configurez cette URL dans votre compte eBilling pour recevoir les notifications de paiement
+                      </p>
+                      <div className="flex items-center gap-2 p-2 bg-white dark:bg-blue-900 rounded border border-blue-300 dark:border-blue-700">
+                        <code className="text-sm font-mono text-blue-800 dark:text-blue-200 flex-1">
+                          {typeof window !== "undefined" ? `${window.location.origin}/api/webhooks/ebilling` : "/api/webhooks/ebilling"}
+                        </code>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs"
+                          onClick={() => {
+                            const url = typeof window !== "undefined" ? `${window.location.origin}/api/webhooks/ebilling` : "/api/webhooks/ebilling";
+                            navigator.clipboard.writeText(url);
+                            toast({ title: "Copié !", description: "URL de callback copiée dans le presse-papier" });
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Rate Limiting */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">⏱️ Limitation de débit</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Prévenir les abus API</p>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-muted rounded-lg mb-4">
-                  <div>
-                    <Label htmlFor="rate-limit-enabled">Activer Rate Limiting</Label>
-                    <p className="text-xs text-muted-foreground">Limite les requêtes par minute</p>
-                  </div>
-                  <input
-                    id="rate-limit-enabled"
-                    type="checkbox"
-                    checked={Boolean(rateLimitEnabled)}
-                    onChange={(e) => setRateLimitEnabled(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                </div>
-
-                {rateLimitEnabled && (
-                  <div className="space-y-2">
-                    <Label htmlFor="max-requests">Requêtes maximum par minute</Label>
-                    <Input
-                      id="max-requests"
-                      type="number"
-                      min="10"
-                      max="1000"
-                      value={String(maxRequestsPerMinute)}
-                      onChange={(e) => setMaxRequestsPerMinute(Number(e.target.value))}
-                    />
-                    <p className="text-xs text-muted-foreground">Recommandé : 60-100 requêtes/minute</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Session */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">🔐 Gestion des sessions</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Sécurité des connexions utilisateur</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="session-timeout">Timeout de session (minutes)</Label>
-                  <Input
-                    id="session-timeout"
-                    type="number"
-                    min="5"
-                    max="1440"
-                    value={String(sessionTimeout)}
-                    onChange={(e) => setSessionTimeout(Number(e.target.value))}
-                  />
-                  <p className="text-xs text-muted-foreground">Déconnexion automatique après inactivité (recommandé : 30 min)</p>
                 </div>
               </div>
 
