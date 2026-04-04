@@ -69,7 +69,7 @@ export default function Home() {
 
   const loadFeaturedDocuments = async () => {
     try {
-      const { data: documents } = (await supabase
+      const { data: documents } = await (supabase as any)
         .from("documents")
         .select(`
           *,
@@ -88,7 +88,7 @@ export default function Home() {
         .eq("is_published", true)
         .eq("is_approved", true)
         .order("created_at", { ascending: false })
-        .limit(6)) as any;
+        .limit(6);
 
       setFeaturedDocuments(documents || []);
     } catch (error) {
