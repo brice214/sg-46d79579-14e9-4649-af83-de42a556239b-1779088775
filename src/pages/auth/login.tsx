@@ -127,7 +127,7 @@ export default function Login() {
           <CardFooter className="flex justify-center border-t border-gold/20 p-4 mt-4">
             <p className="text-sm text-muted-foreground">
               Pas encore de compte ?{" "}
-              <Link href="/auth/compte" className="text-gold hover:text-gold/80 font-medium transition-colors">
+              <Link href="/auth/register" className="text-gold hover:text-gold/80 font-medium transition-colors">
                 S'inscrire
               </Link>
             </p>

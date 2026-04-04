@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Upload, LayoutDashboard, LogOut, User, Settings, X, Menu } from "lucide-react";
+import { BookOpen, Upload, LayoutDashboard, LogOut, User, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRouter } from "next/router";
@@ -140,10 +140,10 @@ export function Header() {
           ) : (
             <>
               <Button asChild variant="ghost" size="sm" className="hover:bg-gold/10">
-                <Link href="/auth/connexion">Connexion</Link>
+                <Link href="/auth/login">Connexion</Link>
               </Button>
               <Button asChild size="sm" className="bg-gradient-to-r from-earth to-gold hover:opacity-90 text-white shadow-lg">
-                <Link href="/auth/compte">S'inscrire</Link>
+                <Link href="/auth/register">S'inscrire</Link>
               </Button>
             </>
           )}
