@@ -45,7 +45,8 @@ export default async function handler(
       client_address,
       short_description,
       document_slug,
-      document_title
+      document_title,
+      expiry_period = 30 // 30 minutes par défaut
     } = req.body;
 
     if (!document_id || !amount || !client_name || !client_email || !client_phone) {
@@ -105,7 +106,7 @@ export default async function handler(
     }
     console.log("✅ Configuration OK");
 
-    // URLs
+    // URLs selon documentation officielle
     const apiUrl = environment === "PROD"
       ? "https://www.billing-easy.com/api/v1/merchant/e_bills"
       : "https://lab.billing-easy.net/api/v1/merchant/e_bills";
@@ -167,7 +168,7 @@ export default async function handler(
     console.log("✅ Transaction créée:", transaction.id);
 
     // ═════════════════════════════════════════════════════════
-    // ÉTAPE 5 : APPELER API eBILLING
+    // ÉTAPE 5 : APPELER API eBILLING (avec expiry_period)
     // ═════════════════════════════════════════════════════════
     console.log("\n📋 ÉTAPE 5: Appel API eBilling");
     const ebillingPayload = {
@@ -177,8 +178,7 @@ export default async function handler(
       payer_msisdn: client_phone,
       payer_name: client_name,
       external_reference: reference,
-      success_url: successUrl,
-      callback_url: callbackUrl
+      expiry_period: parseInt(expiry_period) || 30 // Paramètre requis selon doc officielle
     };
 
     console.log("Payload eBilling:", JSON.stringify(ebillingPayload, null, 2));
@@ -249,20 +249,87 @@ export default async function handler(
     console.log("✅ Transaction mise à jour: pending");
 
     // ═════════════════════════════════════════════════════════
-    // SUCCÈS : RETOURNER DONNÉES POUR REDIRECTION
+    // ÉTAPE 7 : REDIRECTION POST SELON DOC OFFICIELLE
     // ═════════════════════════════════════════════════════════
-    const successResponse = {
-      success: true,
-      billId,
-      redirectUrl: portalUrl,
-      successUrl,
-      reference
-    };
+    console.log("\n📋 ÉTAPE 7: Génération formulaire de redirection POST");
+    
+    // Selon la doc officielle (section 4.2.4), il faut rediriger avec un formulaire POST
+    // contenant invoice_number et merchant_redirect_url
+    const redirectHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirection vers E-Billing...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <h2>Redirection vers le portail de paiement...</h2>
+    <p>Veuillez patienter, vous allez être redirigé automatiquement.</p>
+  </div>
+  
+  <form id="ebilling-redirect-form" method="POST" action="${portalUrl}">
+    <input type="hidden" name="invoice_number" value="${billId}">
+    <input type="hidden" name="merchant_redirect_url" value="${successUrl}">
+  </form>
+  
+  <script>
+    // Auto-submit le formulaire selon la documentation officielle E-Billing
+    document.getElementById('ebilling-redirect-form').submit();
+  </script>
+</body>
+</html>`;
 
-    console.log("✅ SUCCÈS - Réponse finale:", JSON.stringify(successResponse, null, 2));
+    console.log("✅ Formulaire de redirection POST généré");
+    console.log("Paramètres de redirection:", {
+      action: portalUrl,
+      invoice_number: billId,
+      merchant_redirect_url: successUrl
+    });
     console.log("═══════════════════════════════════════════════════════");
 
-    return res.status(200).json(successResponse);
+    // Retourner la page HTML avec le formulaire auto-submit
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.status(200).send(redirectHtml);
 
   } catch (error: any) {
     console.error("❌❌❌ EXCEPTION CRITIQUE ❌❌❌");
