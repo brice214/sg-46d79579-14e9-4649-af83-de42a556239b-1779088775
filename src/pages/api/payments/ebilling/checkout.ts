@@ -143,6 +143,7 @@ export default async function handler(
       client_phone,
       client_address: client_address || "Libreville, Gabon",
       short_description: short_description || `Achat: ${document_title}`,
+      user_id: null, // Nullable car les achats peuvent être faits sans connexion
       metadata: {
         document_slug,
         document_title,

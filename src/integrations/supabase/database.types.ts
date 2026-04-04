@@ -144,6 +144,7 @@ export type Database = {
       ebilling_transactions: {
         Row: {
           amount: number
+          client_address: string | null
           client_email: string
           client_name: string
           client_phone: string
@@ -155,13 +156,15 @@ export type Database = {
           operator: string | null
           paid_at: string | null
           reference: string
+          short_description: string | null
           status: string
           transaction_id: string | null
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount: number
+          client_address?: string | null
           client_email: string
           client_name: string
           client_phone: string
@@ -173,13 +176,15 @@ export type Database = {
           operator?: string | null
           paid_at?: string | null
           reference: string
+          short_description?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount?: number
+          client_address?: string | null
           client_email?: string
           client_name?: string
           client_phone?: string
@@ -191,10 +196,11 @@ export type Database = {
           operator?: string | null
           paid_at?: string | null
           reference?: string
+          short_description?: string | null
           status?: string
           transaction_id?: string | null
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
