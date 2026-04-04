@@ -19,6 +19,7 @@ import { purchaseService } from "@/services/purchaseService";
 import { reportService } from "@/services/reportService";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles, CheckCircle, XCircle, Check } from "lucide-react";
+import { EbillingCheckout } from "@/components/payment/EbillingCheckout";
 
 // Import PDFViewer dynamically to avoid SSR issues
 const PDFViewer = dynamic(
@@ -72,6 +73,7 @@ export default function DocumentPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showEbillingCheckout, setShowEbillingCheckout] = useState(false);
 
   // Report modal state
   const [reportReason, setReportReason] = useState("");
@@ -236,28 +238,10 @@ export default function DocumentPage() {
     }
 
     try {
-      // For now, we'll implement Mobile Money only
-      // Stripe and PayPal will be added later
       if (method === "mobile_money") {
-        const result = await purchaseService.createPurchase(document.id, currentUser.id);
-        
-        if (result.success) {
-          toast({
-            title: "Achat réussi !",
-            description: "Vous avez maintenant accès au document complet.",
-          });
-          setHasAccess(true);
-          setShowPaymentDialog(false);
-          
-          // Reload to get full access
-          router.reload();
-        } else {
-          toast({
-            title: "Erreur",
-            description: result.error || "Une erreur est survenue lors de l'achat.",
-            variant: "destructive",
-          });
-        }
+        // Fermer le dialog de sélection et afficher eBilling
+        setShowPaymentDialog(false);
+        setShowEbillingCheckout(true);
       } else {
         toast({
           title: "Bientôt disponible",
@@ -773,7 +757,7 @@ export default function DocumentPage() {
                   <span className="text-xl font-bold">Mobile Money</span>
                 </div>
                 <p className="text-sm text-white/90 ml-9">
-                  Airtel Money, Moov Money, Orange Money, MTN Money
+                  Airtel Money, Moov Money via eBilling
                 </p>
               </button>
 
@@ -810,6 +794,39 @@ export default function DocumentPage() {
               <Check className="h-5 w-5 text-green-600" />
               <span className="font-medium">Paiement sécurisé • Accès immédiat</span>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* eBilling Checkout Dialog */}
+        <Dialog open={showEbillingCheckout} onOpenChange={setShowEbillingCheckout}>
+          <DialogContent className="sm:max-w-lg">
+            <EbillingCheckout
+              amount={document.price}
+              description={`Achat du document: ${document.title}`}
+              documentId={document.id}
+              userId={currentUser?.id || ""}
+              documentTitle={document.title}
+              clientInfo={currentUser ? {
+                name: currentUser.user_metadata?.full_name || "",
+                email: currentUser.email || "",
+                phone: currentUser.user_metadata?.phone || ""
+              } : undefined}
+              onSuccess={() => {
+                setShowEbillingCheckout(false);
+                toast({
+                  title: "Redirection en cours...",
+                  description: "Vous allez être redirigé vers le portail de paiement eBilling.",
+                });
+              }}
+              onError={(error) => {
+                console.error("eBilling error:", error);
+                toast({
+                  title: "Erreur",
+                  description: "Impossible d'initialiser le paiement. Veuillez réessayer.",
+                  variant: "destructive",
+                });
+              }}
+            />
           </DialogContent>
         </Dialog>
       </main>
