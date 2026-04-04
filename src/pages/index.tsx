@@ -116,18 +116,6 @@ export default function Home() {
     }
   };
 
-  const categoriesList = [
-    { id: 1, name: "Littérature", slug: "litterature", icon: "📚", description: "Romans, nouvelles, poésie africaine", color: "from-amber-500/20 to-orange-600/20", iconBg: "bg-gradient-to-br from-amber-500 to-orange-600" },
-    { id: 2, name: "Sciences", slug: "sciences", icon: "🔬", description: "Recherches scientifiques et techniques", color: "from-blue-500/20 to-cyan-600/20", iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600" },
-    { id: 3, name: "Histoire", slug: "histoire", icon: "📜", description: "Histoire africaine et mondiale", color: "from-yellow-600/20 to-amber-700/20", iconBg: "bg-gradient-to-br from-yellow-600 to-amber-700" },
-    { id: 4, name: "Philosophie", slug: "philosophie", icon: "💭", description: "Pensée et philosophie africaine", color: "from-purple-500/20 to-pink-600/20", iconBg: "bg-gradient-to-br from-purple-500 to-pink-600" },
-    { id: 5, name: "Économie", slug: "economie", icon: "📊", description: "Économie et développement", color: "from-green-500/20 to-emerald-600/20", iconBg: "bg-gradient-to-br from-green-500 to-emerald-600" },
-    { id: 6, name: "Éducation", slug: "education", icon: "🎓", description: "Manuels scolaires et pédagogie", color: "from-indigo-500/20 to-blue-600/20", iconBg: "bg-gradient-to-br from-indigo-500 to-blue-600" },
-    { id: 7, name: "Arts", slug: "arts", icon: "🎨", description: "Arts visuels, musique et culture", color: "from-pink-500/20 to-rose-600/20", iconBg: "bg-gradient-to-br from-pink-500 to-rose-600" },
-    { id: 8, name: "Droit", slug: "droit", icon: "⚖️", description: "Droit et sciences juridiques", color: "from-slate-500/20 to-gray-600/20", iconBg: "bg-gradient-to-br from-slate-500 to-gray-600" },
-    { id: 9, name: "Affaires", slug: "affaires", icon: "💼", description: "Entrepreneuriat et gestion d'entreprises", color: "from-earth/30 to-gold/30", iconBg: "bg-gradient-to-br from-earth to-gold" }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
