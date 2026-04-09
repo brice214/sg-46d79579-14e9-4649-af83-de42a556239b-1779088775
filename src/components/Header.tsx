@@ -43,11 +43,13 @@ export function Header() {
   };
 
   const loadProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
+    
+    console.log("🔍 Header - Profile loaded:", { data, error, role: data?.role });
     setProfile(data);
   };
 
