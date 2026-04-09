@@ -1,104 +1,127 @@
-# Import Automatique de Base de Données AfriLitt
+# Import de Base de Données AfriLitt
 
-## 🚀 Installation et Utilisation
+## 🚀 Méthode Recommandée : SQL Editor (5 minutes)
 
-### Option 1: Import Automatique (Recommandé)
+### Étape 1 : Accéder au SQL Editor
 
-1. **Installer les dépendances:**
+1. Ouvrez votre projet Supabase : https://supabase.com/dashboard/project/pvjeufrrktatorurgstl
+2. Cliquez sur **SQL Editor** dans le menu de gauche
+3. Cliquez sur **+ New Query**
+
+### Étape 2 : Importer le schéma (01_schema.sql)
+
+1. Dans votre éditeur de code, ouvrez `supabase/migration-export/01_schema.sql`
+2. **Sélectionnez tout** (Ctrl+A / Cmd+A) et **copiez** (Ctrl+C / Cmd+C)
+3. Retournez dans le SQL Editor de Supabase
+4. **Collez** le contenu (Ctrl+V / Cmd+V)
+5. Cliquez sur **Run** (bouton vert en bas à droite)
+6. ✅ Attendez ~10-15 secondes jusqu'à voir "Success"
+
+### Étape 3 : Importer les données (02_data.sql)
+
+1. Dans le SQL Editor, cliquez sur **+ New Query** (nouvelle requête)
+2. Dans votre éditeur de code, ouvrez `supabase/migration-export/02_data.sql`
+3. **Sélectionnez tout** et **copiez**
+4. Retournez dans le SQL Editor
+5. **Collez** le contenu
+6. Cliquez sur **Run**
+7. ✅ Attendez ~5 secondes jusqu'à voir "Success"
+
+### Étape 4 : Vérifier l'import
+
+Dans Supabase Dashboard, allez dans **Table Editor** :
+- `categories` → devrait avoir **9 lignes**
+- `homepage_banners` → devrait avoir **2 lignes**
+- `platform_settings` → devrait avoir **22 lignes**
+
+## ✅ Migration Terminée !
+
+### Prochaines étapes importantes
+
+#### 1. Créer les utilisateurs (Authentication)
+
+Allez dans **Authentication → Users** et créez :
+
+**Admin :**
+- Email : `admin@afrilitt.com`
+- Mot de passe : (votre choix)
+- Après création, trouvez l'UUID de l'utilisateur
+- Allez dans **Table Editor → profiles**
+- Trouvez la ligne correspondante et changez `role` en `admin`
+
+**Auteur :**
+- Email : `bantoo1reseau@gmail.com`
+- Mot de passe : (votre choix)
+- Role : `author` (dans la table profiles)
+
+**Lecteur :**
+- Email : `goodchoice.gabon@gmail.com`
+- Mot de passe : (votre choix)
+- Role : `user` (par défaut)
+
+#### 2. Créer le bucket Storage
+
+Allez dans **Storage** :
+1. Cliquez sur **Create a new bucket**
+2. Nom : `documents`
+3. **Public bucket** : ✅ Cochez cette case
+4. Créez le bucket
+
+Ensuite, dans le bucket `documents`, créez ces dossiers :
+- `pdfs/` - Documents PDF complets
+- `covers/` - Images de couverture
+- `previews/` - Aperçus PDF (premières pages)
+
+#### 3. Redémarrer l'application
+
 ```bash
-cd supabase/migration-export
-npm install
+pm2 restart all
 ```
 
-2. **Vérifier la configuration:**
-Assurez-vous que `.env.local` à la racine du projet contient:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://pvjeufrrktatorurgstl.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
-```
+#### 4. Tester l'application
 
-3. **Lancer l'import:**
-```bash
-npm run import
-```
+Ouvrez http://localhost:3000 et vérifiez :
+- ✅ Page d'accueil s'affiche
+- ✅ Catégories visibles
+- ✅ Connexion fonctionne
+- ✅ Dashboard accessible
 
-Le script va:
-- ✅ Vérifier la connexion
-- ✅ Créer toutes les tables
-- ✅ Configurer RLS
-- ✅ Importer les données
-- ✅ Vérifier l'intégrité
+## 🔧 Dépannage
 
-**Durée:** ~30 secondes
+### Erreur "relation does not exist"
+**Solution :** Vérifiez que vous avez bien exécuté `01_schema.sql` AVANT `02_data.sql`
 
-### Option 2: Import Manuel
+### Erreur "duplicate key value"
+**Solution :** Normal si vous relancez l'import. Les données existent déjà.
 
-Si vous préférez plus de contrôle, suivez le guide `MIGRATION_GUIDE.md`.
+### Pas de données dans les tables
+**Solution :** 
+1. Vérifiez que `02_data.sql` s'est exécuté sans erreur
+2. Vérifiez RLS : allez dans **Authentication → Policies** et vérifiez que les policies existent
 
-## 📋 Que fait le script?
+### L'application ne se connecte pas à la base
+**Solution :** 
+1. Vérifiez que `.env.local` contient les bonnes clés
+2. Redémarrez le serveur : `pm2 restart all`
 
-### Étape 1: Schéma (01_schema.sql)
-- Crée les extensions (uuid-ossp)
-- Crée 10 tables principales
-- Configure tous les index
-- Active RLS sur toutes les tables
-- Crée toutes les policies de sécurité
-- Configure le trigger de création automatique de profil
+## 📚 Documentation Complète
 
-### Étape 2: Données (02_data.sql)
+Pour le guide détaillé avec toutes les explications, consultez : `MIGRATION_GUIDE.md`
+
+## 🎯 Résumé
+
+✅ **Ce qui a été migré :**
+- 10 tables avec toutes les contraintes
+- Toutes les policies RLS
 - 9 catégories
 - 2 bannières homepage
 - 22 paramètres plateforme
 
-## ⚠️ Important
+❌ **Ce qui doit être fait manuellement :**
+- Créer les utilisateurs dans Authentication
+- Créer le bucket Storage `documents`
+- Migrer les fichiers documents (si applicable)
 
-**Le script NE migre PAS:**
-- ❌ Les utilisateurs Auth (à créer manuellement)
-- ❌ Les documents (fichiers Storage)
-- ❌ Les transactions historiques
+---
 
-Ces éléments doivent être migrés manuellement (voir MIGRATION_GUIDE.md).
-
-## 🐛 Dépannage
-
-### Erreur: "SUPABASE_SERVICE_ROLE_KEY manquant"
-**Solution:** Vérifiez que `.env.local` existe à la racine et contient la clé.
-
-### Erreur: "Cannot connect to database"
-**Solution:** Vérifiez que l'URL Supabase est correcte et que le projet est actif.
-
-### Erreur: "Permission denied"
-**Solution:** Assurez-vous d'utiliser la `service_role_key`, pas la `anon_key`.
-
-### Avertissements lors de l'import
-**Normal:** Si vous relancez le script, certaines tables existent déjà. Les erreurs "already exists" sont normales.
-
-## 📊 Vérification Post-Import
-
-Après l'import, vérifiez dans Supabase Dashboard:
-
-1. **Table Editor:**
-   - `categories` → 9 lignes
-   - `homepage_banners` → 2 lignes
-   - `platform_settings` → 22 lignes
-
-2. **Authentication:**
-   - Créez vos utilisateurs (admin, auteurs, etc.)
-
-3. **Storage:**
-   - Créez le bucket `documents` (public)
-
-4. **Application:**
-   - Redémarrez: `pm2 restart all`
-   - Testez: `http://localhost:3000`
-
-## 🔄 Relancer l'import
-
-Vous pouvez relancer le script sans problème. Il va:
-- Ignorer les tables existantes
-- Mettre à jour les données si nécessaire
-- Recréer les policies RLS
-
-## 📚 Documentation Complète
-
-Pour le guide complet étape par étape, consultez: `MIGRATION_GUIDE.md`
+**Temps total estimé :** 10-15 minutes (import + configuration)
