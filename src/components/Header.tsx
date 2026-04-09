@@ -26,8 +26,10 @@ export function Header() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("🚀 Header - useEffect déclenché");
     checkUser();
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("🔔 Header - Auth state changed:", { event, user: session?.user?.email });
       setUser(session?.user ?? null);
       if (session?.user) {
         loadProfile(session.user.id);
@@ -42,34 +44,48 @@ export function Header() {
   }, []);
 
   const checkUser = async () => {
+    console.log("🔍 Header - checkUser appelé");
     const { data: { session } } = await supabase.auth.getSession();
+    console.log("📧 Header - Session récupérée:", { 
+      hasSession: !!session, 
+      userEmail: session?.user?.email,
+      userId: session?.user?.id 
+    });
     setUser(session?.user ?? null);
     if (session?.user) {
-      loadProfile(session.user.id);
+      await loadProfile(session.user.id);
     }
   };
 
   const loadProfile = async (userId: string) => {
+    console.log("🔄 Header - loadProfile appelé pour userId:", userId);
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
     
-    console.log("🔍 Header - Profile chargé:", { 
-      data, 
-      error, 
-      role: data?.role,
-      full_name: data?.full_name,
-      isAdmin: data?.role === "admin"
-    });
+    console.log("=" .repeat(80));
+    console.log("🎯 HEADER - PROFILE CHARGÉ - DÉTAILS COMPLETS:");
+    console.log("  → Email:", data?.email);
+    console.log("  → Full Name:", data?.full_name);
+    console.log("  → Role (brut):", data?.role);
+    console.log("  → Role (type):", typeof data?.role);
+    console.log("  → Role === 'admin':", data?.role === "admin");
+    console.log("  → Error:", error);
+    console.log("  → Data complète:", JSON.stringify(data, null, 2));
+    console.log("=" .repeat(80));
     
     if (data) {
       setProfile(data);
+      console.log("✅ Header - Profile stocké dans state:", data);
+    } else {
+      console.error("❌ Header - Erreur chargement profile:", error);
     }
   };
 
   const handleLogout = async () => {
+    console.log("🚪 Header - Déconnexion...");
     await supabase.auth.signOut();
     router.push("/");
   };
@@ -78,6 +94,15 @@ export function Header() {
     if (!role) return "Visiteur";
     return roleTranslations[role] || "Utilisateur";
   };
+
+  // LOG EN TEMPS RÉEL DE L'ÉTAT
+  console.log("🖼️ Header - Render:", {
+    hasUser: !!user,
+    hasProfile: !!profile,
+    profileRole: profile?.role,
+    isAdmin: profile?.role === "admin",
+    shouldShowAdminMenu: profile?.role === "admin"
+  });
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gold/20 bg-background/95 backdrop-blur-lg supports-[backdrop-filter]:bg-background/80 shadow-lg">
@@ -146,14 +171,29 @@ export function Header() {
                       Tableau de bord
                     </Link>
                   </DropdownMenuItem>
-                  {profile?.role === "admin" && (
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href="/admin" className="flex items-center text-gold font-medium">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Administration
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
+                  
+                  {/* MENU ADMIN - CONDITION SIMPLE ET VISIBLE */}
+                  {(() => {
+                    const isAdmin = profile?.role === "admin";
+                    console.log("🎨 Header - Render menu admin:", { 
+                      profileRole: profile?.role, 
+                      isAdmin,
+                      willShowMenu: isAdmin 
+                    });
+                    
+                    if (isAdmin) {
+                      return (
+                        <DropdownMenuItem asChild className="cursor-pointer">
+                          <Link href="/admin" className="flex items-center text-gold font-medium">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Administration
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
                   <DropdownMenuSeparator className="bg-gold/10" />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
