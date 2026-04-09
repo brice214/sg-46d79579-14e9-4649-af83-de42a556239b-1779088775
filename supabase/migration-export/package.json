@@ -1,0 +1,16 @@
+{
+  "name": "afrilitt-database-import",
+  "version": "1.0.0",
+  "description": "Script d'import automatique de la base de données AfriLitt",
+  "main": "import-database.js",
+  "scripts": {
+    "import": "node import-database.js"
+  },
+  "keywords": ["supabase", "migration", "import"],
+  "author": "AfriLitt",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
+  }
+}
