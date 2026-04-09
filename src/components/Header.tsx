@@ -50,6 +50,8 @@ export function Header() {
   };
 
   const loadProfile = async (userId: string) => {
+    console.log("🔍 LOADING PROFILE FOR USER ID:", userId);
+    
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
@@ -57,10 +59,16 @@ export function Header() {
       .single();
     
     if (data) {
-      console.log("✅ Profile chargé:", { email: data.email, role: data.role, isAdmin: data.role === "admin" });
+      console.log("✅ Profile chargé:", { 
+        userId: userId,
+        profileId: data.id,
+        email: data.email, 
+        role: data.role, 
+        isAdmin: data.role === "admin" 
+      });
       setProfile(data);
     } else {
-      console.error("❌ Erreur chargement profile:", error);
+      console.error("❌ Erreur chargement profile:", { userId, error });
     }
   };
 
