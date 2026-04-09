@@ -13,6 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+const roleTranslations: Record<string, string> = {
+  admin: "Administrateur",
+  author: "Auteur",
+  visitor: "Visiteur",
+  user: "Utilisateur"
+};
+
 export function Header() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -49,13 +56,27 @@ export function Header() {
       .eq("id", userId)
       .single();
     
-    console.log("🔍 Header - Profile loaded:", { data, error, role: data?.role });
-    setProfile(data);
+    console.log("🔍 Header - Profile chargé:", { 
+      data, 
+      error, 
+      role: data?.role,
+      full_name: data?.full_name,
+      isAdmin: data?.role === "admin"
+    });
+    
+    if (data) {
+      setProfile(data);
+    }
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
+  };
+
+  const getRoleLabel = (role: string | null | undefined): string => {
+    if (!role) return "Visiteur";
+    return roleTranslations[role] || "Utilisateur";
   };
 
   return (
@@ -106,7 +127,7 @@ export function Header() {
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm font-medium">
-                      {profile?.full_name || user.email?.split('@')[0]}
+                      {profile?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -114,7 +135,9 @@ export function Header() {
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium">{profile?.full_name || "Utilisateur"}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-gold capitalize mt-1">{profile?.role || "visitor"}</p>
+                    <p className="text-xs text-gold font-medium mt-1">
+                      {getRoleLabel(profile?.role)}
+                    </p>
                   </div>
                   <DropdownMenuSeparator className="bg-gold/10" />
                   <DropdownMenuItem asChild className="cursor-pointer">
@@ -125,7 +148,7 @@ export function Header() {
                   </DropdownMenuItem>
                   {profile?.role === "admin" && (
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link href="/admin" className="flex items-center text-gold">
+                      <Link href="/admin" className="flex items-center text-gold font-medium">
                         <Settings className="mr-2 h-4 w-4" />
                         Administration
                       </Link>
