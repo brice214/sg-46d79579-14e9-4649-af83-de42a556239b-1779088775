@@ -155,16 +155,24 @@ async function main() {
   );
   logSuccess('Client Supabase initialisé');
 
-  // Test connection
+  // Test connection - simplified test that doesn't require existing tables
   logStep('TEST', 'Test de connexion...');
-  const { data: testData, error: testError } = await supabase
-    .from('categories')
-    .select('count')
-    .limit(1);
+  try {
+    const { data: testData, error: testError } = await supabase
+      .from('categories')
+      .select('count')
+      .limit(1);
 
-  if (testError && !testError.message.includes('does not exist')) {
+    // Any response means connection works, even if table doesn't exist
+    if (testError && !testError.message.includes('does not exist') && !testError.code?.includes('PGRST205')) {
+      logError('Impossible de se connecter à Supabase');
+      console.error(testError);
+      process.exit(1);
+    }
+  } catch (err) {
+    // Connection test failed
     logError('Impossible de se connecter à Supabase');
-    console.error(testError);
+    console.error(err);
     process.exit(1);
   }
   logSuccess('Connexion établie');
