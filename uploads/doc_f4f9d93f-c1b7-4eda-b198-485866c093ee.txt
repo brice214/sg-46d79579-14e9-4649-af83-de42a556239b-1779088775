@@ -1,0 +1,49 @@
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:86 [HMR] Invalid message: {"action":"isrManifest","data":{"/dashboard":true,"/":true}}
+TypeError: Cannot read properties of undefined (reading 'components')
+    at handleStaticIndicator (hot-reloader-client.ts:277:42)
+    at processMessage (hot-reloader-client.ts:304:7)
+    at hot-reloader-client.ts:84:7
+    at WebSocket.handleMessage (websocket.ts:67:9)
+(anonymous) @ hot-reloader-client.ts:86
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 82ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 373ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 762ms
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+Header.tsx:52 🔍 Header - Profile loaded: Object
+Header.tsx:52 🔍 Header - Profile loaded: Object
+Header.tsx:52 🔍 Header - Profile loaded: Object
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 54ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 16ms
+pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6:1  Failed to load resource: the server responded with a status of 400 ()
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 129063ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 146ms
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 128771ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 33ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 50ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 1119ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 75ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 211ms
+Header.tsx:52 🔍 Header - Profile loaded: {data: {…}, error: null, role: 'visitor'}
+Header.tsx:52 🔍 Header - Profile loaded: {data: {…}, error: null, role: 'visitor'}
+Header.tsx:52 🔍 Header - Profile loaded: {data: {…}, error: null, role: 'visitor'}
+Header.tsx:52 🔍 Header - Profile loaded: {data: {…}, error: null, role: 'visitor'}
