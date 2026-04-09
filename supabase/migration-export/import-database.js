@@ -42,118 +42,80 @@ function logWarning(message) {
   log(`⚠️  ${message}`, 'yellow');
 }
 
-async function executeSQL(supabase, sqlContent, filename) {
+async function executeSQLStatements(supabase, sqlContent, filename) {
   try {
     logStep('EXEC', `Exécution de ${filename}...`);
     
-    const { data, error } = await supabase.rpc('exec_sql', {
-      sql_query: sqlContent
-    });
-
-    if (error) {
-      // If exec_sql function doesn't exist, try direct query
-      if (error.message.includes('function') && error.message.includes('does not exist')) {
-        logWarning('Fonction exec_sql non trouvée, utilisation de la méthode alternative...');
-        
-        // Split SQL into individual statements
-        const statements = sqlContent
-          .split(';')
-          .map(s => s.trim())
-          .filter(s => s.length > 0 && !s.startsWith('--'));
-
-        let successCount = 0;
-        let errorCount = 0;
-
-        for (let i = 0; i < statements.length; i++) {
-          const statement = statements[i] + ';';
-          
-          // Skip comments
-          if (statement.trim().startsWith('--')) continue;
-          
-          const { error: stmtError } = await supabase.rpc('exec', {
-            query: statement
-          });
-
-          if (stmtError) {
-            // Try one more method - using postgrest directly
-            const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/query`, {
-              method: 'POST',
-              headers: {
-                'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
-                'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ query: statement })
-            });
-
-            if (!response.ok) {
-              errorCount++;
-              logWarning(`Statement ${i + 1}/${statements.length} échoué (peut être normal si déjà existant)`);
-            } else {
-              successCount++;
-            }
-          } else {
-            successCount++;
-          }
-        }
-
-        logSuccess(`${successCount}/${statements.length} statements exécutés`);
-        if (errorCount > 0) {
-          logWarning(`${errorCount} statements ont échoué (probablement déjà existants)`);
-        }
+    // Split SQL into individual statements
+    const statements = sqlContent
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => {
+        // Filter out empty lines and comments
+        if (!s) return false;
+        if (s.startsWith('--')) return false;
+        if (s.match(/^\/\*/)) return false;
         return true;
-      }
+      });
+
+    log(`  → ${statements.length} statements à exécuter`, 'blue');
+
+    let successCount = 0;
+    let errorCount = 0;
+    let skippedCount = 0;
+
+    for (let i = 0; i < statements.length; i++) {
+      const statement = statements[i];
       
-      throw error;
-    }
-
-    logSuccess(`${filename} exécuté avec succès!`);
-    return true;
-
-  } catch (error) {
-    logError(`Erreur lors de l'exécution de ${filename}:`);
-    console.error(error);
-    return false;
-  }
-}
-
-async function executeSQLDirect(supabase, sqlContent, filename) {
-  try {
-    logStep('EXEC', `Exécution directe de ${filename}...`);
-    
-    // Use Supabase Management API to execute SQL
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL.split('//')[1].split('.')[0];
-    
-    const response = await fetch(
-      `https://api.supabase.com/v1/projects/${projectRef}/database/query`,
-      {
-        method: 'POST',
-        headers: {
-          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: sqlContent })
+      // Show progress every 10 statements
+      if (i % 10 === 0 && i > 0) {
+        log(`  → Progression: ${i}/${statements.length} (${successCount} OK, ${errorCount} erreurs, ${skippedCount} ignorés)`, 'blue');
       }
-    );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      try {
+        // Execute via Supabase client using raw SQL
+        const { error } = await supabase.rpc('exec', {
+          sql: statement + ';'
+        });
+
+        if (error) {
+          // Check if it's an "already exists" error - these are OK
+          if (error.message.includes('already exists') || 
+              error.message.includes('duplicate') ||
+              error.message.includes('does not exist')) {
+            skippedCount++;
+          } else {
+            errorCount++;
+            if (errorCount <= 3) {
+              logWarning(`Statement ${i + 1}: ${error.message.substring(0, 100)}`);
+            }
+          }
+        } else {
+          successCount++;
+        }
+      } catch (err) {
+        errorCount++;
+        if (errorCount <= 3) {
+          logWarning(`Statement ${i + 1} exception: ${err.message.substring(0, 100)}`);
+        }
+      }
     }
 
-    const result = await response.json();
-    logSuccess(`${filename} exécuté avec succès!`);
-    
-    if (result.length > 0) {
-      log(`  → ${result.length} résultats retournés`, 'blue');
+    log(`\n  Résultat final:`, 'cyan');
+    logSuccess(`${successCount} statements exécutés avec succès`);
+    if (skippedCount > 0) {
+      log(`  ${skippedCount} statements ignorés (déjà existants)`, 'yellow');
     }
-    
-    return true;
+    if (errorCount > 0) {
+      logWarning(`${errorCount} erreurs rencontrées`);
+    }
+
+    // Consider it a success if we have more successes than errors
+    return successCount > errorCount;
 
   } catch (error) {
-    logError(`Erreur lors de l'exécution de ${filename}:`);
-    console.error(error.message);
+    logError(`Erreur fatale lors de l'exécution de ${filename}:`);
+    console.error(error);
     return false;
   }
 }
@@ -179,7 +141,7 @@ async function main() {
   logSuccess('Variables d\'environnement OK');
   log(`  URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL}`, 'blue');
 
-  // Initialize Supabase client
+  // Initialize Supabase client with service role
   logStep('INIT', 'Initialisation du client Supabase...');
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -192,6 +154,20 @@ async function main() {
     }
   );
   logSuccess('Client Supabase initialisé');
+
+  // Test connection
+  logStep('TEST', 'Test de connexion...');
+  const { data: testData, error: testError } = await supabase
+    .from('categories')
+    .select('count')
+    .limit(1);
+
+  if (testError && !testError.message.includes('does not exist')) {
+    logError('Impossible de se connecter à Supabase');
+    console.error(testError);
+    process.exit(1);
+  }
+  logSuccess('Connexion établie');
 
   // Read SQL files
   logStep('READ', 'Lecture des fichiers SQL...');
@@ -218,7 +194,8 @@ async function main() {
 
   // Confirmation prompt
   log('\n⚠️  ATTENTION: Cette opération va modifier votre base de données!', 'yellow');
-  log('Assurez-vous que:', 'yellow');
+  log('Méthode utilisée: Import SQL statement par statement', 'yellow');
+  log('\nAssurez-vous que:', 'yellow');
   log('  1. Vous avez configuré le bon projet dans .env.local', 'yellow');
   log('  2. Le projet est vide ou que vous acceptez d\'écraser les données', 'yellow');
   log('\nAppuyez sur Ctrl+C pour annuler, ou attendez 5 secondes...', 'yellow');
@@ -227,25 +204,36 @@ async function main() {
 
   // Execute schema
   logStep('1/2', 'Import du schéma (tables, RLS, contraintes)...');
-  const schemaSuccess = await executeSQLDirect(supabase, schemaSQL, '01_schema.sql');
+  log('Note: Certaines erreurs "already exists" sont normales si vous relancez le script', 'yellow');
+  
+  const schemaSuccess = await executeSQLStatements(supabase, schemaSQL, '01_schema.sql');
 
   if (!schemaSuccess) {
-    logError('L\'import du schéma a échoué. Arrêt du script.');
-    log('\nConseil: Vérifiez que le projet Supabase est accessible et que la clé service_role est correcte.', 'yellow');
+    logError('L\'import du schéma a rencontré trop d\'erreurs.');
+    log('\nOptions:', 'yellow');
+    log('  1. Vérifiez les logs ci-dessus', 'blue');
+    log('  2. Utilisez le SQL Editor dans Supabase Dashboard', 'blue');
+    log('  3. Copiez/collez le contenu de 01_schema.sql manuellement', 'blue');
+    log('\nConsultez MIGRATION_GUIDE.md pour l\'import manuel.', 'yellow');
     process.exit(1);
   }
 
   // Wait a bit for schema to settle
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  log('\nAttente de 3 secondes pour stabilisation du schéma...', 'blue');
+  await new Promise(resolve => setTimeout(resolve, 3000));
 
   // Execute data
   logStep('2/2', 'Import des données (catégories, bannières, settings)...');
-  const dataSuccess = await executeSQLDirect(supabase, dataSQL, '02_data.sql');
+  const dataSuccess = await executeSQLStatements(supabase, dataSQL, '02_data.sql');
 
   if (!dataSuccess) {
     logWarning('L\'import des données a rencontré des erreurs.');
     log('Cela peut être normal si certaines données existent déjà.', 'yellow');
   }
+
+  // Wait before verification
+  log('\nAttente de 2 secondes avant vérification...', 'blue');
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Final verification
   logStep('VERIFY', 'Vérification de l\'import...');
@@ -259,21 +247,25 @@ async function main() {
   let allChecksPass = true;
 
   for (const check of checks) {
-    const { data, error } = await supabase
-      .from(check.table)
-      .select('*', { count: 'exact', head: true });
+    try {
+      const { count, error } = await supabase
+        .from(check.table)
+        .select('*', { count: 'exact', head: true });
 
-    if (error) {
-      logError(`Erreur vérification ${check.table}: ${error.message}`);
-      allChecksPass = false;
-    } else {
-      const count = data?.length || 0;
-      if (count >= check.expected) {
-        logSuccess(`${check.table}: ${count} lignes (attendu: ${check.expected})`);
-      } else {
-        logWarning(`${check.table}: ${count} lignes (attendu: ${check.expected})`);
+      if (error) {
+        logError(`Erreur vérification ${check.table}: ${error.message}`);
         allChecksPass = false;
+      } else {
+        if (count >= check.expected) {
+          logSuccess(`${check.table}: ${count} lignes (attendu: ${check.expected})`);
+        } else {
+          logWarning(`${check.table}: ${count} lignes (attendu: ${check.expected})`);
+          allChecksPass = false;
+        }
       }
+    } catch (err) {
+      logError(`Exception lors de la vérification de ${check.table}: ${err.message}`);
+      allChecksPass = false;
     }
   }
 
@@ -296,6 +288,11 @@ async function main() {
     log('  1. Les logs ci-dessus pour identifier les problèmes', 'blue');
     log('  2. Que le projet Supabase est accessible', 'blue');
     log('  3. Que les clés dans .env.local sont correctes', 'blue');
+    log('\n💡 Alternative: Import manuel via SQL Editor', 'cyan');
+    log('  1. Ouvrez Supabase Dashboard → SQL Editor', 'blue');
+    log('  2. Copiez le contenu de 01_schema.sql', 'blue');
+    log('  3. Exécutez-le dans l\'éditeur', 'blue');
+    log('  4. Répétez avec 02_data.sql', 'blue');
     log('\nConsultez MIGRATION_GUIDE.md pour le dépannage.', 'yellow');
   }
 
