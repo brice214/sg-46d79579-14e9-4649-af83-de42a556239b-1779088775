@@ -1,0 +1,30 @@
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 953ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 378ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 194ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: a2a586b2-d275-4af4-bbd7-14dad2696585
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: a2a586b2-d275-4af4-bbd7-14dad2696585
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: a2a586b2-d275-4af4-bbd7-14dad2696585
+Header.tsx:62 ✅ Profile chargé: {userId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', profileId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', email: 'admin@afrilitt.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', profileId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', email: 'admin@afrilitt.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', profileId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', email: 'admin@afrilitt.com', role: 'visitor', isAdmin: false}
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+e @ visual-editor.js:632
+X @ visual-editor.js:650
+(anonymous) @ visual-editor.js:654
+(anonymous) @ visual-editor.js:657
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 128316ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 26ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 35ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: a2a586b2-d275-4af4-bbd7-14dad2696585
+Header.tsx:62 ✅ Profile chargé: {userId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', profileId: 'a2a586b2-d275-4af4-bbd7-14dad2696585', email: 'admin@afrilitt.com', role: 'visitor', isAdmin: false}
