@@ -105,23 +105,32 @@ export function EbillingCheckout({
       console.log("📝 Création formulaire POST eBilling:");
       console.log("  - Action:", response.redirectUrl);
       console.log("  - Bill ID:", response.billId);
+      console.log("  - Success URL:", response.successUrl);
 
       const form = document.createElement("form");
       form.method = "POST";
       form.action = response.redirectUrl;
 
-      // Champ invoice_number (SEUL champ requis par eBilling)
+      // Champ invoice_number (requis par eBilling)
       const invoiceField = document.createElement("input");
       invoiceField.type = "hidden";
       invoiceField.name = "invoice_number";
       invoiceField.value = response.billId;
       form.appendChild(invoiceField);
 
+      // Champ merchant_redirect_url (URL de retour après paiement)
+      const redirectField = document.createElement("input");
+      redirectField.type = "hidden";
+      redirectField.name = "merchant_redirect_url";
+      redirectField.value = response.successUrl;
+      form.appendChild(redirectField);
+
       document.body.appendChild(form);
       
       console.log("🔄 Soumission formulaire vers eBilling...");
-      console.log("  Champ:", {
-        invoice_number: response.billId
+      console.log("  Champs:", {
+        invoice_number: response.billId,
+        merchant_redirect_url: response.successUrl
       });
 
       // 3. Soumettre le formulaire (redirection POST automatique)

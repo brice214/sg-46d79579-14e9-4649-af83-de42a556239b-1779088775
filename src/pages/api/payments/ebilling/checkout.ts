@@ -179,16 +179,14 @@ export default async function handler(
 
     console.log("Payload:", JSON.stringify(ebillingPayload, null, 2));
 
-    const authString = `${username}:${sharedKey}`;
-    const base64Auth = Buffer.from(authString).toString("base64");
-
     console.log("Appel vers:", apiUrl);
 
     const ebillingResponse = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${base64Auth}`
+        "X-AUTH-USERNAME": username,
+        "X-AUTH-SHARED-KEY": sharedKey
       },
       body: JSON.stringify(ebillingPayload)
     });

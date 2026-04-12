@@ -1,0 +1,1065 @@
+# 📘 GUIDE COMPLET D'INTÉGRATION eBILLING (GABON)
+
+**Version :** 1.0  
+**Date :** 23 février 2026  
+**Auteur :** Documentation Tsangoo SAAS  
+**Opérateurs supportés :** Airtel Money, MobiCash
+
+---
+
+## 📋 TABLE DES MATIÈRES
+
+1. [Vue d'ensemble](#vue-densemble)
+2. [Prérequis](#prérequis)
+3. [Flux complet](#flux-complet)
+4. [Étape 1 : Créer une facture](#étape-1--créer-une-facture-ebilling)
+5. [Étape 2 : Redirection client](#étape-2--redirection-vers-le-portail-ebilling)
+6. [Étape 3 : Callback webhook](#étape-3--réception-du-callback-webhook)
+7. [Code exemple complet](#code-exemple-complet)
+8. [Tests avec le simulateur](#tests-avec-le-simulateur)
+9. [Erreurs courantes](#erreurs-courantes)
+10. [Checklist de mise en production](#checklist-de-mise-en-production)
+
+---
+
+## 🎯 VUE D'ENSEMBLE
+
+eBilling est une **passerelle de paiement mobile money** permettant aux clients de payer via :
+- **Airtel Money** (Gabon)
+- **MobiCash** (Gabon)
+
+### Architecture
+
+```
+┌─────────────┐      ┌──────────────┐      ┌─────────────┐      ┌──────────────┐
+│   Client    │─────>│  Votre Site  │─────>│   eBilling  │─────>│  Opérateur   │
+│ (navigateur)│      │  (Backend)   │      │   (API)     │      │(Airtel/Mobi) │
+└─────────────┘      └──────────────┘      └─────────────┘      └──────────────┘
+       │                     ▲                      │                    │
+       │                     │                      │                    │
+       └─────────────────────┴──────────────────────┴────────────────────┘
+                          Notifications callback
+```
+
+---
+
+## 🔑 PRÉREQUIS
+
+### 1. Compte Marchand eBilling
+
+**Environnement LAB (Tests) :**
+- URL : https://lab.billing-easy.net
+- Créer un compte marchand
+- Obtenir credentials API
+
+**Environnement PROD (Production) :**
+- URL : https://www.billing-easy.com
+- Demander activation compte PROD
+- Obtenir nouveaux credentials PROD
+
+### 2. Credentials API
+
+Après création du compte, récupérer dans **Profile → API Keys** :
+
+| Credential | Description | Exemple |
+|------------|-------------|---------|
+| **Username** | Identifiant marchand | `factugabon` |
+| **Shared Key** | Clé secrète API | `8511c18d-c401-4693-b3ed-0933e21f0b9d` |
+
+⚠️ **Important :** Ne jamais exposer le Shared Key côté client (frontend)
+
+### 3. Infrastructure Backend
+
+Vous devez avoir :
+- ✅ Un serveur backend (Node.js, PHP, Python, etc.)
+- ✅ Une base de données pour stocker les transactions
+- ✅ Un endpoint callback accessible publiquement (HTTPS requis en PROD)
+
+---
+
+## 🔄 FLUX COMPLET
+
+### Diagramme de séquence
+
+```
+CLIENT                 VOTRE SITE              API eBILLING           OPÉRATEUR
+  |                        |                         |                     |
+  |  1. Clic "Payer"       |                         |                     |
+  |----------------------->|                         |                     |
+  |                        |                         |                     |
+  |                        |  2. POST /e_bills       |                     |
+  |                        |  (créer facture)        |                     |
+  |                        |------------------------>|                     |
+  |                        |                         |                     |
+  |                        |  3. bill_id: 5550034567 |                     |
+  |                        |<------------------------|                     |
+  |                        |                         |                     |
+  |  4. Redirection POST   |                         |                     |
+  |  (invoice_number)      |                         |                     |
+  |-------------------------------------------------->|                     |
+  |                        |                         |                     |
+  |  5. Affichage facture  |                         |                     |
+  |  + choix opérateur     |                         |                     |
+  |<--------------------------------------------------|                     |
+  |                        |                         |                     |
+  |  6. Validation paiement|                         |  7. Transfert $$$   |
+  |-------------------------------------------------->|-------------------->|
+  |                        |                         |                     |
+  |                        |  8. POST /callback      |                     |
+  |                        |  (notification)         |                     |
+  |                        |<------------------------|                     |
+  |                        |                         |                     |
+  |  9. Redirection finale |                         |                     |
+  |  (merchant_redirect_url)                         |                     |
+  |<--------------------------------------------------|                     |
+  |                        |                         |                     |
+```
+
+**Durée totale :** 30 secondes à 2 minutes (selon l'opérateur)
+
+---
+
+## 📡 ÉTAPE 1 : CRÉER UNE FACTURE eBILLING
+
+### Endpoint API
+
+**LAB :** `https://lab.billing-easy.net/api/v1/merchant/e_bills`  
+**PROD :** `https://www.billing-easy.com/api/v1/merchant/e_bills`
+
+### Requête HTTP
+
+**Méthode :** `POST`
+
+**Headers :**
+```http
+Content-Type: application/json
+X-AUTH-USERNAME: votre_username
+X-AUTH-SHARED-KEY: votre_shared_key
+```
+
+**Body (JSON) :**
+```json
+{
+  "amount": 15000,
+  "short_description": "Abonnement mensuel Tsangoo SAAS",
+  "payer_email": "client@example.com",
+  "payer_msisdn": "06123456",
+  "payer_name": "Jean Dupont",
+  "external_reference": "REF-1708704123-456"
+}
+```
+
+### Paramètres du Body
+
+| Paramètre | Type | Requis | Description | Exemple |
+|-----------|------|--------|-------------|---------|
+| `amount` | number | ✅ | Montant en FCFA | `15000` |
+| `short_description` | string | ✅ | Description de la facture | `"Abonnement mensuel"` |
+| `payer_email` | string | ✅ | Email du client | `"client@example.com"` |
+| `payer_msisdn` | string | ✅ | Téléphone du client | `"06123456"` |
+| `payer_name` | string | ✅ | Nom du client | `"Jean Dupont"` |
+| `external_reference` | string | ✅ | Référence unique dans votre système | `"REF-12345"` |
+
+⚠️ **Important :** `external_reference` doit être **unique** pour chaque transaction
+
+### Réponse de succès
+
+**HTTP 200 OK**
+
+```json
+{
+  "e_bill": {
+    "bill_id": "5550034567",
+    "status": "pending",
+    "amount": 15000,
+    "created_at": "2026-02-23T16:30:00Z"
+  }
+}
+```
+
+**Clé importante :** `bill_id` → Vous en aurez besoin pour la redirection
+
+### Réponse d'erreur
+
+**HTTP 400 Bad Request**
+
+```json
+{
+  "error": "Invalid credentials"
+}
+```
+
+**HTTP 401 Unauthorized**
+
+```json
+{
+  "error": "Authentication required"
+}
+```
+
+### Code exemple (Node.js)
+
+```javascript
+const axios = require('axios');
+
+async function createEbillingInvoice(amount, clientData) {
+  const apiUrl = "https://lab.billing-easy.net/api/v1/merchant/e_bills";
+  
+  const payload = {
+    amount: parseFloat(amount),
+    short_description: "Abonnement mensuel",
+    payer_email: clientData.email,
+    payer_msisdn: clientData.phone,
+    payer_name: clientData.name,
+    external_reference: `REF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  };
+
+  try {
+    const response = await axios.post(apiUrl, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AUTH-USERNAME': process.env.EBILLING_USERNAME,
+        'X-AUTH-SHARED-KEY': process.env.EBILLING_SHARED_KEY
+      }
+    });
+
+    console.log("✅ Facture créée:", response.data.e_bill.bill_id);
+    return response.data.e_bill.bill_id;
+    
+  } catch (error) {
+    console.error("❌ Erreur création facture:", error.response?.data || error.message);
+    throw error;
+  }
+}
+```
+
+### Code exemple (PHP)
+
+```php
+<?php
+function createEbillingInvoice($amount, $clientData) {
+    $apiUrl = "https://lab.billing-easy.net/api/v1/merchant/e_bills";
+    
+    $payload = [
+        'amount' => floatval($amount),
+        'short_description' => 'Abonnement mensuel',
+        'payer_email' => $clientData['email'],
+        'payer_msisdn' => $clientData['phone'],
+        'payer_name' => $clientData['name'],
+        'external_reference' => 'REF-' . time() . '-' . uniqid()
+    ];
+
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'X-AUTH-USERNAME: ' . getenv('EBILLING_USERNAME'),
+        'X-AUTH-SHARED-KEY: ' . getenv('EBILLING_SHARED_KEY')
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        $data = json_decode($response, true);
+        return $data['e_bill']['bill_id'];
+    } else {
+        throw new Exception("Erreur eBilling: " . $response);
+    }
+}
+?>
+```
+
+---
+
+## 🔀 ÉTAPE 2 : REDIRECTION VERS LE PORTAIL eBILLING
+
+Une fois le `bill_id` obtenu, vous devez rediriger le client vers le portail eBilling.
+
+### URL de redirection
+
+**LAB :** `https://test.billing-easy.net`  
+**PROD :** `https://www.billing-easy.com`
+
+### Méthode de redirection
+
+⚠️ **IMPORTANT :** La redirection doit être faite via **POST** (pas GET)
+
+### Paramètres requis
+
+| Paramètre | Description | Exemple |
+|-----------|-------------|---------|
+| `invoice_number` | Le `bill_id` reçu de l'API | `5550034567` |
+| `merchant_redirect_url` | URL de retour après paiement | `https://votresite.com/paiement/success` |
+
+### Code exemple (JavaScript - Frontend)
+
+```javascript
+function redirectToEbilling(billId, successUrl) {
+  const redirectUrl = "https://test.billing-easy.net"; // LAB
+  
+  // Créer un formulaire POST caché
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = redirectUrl;
+  
+  // Ajouter invoice_number
+  const invoiceInput = document.createElement('input');
+  invoiceInput.type = 'hidden';
+  invoiceInput.name = 'invoice_number';
+  invoiceInput.value = billId;
+  form.appendChild(invoiceInput);
+  
+  // Ajouter merchant_redirect_url
+  const redirectInput = document.createElement('input');
+  redirectInput.type = 'hidden';
+  redirectInput.name = 'merchant_redirect_url';
+  redirectInput.value = successUrl;
+  form.appendChild(redirectInput);
+  
+  // Soumettre automatiquement
+  document.body.appendChild(form);
+  form.submit();
+}
+
+// Exemple d'utilisation
+redirectToEbilling("5550034567", "https://votresite.com/paiement/success");
+```
+
+### Code exemple (React)
+
+```jsx
+import { useEffect } from 'react';
+
+function RedirectToEbilling({ billId, successUrl }) {
+  useEffect(() => {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://test.billing-easy.net';
+    
+    const invoiceInput = document.createElement('input');
+    invoiceInput.type = 'hidden';
+    invoiceInput.name = 'invoice_number';
+    invoiceInput.value = billId;
+    form.appendChild(invoiceInput);
+    
+    const redirectInput = document.createElement('input');
+    redirectInput.type = 'hidden';
+    redirectInput.name = 'merchant_redirect_url';
+    redirectInput.value = successUrl;
+    form.appendChild(redirectInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+  }, [billId, successUrl]);
+
+  return <div>Redirection vers eBilling...</div>;
+}
+```
+
+### Ce que voit le client
+
+Après la redirection, le client arrive sur le portail eBilling qui affiche :
+- 💳 Le montant à payer
+- 📝 La description de la facture
+- 📱 Les options de paiement (Airtel Money / MobiCash)
+- 🔢 Les instructions pour finaliser le paiement
+
+---
+
+## 🔔 ÉTAPE 3 : RÉCEPTION DU CALLBACK (WEBHOOK)
+
+Après que le client ait payé, eBilling notifie votre backend via un **callback HTTP POST**.
+
+### Configuration du callback
+
+**Dans votre profil eBilling :**
+1. Connexion → **Profile** → **Edit**
+2. Section **"Notification URL"**
+3. Entrer : `https://votresite.com/api/payments/ebilling/callback`
+4. Cocher les paramètres : `transactionid`, `reference`, `paymentsystem`, `amount`
+5. **Save**
+
+⚠️ **En production :** L'URL callback doit être en **HTTPS**
+
+### Paramètres reçus
+
+eBilling envoie une requête **POST** avec ces paramètres (form-urlencoded) :
+
+| Paramètre | Type | Description | Exemple |
+|-----------|------|-------------|---------|
+| `reference` | string | Votre `external_reference` | `REF-1708704123-456` |
+| `transactionid` | string | ID de transaction opérateur | `AM123456789` |
+| `paymentsystem` | string | Nom de l'opérateur | `Airtel Money` |
+| `amount` | string | Montant payé (FCFA) | `15000` |
+
+### Code exemple (Node.js + Express)
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.post('/api/payments/ebilling/callback', async (req, res) => {
+  console.log("🔔 Callback eBilling reçu:", req.body);
+
+  const { reference, transactionid, paymentsystem, amount } = req.body;
+
+  try {
+    // 1. Récupérer la transaction en DB par reference
+    const transaction = await db.query(
+      'SELECT * FROM transactions WHERE reference = ?',
+      [reference]
+    );
+
+    if (!transaction) {
+      console.error("❌ Transaction introuvable:", reference);
+      return res.status(404).send("Transaction not found");
+    }
+
+    // 2. Vérifier le montant
+    if (parseFloat(amount) !== transaction.amount) {
+      console.error("❌ Montant incorrect:", amount, "vs", transaction.amount);
+      return res.status(400).send("Amount mismatch");
+    }
+
+    // 3. Mettre à jour la transaction
+    await db.query(
+      'UPDATE transactions SET status = ?, operator = ?, transaction_id = ?, paid_at = NOW() WHERE reference = ?',
+      ['paid', paymentsystem, transactionid, reference]
+    );
+
+    console.log("✅ Transaction validée:", reference);
+
+    // 4. Actions métier (activer abonnement, envoyer email, etc.)
+    await activerAbonnement(transaction.user_id);
+    await envoyerEmailConfirmation(transaction.email);
+
+    // 5. IMPORTANT: Retourner HTTP 200
+    res.status(200).send("OK");
+
+  } catch (error) {
+    console.error("❌ Erreur traitement callback:", error);
+    res.status(500).send("Internal error");
+  }
+});
+```
+
+### Code exemple (PHP)
+
+```php
+<?php
+// callback.php
+
+$reference = $_POST['reference'] ?? null;
+$transactionid = $_POST['transactionid'] ?? null;
+$paymentsystem = $_POST['paymentsystem'] ?? null;
+$amount = $_POST['amount'] ?? null;
+
+if (!$reference || !$transactionid || !$amount) {
+    http_response_code(400);
+    die("Missing parameters");
+}
+
+try {
+    // 1. Récupérer la transaction
+    $stmt = $pdo->prepare("SELECT * FROM transactions WHERE reference = ?");
+    $stmt->execute([$reference]);
+    $transaction = $stmt->fetch();
+
+    if (!$transaction) {
+        http_response_code(404);
+        die("Transaction not found");
+    }
+
+    // 2. Vérifier le montant
+    if (floatval($amount) !== floatval($transaction['amount'])) {
+        http_response_code(400);
+        die("Amount mismatch");
+    }
+
+    // 3. Mettre à jour
+    $stmt = $pdo->prepare(
+        "UPDATE transactions SET status = 'paid', operator = ?, transaction_id = ?, paid_at = NOW() WHERE reference = ?"
+    );
+    $stmt->execute([$paymentsystem, $transactionid, $reference]);
+
+    // 4. Actions métier
+    activerAbonnement($transaction['user_id']);
+    envoyerEmailConfirmation($transaction['email']);
+
+    // 5. Retourner HTTP 200
+    http_response_code(200);
+    echo "OK";
+
+} catch (Exception $e) {
+    error_log("Erreur callback eBilling: " . $e->getMessage());
+    http_response_code(500);
+    die("Internal error");
+}
+?>
+```
+
+### Sécurité du callback
+
+**Vérifications à implémenter :**
+
+1. ✅ **Vérifier l'IP source** (optionnel)
+2. ✅ **Vérifier que la transaction existe**
+3. ✅ **Vérifier le montant**
+4. ✅ **Éviter les doublons** (vérifier si déjà traité)
+5. ✅ **Logger toutes les tentatives**
+
+```javascript
+// Exemple de vérification IP (optionnel)
+const EBILLING_IPS = ['196.1.95.124', '41.203.195.33']; // IPs à confirmer avec eBilling
+
+app.post('/callback', (req, res) => {
+  const clientIp = req.ip || req.connection.remoteAddress;
+  
+  if (!EBILLING_IPS.includes(clientIp)) {
+    console.warn("⚠️ Callback depuis IP non autorisée:", clientIp);
+    // Décider si vous bloquez ou loggez seulement
+  }
+  
+  // ... reste du code
+});
+```
+
+---
+
+## 💻 CODE EXEMPLE COMPLET
+
+### Backend (Node.js + Express + MySQL)
+
+```javascript
+const express = require('express');
+const axios = require('axios');
+const mysql = require('mysql2/promise');
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configuration eBilling
+const EBILLING_CONFIG = {
+  username: process.env.EBILLING_USERNAME,
+  sharedKey: process.env.EBILLING_SHARED_KEY,
+  environment: process.env.EBILLING_ENV || 'LAB',
+  apiUrl: process.env.EBILLING_ENV === 'PROD' 
+    ? 'https://www.billing-easy.com/api/v1/merchant/e_bills'
+    : 'https://lab.billing-easy.net/api/v1/merchant/e_bills',
+  redirectUrl: process.env.EBILLING_ENV === 'PROD'
+    ? 'https://www.billing-easy.com'
+    : 'https://test.billing-easy.net'
+};
+
+// Connexion DB
+const db = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'myapp'
+});
+
+// ============================================
+// ROUTE 1: Initier un paiement
+// ============================================
+app.post('/api/payments/ebilling/checkout', async (req, res) => {
+  const { amount, clientName, clientEmail, clientPhone, description } = req.body;
+
+  try {
+    // 1. Générer référence unique
+    const reference = `REF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // 2. Créer transaction en DB
+    await db.execute(
+      'INSERT INTO transactions (reference, amount, status, created_at) VALUES (?, ?, ?, NOW())',
+      [reference, amount, 'created']
+    );
+
+    // 3. Appeler API eBilling
+    const ebillingPayload = {
+      amount: parseFloat(amount),
+      short_description: description || 'Paiement',
+      payer_email: clientEmail,
+      payer_msisdn: clientPhone,
+      payer_name: clientName,
+      external_reference: reference
+    };
+
+    const response = await axios.post(EBILLING_CONFIG.apiUrl, ebillingPayload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AUTH-USERNAME': EBILLING_CONFIG.username,
+        'X-AUTH-SHARED-KEY': EBILLING_CONFIG.sharedKey
+      }
+    });
+
+    const billId = response.data.e_bill.bill_id;
+
+    // 4. Mettre à jour transaction avec bill_id
+    await db.execute(
+      'UPDATE transactions SET ebilling_id = ?, status = ? WHERE reference = ?',
+      [billId, 'pending', reference]
+    );
+
+    // 5. Retourner billId au frontend
+    res.json({
+      success: true,
+      billId: billId,
+      reference: reference,
+      redirectUrl: EBILLING_CONFIG.redirectUrl
+    });
+
+  } catch (error) {
+    console.error('Erreur checkout:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// ROUTE 2: Callback eBilling
+// ============================================
+app.post('/api/payments/ebilling/callback', async (req, res) => {
+  const { reference, transactionid, paymentsystem, amount } = req.body;
+
+  console.log('🔔 Callback reçu:', req.body);
+
+  try {
+    // 1. Récupérer transaction
+    const [rows] = await db.execute(
+      'SELECT * FROM transactions WHERE reference = ?',
+      [reference]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).send('Transaction not found');
+    }
+
+    const transaction = rows[0];
+
+    // 2. Vérifier montant
+    if (parseFloat(amount) !== transaction.amount) {
+      return res.status(400).send('Amount mismatch');
+    }
+
+    // 3. Vérifier si déjà payée (éviter doublons)
+    if (transaction.status === 'paid') {
+      console.warn('⚠️ Transaction déjà payée:', reference);
+      return res.status(200).send('Already processed');
+    }
+
+    // 4. Mettre à jour
+    await db.execute(
+      'UPDATE transactions SET status = ?, operator = ?, transaction_id = ?, paid_at = NOW() WHERE reference = ?',
+      ['paid', paymentsystem, transactionid, reference]
+    );
+
+    console.log('✅ Paiement validé:', reference);
+
+    // 5. Actions métier
+    // TODO: Activer abonnement, envoyer email, etc.
+
+    res.status(200).send('OK');
+
+  } catch (error) {
+    console.error('❌ Erreur callback:', error);
+    res.status(500).send('Internal error');
+  }
+});
+
+// ============================================
+// ROUTE 3: Vérifier statut transaction
+// ============================================
+app.get('/api/payments/ebilling/status/:reference', async (req, res) => {
+  const { reference } = req.params;
+
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM transactions WHERE reference = ?',
+      [reference]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.json(rows[0]);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### Frontend (React)
+
+```jsx
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function PaymentButton() {
+  const [loading, setLoading] = useState(false);
+
+  const handlePayment = async () => {
+    setLoading(true);
+
+    try {
+      // 1. Appeler API checkout
+      const response = await axios.post('/api/payments/ebilling/checkout', {
+        amount: 15000,
+        clientName: 'Jean Dupont',
+        clientEmail: 'jean@example.com',
+        clientPhone: '06123456',
+        description: 'Abonnement mensuel'
+      });
+
+      const { billId, redirectUrl } = response.data;
+
+      // 2. Redirection POST vers eBilling
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = redirectUrl;
+
+      const invoiceInput = document.createElement('input');
+      invoiceInput.type = 'hidden';
+      invoiceInput.name = 'invoice_number';
+      invoiceInput.value = billId;
+      form.appendChild(invoiceInput);
+
+      const redirectInput = document.createElement('input');
+      redirectInput.type = 'hidden';
+      redirectInput.name = 'merchant_redirect_url';
+      redirectInput.value = `${window.location.origin}/payment/success`;
+      form.appendChild(redirectInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
+    } catch (error) {
+      console.error('Erreur paiement:', error);
+      alert('Erreur lors de l\'initialisation du paiement');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button onClick={handlePayment} disabled={loading}>
+      {loading ? 'Chargement...' : 'Payer 15 000 FCFA'}
+    </button>
+  );
+}
+
+export default PaymentButton;
+```
+
+### Page de succès
+
+```jsx
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+
+function PaymentSuccess() {
+  const [searchParams] = useSearchParams();
+  const reference = searchParams.get('reference');
+  const [status, setStatus] = useState('loading');
+  const [transaction, setTransaction] = useState(null);
+
+  useEffect(() => {
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get(`/api/payments/ebilling/status/${reference}`);
+        
+        if (response.data.status === 'paid') {
+          setStatus('success');
+          setTransaction(response.data);
+        } else if (attempts >= maxAttempts) {
+          setStatus('pending');
+        } else {
+          attempts++;
+          setTimeout(checkStatus, 2000); // Réessayer après 2s
+        }
+      } catch (error) {
+        setStatus('error');
+      }
+    };
+
+    if (reference) {
+      checkStatus();
+    }
+  }, [reference]);
+
+  if (status === 'loading') {
+    return <div>Vérification du paiement...</div>;
+  }
+
+  if (status === 'success') {
+    return (
+      <div>
+        <h1>✅ Paiement réussi !</h1>
+        <p>Référence: {transaction.reference}</p>
+        <p>Montant: {transaction.amount} FCFA</p>
+        <p>Opérateur: {transaction.operator}</p>
+      </div>
+    );
+  }
+
+  if (status === 'pending') {
+    return (
+      <div>
+        <h1>⏳ Paiement en cours de traitement</h1>
+        <p>Vous recevrez une confirmation par email</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1>❌ Erreur</h1>
+      <p>Une erreur est survenue</p>
+    </div>
+  );
+}
+
+export default PaymentSuccess;
+```
+
+---
+
+## 🧪 TESTS AVEC LE SIMULATEUR
+
+### URL Simulateur
+
+**https://simu.billing-easy.net**
+
+### Procédure de test End-to-End
+
+1. **Créer une facture** via API → Récupérer `bill_id`
+
+2. **Aller sur le simulateur** : https://simu.billing-easy.net
+
+3. **Section "Test payment end-2-end"**
+   - Entrer le `bill_id` (ex: 5550034567)
+   - Cliquer **"Query invoice"**
+
+4. **Vérifier les détails** de la facture affichés
+
+5. **Sélectionner un opérateur** :
+   - Airtel Money
+   - MobiCash
+
+6. **Cliquer "Pay invoice"**
+
+7. **Résultat attendu** :
+   ```
+   Payment was received. Thank you!
+   Airtel Money
+   HTTP code 200
+   ```
+
+8. **Vérifier votre callback** :
+   - Votre endpoint doit avoir reçu le POST
+   - Logs doivent afficher les paramètres
+   - Transaction mise à jour en DB
+
+### Codes de test
+
+Le simulateur accepte n'importe quel numéro pour les tests LAB.
+
+---
+
+## ⚠️ ERREURS COURANTES
+
+### 1. 400 Bad Request lors de création facture
+
+**Causes possibles :**
+- Credentials invalides (username ou shared_key)
+- Paramètres manquants ou mal formatés
+- Headers manquants
+
+**Solution :**
+```javascript
+// Vérifier que TOUS les headers sont présents
+{
+  'Content-Type': 'application/json',
+  'X-AUTH-USERNAME': 'votre_username',
+  'X-AUTH-SHARED-KEY': 'votre_shared_key'
+}
+```
+
+### 2. 401 Unauthorized
+
+**Causes :**
+- Username ou Shared Key incorrect
+- Headers mal nommés
+
+**Solution :**
+- Vérifier les credentials dans votre profil eBilling
+- Respecter exactement `X-AUTH-USERNAME` et `X-AUTH-SHARED-KEY`
+
+### 3. Callback non reçu
+
+**Causes :**
+- URL callback non enregistrée dans profil eBilling
+- Endpoint non accessible publiquement
+- Firewall bloquant
+
+**Solution :**
+1. Enregistrer URL dans Profile → Notification URL
+2. Vérifier que l'URL est accessible (HTTPS en prod)
+3. Tester avec un outil comme webhook.site
+
+### 4. Redirection POST ne fonctionne pas
+
+**Cause :**
+- Utilisation de GET au lieu de POST
+
+**Solution :**
+```javascript
+// CORRECT ✅
+form.method = 'POST';
+form.action = 'https://test.billing-easy.net';
+
+// INCORRECT ❌
+window.location.href = 'https://test.billing-easy.net?invoice_number=...';
+```
+
+### 5. Paiement validé mais callback non traité
+
+**Causes :**
+- Erreur dans le code du callback
+- Callback ne retourne pas HTTP 200
+
+**Solution :**
+```javascript
+// TOUJOURS retourner 200 à la fin
+res.status(200).send('OK');
+```
+
+### 6. Montants incorrects
+
+**Cause :**
+- Conversion string/number mal gérée
+
+**Solution :**
+```javascript
+// CORRECT ✅
+amount: parseFloat(montant)
+
+// INCORRECT ❌
+amount: montant // peut être string
+```
+
+---
+
+## ✅ CHECKLIST DE MISE EN PRODUCTION
+
+### Avant de passer en PROD
+
+- [ ] **Tests complets en LAB**
+  - [ ] Création de facture OK
+  - [ ] Redirection vers portail OK
+  - [ ] Callback reçu et traité OK
+  - [ ] Page de succès OK
+  - [ ] Paiement Airtel Money testé
+  - [ ] Paiement MobiCash testé
+
+- [ ] **Sécurité**
+  - [ ] Credentials en variables d'environnement
+  - [ ] HTTPS activé sur callback URL
+  - [ ] Validation des montants
+  - [ ] Protection contre doublons
+  - [ ] Logs de sécurité activés
+
+- [ ] **Infrastructure**
+  - [ ] Base de données en production
+  - [ ] Serveur backend accessible
+  - [ ] Monitoring activé
+  - [ ] Système d'alertes configuré
+
+- [ ] **Compte eBilling PROD**
+  - [ ] Compte créé sur https://www.billing-easy.com
+  - [ ] Credentials PROD récupérés
+  - [ ] Callback URL PROD enregistrée
+  - [ ] Variables d'environnement mises à jour
+
+- [ ] **Tests en PROD**
+  - [ ] Premier paiement test avec petit montant (500 FCFA)
+  - [ ] Vérification callback PROD
+  - [ ] Vérification emails de confirmation
+
+---
+
+## 📞 SUPPORT
+
+### Documentation officielle eBilling
+
+- **Site principal :** https://www.billing-easy.com
+- **API Documentation :** Demander à votre contact eBilling
+- **Support technique :** Via votre tableau de bord marchand
+
+### Contacts utiles
+
+- **Email support :** support@billing-easy.com (à vérifier)
+- **Environnement LAB :** https://lab.billing-easy.net
+- **Simulateur :** https://simu.billing-easy.net
+
+---
+
+## 📝 NOTES IMPORTANTES
+
+### Délais de traitement
+
+- **Airtel Money :** ~10-30 secondes
+- **MobiCash :** ~20-60 secondes
+- **Callback :** Envoyé immédiatement après validation opérateur
+
+### Limites et quotas
+
+Vérifier avec eBilling :
+- Nombre de transactions par jour
+- Montant maximum par transaction
+- Montant cumulé maximum
+
+### Frais
+
+Les frais sont déduits par eBilling et l'opérateur. Vérifier votre contrat marchand.
+
+### Réconciliation
+
+eBilling fournit :
+- Tableau de bord avec toutes les transactions
+- Export CSV
+- Rapports mensuels
+
+---
+
+**📅 Dernière mise à jour :** 23 février 2026  
+**🔖 Version :** 1.0  
+**✍️ Auteur :** Équipe Tsangoo SAAS
+
+---
+
+**🎯 NEXT STEPS APRÈS LECTURE :**
+
+1. Créer compte LAB eBilling
+2. Récupérer credentials
+3. Tester avec le code exemple Node.js
+4. Tester paiement avec simulateur
+5. Passer en PROD quand tout fonctionne
+
+**Bon courage ! 🚀**

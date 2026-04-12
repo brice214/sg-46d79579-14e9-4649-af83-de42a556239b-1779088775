@@ -1,0 +1,381 @@
+/payment?invoice=5550058873&redirect_url=https%3A%2F%2F3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev%2Fpaiement%2Fsuccess:1  GET https://lab.billing-easy.net/payment?invoice=5550058873&redirect_url=https%3A%2F%2F3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev%2Fpaiement%2Fsuccess 404 (Not Found)
+Navigated to https://lab.billing-easy.net/payment?invoice=5550058873&redirect_url=https%3A%2F%2F3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev%2Fpaiement%2Fsuccess
+Navigated to https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/documents/guide-d-impl-mentaion-mobile-ebilling-1775985329846
+modernizr-2.8.3.min.js:815 Softgen Script.js Monitoring started
+popper.js:25060 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+jquery.js:11581 [HMR] connected
+jquery.js:12133 [Fast Refresh] rebuilding
+jquery.js:12083 [Fast Refresh] done in 113ms
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:3098 getDocumentBySlug: {data: {…}, error: null}
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+typed.js:3098 getDocumentBySlug: {data: {…}, error: null}
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+typed.js:3191 checkUserAccess: {data: null, error: null}
+jquery.js:12133 [Fast Refresh] rebuilding
+jquery.js:12083 [Fast Refresh] done in 48ms
+jquery.js:12133 [Fast Refresh] rebuilding
+VM44:815 Softgen Script.js Monitoring started
+Navigated to https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/documents/guide-d-impl-mentaion-mobile-ebilling-1775985329846
+guide-d-impl-mentaion-mobile-ebilling-1775985329846:25060 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+script.js:11581 [HMR] connected
+script.js:12133 [Fast Refresh] rebuilding
+script.js:12083 [Fast Refresh] done in 109ms
+src_pages__app_5771e187._.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+src_pages__app_5771e187._.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+src_pages__app_5771e187._.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+src_pages__app_5771e187._.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+src_pages__app_5771e187._.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+src_pages__app_5771e187._.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+src_pages__app_5771e187._.js:3098 getDocumentBySlug: {data: {…}, error: null}
+src_pages__app_5771e187._.js:3098 getDocumentBySlug: {data: {…}, error: null}
+src_pages__app_5771e187._.js:3191 checkUserAccess: {data: null, error: null}
+script.js:12133 [Fast Refresh] rebuilding
+script.js:12083 [Fast Refresh] done in 70ms
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ pdf.worker.min.mjs:25
+checkInvalidFunctions @ pdf.worker.min.mjs:28
+sanitizeTTPrograms @ pdf.worker.min.mjs:28
+checkAndRepair @ pdf.worker.min.mjs:28
+Font @ pdf.worker.min.mjs:28
+translateFont @ pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ pdf.worker.min.mjs:28
+handleSetFont @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ pdf.worker.min.mjs:28
+#ft @ pdf.worker.min.mjs:28
+#ot @ pdf.worker.min.mjs:28
+script.js:11286 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ script.js:11286
+TitleWarning.useEffect @ GoTrueClient.ts:2605
+commitHookEffectListMount @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:19629
+commitPassiveMountOnFiber @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21073
+commitPassiveMountEffects_complete @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21045
+commitPassiveMountEffects_begin @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21035
+commitPassiveMountEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21025
+flushPassiveEffectsImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22784
+flushPassiveEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22739
+commitRootImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22701
+commitRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22501
+performSyncWorkOnRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22038
+flushSyncCallbacks @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:10480
+(anonymous) @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21666
+GoTrueClient.ts:2631 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ GoTrueClient.ts:2631
+commitHookEffectListMount @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:19629
+commitPassiveMountOnFiber @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21073
+commitPassiveMountEffects_complete @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21045
+commitPassiveMountEffects_begin @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21035
+commitPassiveMountEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21025
+flushPassiveEffectsImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22784
+flushPassiveEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22739
+commitRootImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22701
+commitRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22501
+performSyncWorkOnRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22038
+flushSyncCallbacks @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:10480
+(anonymous) @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21666
+script.js:11286 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ script.js:11286
+TitleWarning.useEffect @ GoTrueClient.ts:2605
+commitHookEffectListMount @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:19629
+invokePassiveEffectMountInDEV @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21266
+invokeEffectsInDev @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:23039
+commitDoubleInvokeEffectsInDEV @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:23022
+flushPassiveEffectsImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22797
+flushPassiveEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22739
+commitRootImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22701
+commitRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22501
+performSyncWorkOnRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22038
+flushSyncCallbacks @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:10480
+(anonymous) @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21666
+GoTrueClient.ts:2631 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ GoTrueClient.ts:2631
+commitHookEffectListMount @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:19629
+invokePassiveEffectMountInDEV @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21266
+invokeEffectsInDev @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:23039
+commitDoubleInvokeEffectsInDEV @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:23022
+flushPassiveEffectsImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22797
+flushPassiveEffects @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22739
+commitRootImpl @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22701
+commitRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22501
+performSyncWorkOnRoot @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:22038
+flushSyncCallbacks @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:10480
+(anonymous) @ guide-d-impl-mentaion-mobile-ebilling-1775985329846:21666
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+e @ visual-editor.js:632
+X @ visual-editor.js:650
+(anonymous) @ visual-editor.js:654
+(anonymous) @ visual-editor.js:657
+src_pages__app_5771e187._.js:3441 📤 Envoi requête checkout à l'API...
+src_pages__app_5771e187._.js:3442 Données envoyées: {document_id: 'd9e9db38-64b0-4762-8a7a-d19e23475d14', amount: 20000, short_description: "Achat du document: Guide d'implémentaion mobile Ebilling", client_name: 'Jean Dupont', client_email: 'goodchoice.gabon@gmail.com', …}
+src_pages__app_5771e187._.js:3321 🌐 Appel API /checkout...
+src_pages__app_5771e187._.js:3322 URL: /api/payments/ebilling/checkout
+src_pages__app_5771e187._.js:3323 Payload: {
+  "document_id": "d9e9db38-64b0-4762-8a7a-d19e23475d14",
+  "amount": 20000,
+  "short_description": "Achat du document: Guide d'implémentaion mobile Ebilling",
+  "client_name": "Jean Dupont",
+  "client_email": "goodchoice.gabon@gmail.com",
+  "client_phone": "077855223",
+  "client_address": "Libreville, Gabon",
+  "document_slug": "guide-d-impl-mentaion-mobile-ebilling-1775985329846",
+  "document_title": "Guide d'implémentaion mobile Ebilling"
+}
+script.js:12133 [Fast Refresh] rebuilding
+script.js:12083 [Fast Refresh] done in 125ms
+src_pages__app_5771e187._.js:3331 📥 Réponse API reçue:
+src_pages__app_5771e187._.js:3332   - Status: 200
+src_pages__app_5771e187._.js:3333   - Status Text: 
+src_pages__app_5771e187._.js:3334   - Headers: {access-control-allow-credentials: 'true, true', access-control-allow-headers: '*', access-control-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS', access-control-allow-origin: 'https://softgen.ai https://staging.softgen.ai http…-46d79579-14e9-4649-af83-de42a556239b.softgen.dev', alt-svc: 'h3=":443"; ma=86400', …}
+src_pages__app_5771e187._.js:3337   - Body (raw): {"success":true,"billId":"5550058874","redirectUrl":"https://test.billing-easy.net","successUrl":"https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success","reference":"REF-1775991291658-768","transactionId":"5c29b97d-accb-49fb-b187-351752e75393"}
+src_pages__app_5771e187._.js:3356 ✅ Response parsed: {success: true, billId: '5550058874', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1775991291658-768', …}
+src_pages__app_5771e187._.js:3464 ✅ Checkout response: {success: true, billId: '5550058874', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1775991291658-768', …}
+src_pages__app_5771e187._.js:3465 📊 Détails complets: {
+  "success": true,
+  "billId": "5550058874",
+  "redirectUrl": "https://test.billing-easy.net",
+  "successUrl": "https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success",
+  "reference": "REF-1775991291658-768",
+  "transactionId": "5c29b97d-accb-49fb-b187-351752e75393"
+}
+src_pages__app_5771e187._.js:3467 📝 Création formulaire POST eBilling:
+src_pages__app_5771e187._.js:3468   - Action: https://test.billing-easy.net
+src_pages__app_5771e187._.js:3469   - Bill ID: 5550058874
+src_pages__app_5771e187._.js:3470   - Success URL: https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success
+src_pages__app_5771e187._.js:3487 🔄 Soumission formulaire vers eBilling...
+src_pages__app_5771e187._.js:3488   Champs: {invoice_number: '5550058874', merchant_redirect_url: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success'}
+Navigated to https://test.billing-easy.net/error
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFQ.woff2
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDz8Z1xlFQ.woff2
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrJJfecg.woff2
+Navigated to https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/documents/guide-d-impl-mentaion-mobile-ebilling-1775985329846
+particles.js:815 Softgen Script.js Monitoring started
+popper.js:25060 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+jquery.easing.min.js:11581 [HMR] connected
+jquery.easing.min.js:12133 [Fast Refresh] rebuilding
+jquery.easing.min.js:12083 [Fast Refresh] done in 168ms
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:977 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+typed.js:3098 getDocumentBySlug: {data: {…}, error: null}
+typed.js:3098 getDocumentBySlug: {data: {…}, error: null}
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+typed.js:980 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+jquery.easing.min.js:12133 [Fast Refresh] rebuilding
+jquery.easing.min.js:12083 [Fast Refresh] done in 51ms
+typed.js:3191 checkUserAccess: {data: null, error: null}
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ pdf.worker.min.mjs:25
+checkInvalidFunctions @ pdf.worker.min.mjs:28
+sanitizeTTPrograms @ pdf.worker.min.mjs:28
+checkAndRepair @ pdf.worker.min.mjs:28
+Font @ pdf.worker.min.mjs:28
+translateFont @ pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ pdf.worker.min.mjs:28
+handleSetFont @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ pdf.worker.min.mjs:28
+#ft @ pdf.worker.min.mjs:28
+#ot @ pdf.worker.min.mjs:28
+jquery.easing.min.js:12133 [Fast Refresh] rebuilding
+Navigated to https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/documents/guide-d-impl-mentaion-mobile-ebilling-1775985329846
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 42ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 32ms
+documentService.ts:206 checkUserAccess: {data: null, error: null}
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ pdf.worker.min.mjs:25
+checkInvalidFunctions @ pdf.worker.min.mjs:28
+sanitizeTTPrograms @ pdf.worker.min.mjs:28
+checkAndRepair @ pdf.worker.min.mjs:28
+Font @ pdf.worker.min.mjs:28
+translateFont @ pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ pdf.worker.min.mjs:28
+handleSetFont @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ pdf.worker.min.mjs:28
+#ft @ pdf.worker.min.mjs:28
+#ot @ pdf.worker.min.mjs:28
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+e @ visual-editor.js:632
+X @ visual-editor.js:650
+(anonymous) @ visual-editor.js:654
+(anonymous) @ visual-editor.js:657
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ client.ts:62
+TitleWarning.useEffect @ dialog.tsx:517
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ dialog.tsx:540
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ client.ts:62
+TitleWarning.useEffect @ dialog.tsx:517
+commitHookEffectListMount @ react-dom.development.js:23189
+invokePassiveEffectMountInDEV @ react-dom.development.js:25193
+invokeEffectsInDev @ react-dom.development.js:27390
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27369
+flushPassiveEffectsImpl @ react-dom.development.js:27095
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ dialog.tsx:540
+commitHookEffectListMount @ react-dom.development.js:23189
+invokePassiveEffectMountInDEV @ react-dom.development.js:25193
+invokeEffectsInDev @ react-dom.development.js:27390
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27369
+flushPassiveEffectsImpl @ react-dom.development.js:27095
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+EbillingCheckout.tsx:76 📤 Envoi requête checkout à l'API...
+EbillingCheckout.tsx:77 Données envoyées: {document_id: 'd9e9db38-64b0-4762-8a7a-d19e23475d14', amount: 20000, short_description: "Achat du document: Guide d'implémentaion mobile Ebilling", client_name: 'Ange Victorien MAMBELO', client_email: 'goodchoice.gabon@gmail.com', …}
+ebillingService.ts:31 🌐 Appel API /checkout...
+ebillingService.ts:32 URL: /api/payments/ebilling/checkout
+ebillingService.ts:33 Payload: {
+  "document_id": "d9e9db38-64b0-4762-8a7a-d19e23475d14",
+  "amount": 20000,
+  "short_description": "Achat du document: Guide d'implémentaion mobile Ebilling",
+  "client_name": "Ange Victorien MAMBELO",
+  "client_email": "goodchoice.gabon@gmail.com",
+  "client_phone": "077888888",
+  "client_address": "Libreville, Gabon",
+  "document_slug": "guide-d-impl-mentaion-mobile-ebilling-1775985329846",
+  "document_title": "Guide d'implémentaion mobile Ebilling"
+}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 180ms
+ebillingService.ts:43 📥 Réponse API reçue:
+ebillingService.ts:44   - Status: 200
+ebillingService.ts:45   - Status Text: 
+ebillingService.ts:46   - Headers: {access-control-allow-credentials: 'true, true', access-control-allow-headers: '*', access-control-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS', access-control-allow-origin: 'https://softgen.ai https://staging.softgen.ai http…-46d79579-14e9-4649-af83-de42a556239b.softgen.dev', alt-svc: 'h3=":443"; ma=86400', …}
+ebillingService.ts:50   - Body (raw): {"success":true,"billId":"5550058875","redirectUrl":"https://test.billing-easy.net","successUrl":"https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success","reference":"REF-1775991913786-146","transactionId":"0f0cee64-c668-493c-81e2-c4d19a26f1b6"}
+ebillingService.ts:75 ✅ Response parsed: {success: true, billId: '5550058875', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1775991913786-146', …}
+EbillingCheckout.tsx:101 ✅ Checkout response: {success: true, billId: '5550058875', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1775991913786-146', …}
+EbillingCheckout.tsx:102 📊 Détails complets: {
+  "success": true,
+  "billId": "5550058875",
+  "redirectUrl": "https://test.billing-easy.net",
+  "successUrl": "https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success",
+  "reference": "REF-1775991913786-146",
+  "transactionId": "0f0cee64-c668-493c-81e2-c4d19a26f1b6"
+}
+EbillingCheckout.tsx:105 📝 Création formulaire POST eBilling:
+EbillingCheckout.tsx:106   - Action: https://test.billing-easy.net
+EbillingCheckout.tsx:107   - Bill ID: 5550058875
+EbillingCheckout.tsx:122 🔄 Soumission formulaire vers eBilling...
+EbillingCheckout.tsx:123   Champ: {invoice_number: '5550058875'}
+Navigated to https://test.billing-easy.net/error
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFQ.woff2
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDz8Z1xlFQ.woff2
+error:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrJJfecg.woff2
