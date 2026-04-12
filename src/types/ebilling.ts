@@ -62,10 +62,11 @@ export interface EbillingCheckoutRequest {
 // Réponse de checkout
 export interface EbillingCheckoutResponse {
   success: true;
-  billId: string;           // ID eBilling (pour redirection)
-  redirectUrl: string;      // URL portail eBilling
+  billId: string;           // ID eBilling (555...)
+  paymentUrl: string;       // URL complète: https://test.billing-easy.net?invoice={billId}
   successUrl: string;       // URL de retour après paiement
   reference: string;        // Référence interne
+  transactionId?: string;   // ID transaction en DB
 }
 
 // Callback eBilling (webhook)

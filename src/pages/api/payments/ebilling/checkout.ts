@@ -103,7 +103,7 @@ export default async function handler(
       ? "https://www.billing-easy.com/api/v1/merchant/e_bills"
       : "https://lab.billing-easy.net/api/v1/merchant/e_bills";
     
-    const portalUrl = environment === "PROD"
+    const portalBaseUrl = environment === "PROD"
       ? "https://www.billing-easy.com"
       : "https://test.billing-easy.net";
 
@@ -111,7 +111,7 @@ export default async function handler(
     const successUrl = `${origin}/paiement/success`;
     const callbackUrl = `${origin}/api/payments/ebilling/callback`;
 
-    console.log("URLs:", { apiUrl, portalUrl, successUrl, callbackUrl });
+    console.log("URLs:", { apiUrl, portalBaseUrl, successUrl, callbackUrl });
 
     // ═════════════════════════════════════════════════════════
     // ÉTAPE 3 : GÉNÉRER RÉFÉRENCE UNIQUE
@@ -244,15 +244,20 @@ export default async function handler(
     console.log("✅ Transaction mise à jour: pending");
 
     // ═════════════════════════════════════════════════════════
-    // ÉTAPE 7 : RETOURNER JSON AVEC DONNÉES DE REDIRECTION
+    // ÉTAPE 7 : CONSTRUIRE URL DE REDIRECTION AVEC INVOICE
     // ═════════════════════════════════════════════════════════
-    console.log("\n📋 ÉTAPE 7: Retour JSON pour redirection client-side");
+    console.log("\n📋 ÉTAPE 7: Construction URL de redirection");
+    
+    // URL complète vers le portail eBilling avec le paramètre invoice
+    const paymentUrl = `${portalBaseUrl}?invoice=${billId}`;
+    
+    console.log("URL de paiement:", paymentUrl);
     console.log("═══════════════════════════════════════════════════════");
 
     return res.status(200).json({
       success: true,
       billId,
-      redirectUrl: portalUrl,
+      paymentUrl,
       successUrl,
       reference,
       transactionId: transaction.id
