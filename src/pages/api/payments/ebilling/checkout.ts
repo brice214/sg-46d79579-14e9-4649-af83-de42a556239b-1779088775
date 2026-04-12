@@ -191,10 +191,14 @@ export default async function handler(
     });
 
     console.log("Response status:", ebillingResponse.status);
+    console.log("Response headers:", Object.fromEntries(ebillingResponse.headers.entries()));
+
+    const responseText = await ebillingResponse.text();
+    console.log("Response body (raw):", responseText);
 
     if (!ebillingResponse.ok) {
-      const errorText = await ebillingResponse.text();
-      console.error("❌ API eBilling error:", errorText);
+      console.error("❌ API eBilling error - Status:", ebillingResponse.status);
+      console.error("❌ Response body:", responseText);
       
       await supabase
         .from("ebilling_transactions")
@@ -203,12 +207,24 @@ export default async function handler(
       
       return res.status(500).json({
         error: "Erreur API eBilling",
-        details: errorText
+        details: responseText,
+        status: ebillingResponse.status
       });
     }
 
-    const ebillingData = await ebillingResponse.json();
-    console.log("✅ Réponse eBilling:", JSON.stringify(ebillingData, null, 2));
+    let ebillingData;
+    try {
+      ebillingData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("❌ Erreur parsing JSON:", parseError);
+      console.error("Response reçue:", responseText);
+      return res.status(500).json({
+        error: "Réponse eBilling invalide",
+        details: responseText
+      });
+    }
+
+    console.log("✅ Réponse eBilling (parsed):", JSON.stringify(ebillingData, null, 2));
 
     // Extraction du bill_id - eBilling peut retourner dans différents formats
     const billId = ebillingData?.e_bill?.bill_id || 
