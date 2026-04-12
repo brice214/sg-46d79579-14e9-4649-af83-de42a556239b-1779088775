@@ -28,6 +28,10 @@ const BASE_URL = "/api/payments/ebilling";
 export async function initiateDocumentCheckout(
   data: EbillingCheckoutRequest
 ): Promise<EbillingCheckoutResponse> {
+  console.log("🌐 Appel API /checkout...");
+  console.log("URL:", `${BASE_URL}/checkout`);
+  console.log("Payload:", JSON.stringify(data, null, 2));
+
   const response = await fetch(`${BASE_URL}/checkout`, {
     method: "POST",
     headers: {
@@ -36,10 +40,27 @@ export async function initiateDocumentCheckout(
     body: JSON.stringify(data),
   });
 
+  console.log("📥 Réponse API reçue:");
+  console.log("  - Status:", response.status);
+  console.log("  - Status Text:", response.statusText);
+  console.log("  - Headers:", Object.fromEntries(response.headers.entries()));
+
+  // Lire la réponse brute
+  const responseText = await response.text();
+  console.log("  - Body (raw):", responseText.substring(0, 500)); // Premiers 500 caractères
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ 
-      error: "Erreur serveur" 
-    }));
+    console.error("❌ Erreur HTTP:", response.status);
+    
+    let errorData;
+    try {
+      errorData = JSON.parse(responseText);
+      console.error("  - Error data (parsed):", errorData);
+    } catch (e) {
+      console.error("  - Error data (raw):", responseText);
+      errorData = { error: "Erreur serveur" };
+    }
+
     throw new Error(
       errorData.error || 
       errorData.message || 
@@ -47,7 +68,17 @@ export async function initiateDocumentCheckout(
     );
   }
 
-  return response.json();
+  // Parser le JSON si succès
+  let jsonData;
+  try {
+    jsonData = JSON.parse(responseText);
+    console.log("✅ Response parsed:", jsonData);
+  } catch (e) {
+    console.error("❌ Impossible de parser JSON:", e);
+    throw new Error("Réponse invalide du serveur");
+  }
+
+  return jsonData;
 }
 
 /**

@@ -73,6 +73,19 @@ export function EbillingCheckout({
 
     try {
       // 1. Appel API checkout - retourne JSON avec billId et redirectUrl
+      console.log("📤 Envoi requête checkout à l'API...");
+      console.log("Données envoyées:", {
+        document_id: documentId,
+        amount,
+        short_description: description || `Achat: ${documentTitle}`,
+        client_name: formData.name,
+        client_email: formData.email,
+        client_phone: formData.phone,
+        client_address: formData.address,
+        document_slug: documentSlug,
+        document_title: documentTitle
+      });
+
       const response = await initiateDocumentCheckout({
         document_id: documentId,
         amount,
@@ -86,12 +99,14 @@ export function EbillingCheckout({
       });
 
       console.log("✅ Checkout response:", response);
+      console.log("📊 Détails complets:", JSON.stringify(response, null, 2));
 
       // 2. Rediriger vers le portail eBilling avec le paramètre invoice
-      // URL format: https://test.billing-easy.net?invoice={bill_id}
+      // URL format: https://test.billing-easy.net/payment?invoice={billId}&redirect_url={encodedUrl}
       console.log("🔄 Redirection vers eBilling:");
-      console.log("  - URL:", response.paymentUrl);
+      console.log("  - URL complète:", response.paymentUrl);
       console.log("  - Bill ID:", response.billId);
+      console.log("  - Success URL:", response.successUrl);
 
       // Redirection GET simple
       window.location.href = response.paymentUrl;
@@ -99,7 +114,11 @@ export function EbillingCheckout({
       if (onSuccess) onSuccess();
 
     } catch (error: any) {
-      console.error("❌ Erreur paiement:", error);
+      console.error("❌❌❌ ERREUR COMPLÈTE ❌❌❌");
+      console.error("Type:", error.constructor.name);
+      console.error("Message:", error.message);
+      console.error("Stack:", error.stack);
+      console.error("Error object:", error);
       
       toast({
         title: "Erreur de paiement",
