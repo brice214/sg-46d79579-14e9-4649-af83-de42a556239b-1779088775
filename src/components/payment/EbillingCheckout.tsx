@@ -58,7 +58,7 @@ export function EbillingCheckout({
       return;
     }
 
-    // Validation du numéro de téléphone (format Gabon)
+    // Validation numéro Gabon (06 ou 07)
     const phoneRegex = /^0[67]\d{7}$/;
     if (!phoneRegex.test(formData.phone)) {
       toast({
@@ -72,7 +72,7 @@ export function EbillingCheckout({
     setLoading(true);
 
     try {
-      // 1. Appel API checkout
+      // 1. Appel API checkout - retourne JSON avec billId et redirectUrl
       const response = await initiateDocumentCheckout({
         document_id: documentId,
         amount,
@@ -85,22 +85,38 @@ export function EbillingCheckout({
         document_title: documentTitle
       });
 
-      console.log("✅ Checkout initié:", response);
+      console.log("✅ Checkout response:", response);
 
-      // 2. Créer formulaire invisible pour redirection POST
+      // 2. Créer formulaire POST invisible pour redirection vers eBilling
+      // Selon documentation eBilling section 4.2.4
       const form = document.createElement("form");
       form.method = "POST";
       form.action = response.redirectUrl;
+      form.style.display = "none";
 
+      // Champ invoice_number (billId)
       const invoiceField = document.createElement("input");
       invoiceField.type = "hidden";
       invoiceField.name = "invoice_number";
       invoiceField.value = response.billId;
       form.appendChild(invoiceField);
 
+      // Champ merchant_redirect_url (page de succès)
+      const redirectField = document.createElement("input");
+      redirectField.type = "hidden";
+      redirectField.name = "merchant_redirect_url";
+      redirectField.value = response.successUrl;
+      form.appendChild(redirectField);
+
       document.body.appendChild(form);
       
-      // 3. Soumettre le formulaire (redirection automatique vers eBilling)
+      console.log("🔄 Redirection POST vers eBilling:", {
+        action: response.redirectUrl,
+        invoice_number: response.billId,
+        merchant_redirect_url: response.successUrl
+      });
+
+      // 3. Soumettre le formulaire (redirection automatique)
       form.submit();
 
       if (onSuccess) onSuccess();

@@ -1,0 +1,221 @@
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 64ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 48ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 425ms
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+executeWithRetry @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+executeWithRetry @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+executeWithRetry @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+executeWithRetry @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+e @ visual-editor.js:632
+X @ visual-editor.js:650
+(anonymous) @ visual-editor.js:654
+(anonymous) @ visual-editor.js:657
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 72ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 26ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 65ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 1144ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 86ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 131ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+documentService.ts:56 getPublishedDocuments: {data: Array(1), error: null}
+documentService.ts:56 getPublishedDocuments: {data: Array(1), error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 106ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 72ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 39ms
+documentService.ts:206 checkUserAccess: {data: null, error: null}
+documentService.ts:206 checkUserAccess: {data: null, error: null}
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ pdf.worker.min.mjs:25
+checkInvalidFunctions @ pdf.worker.min.mjs:28
+sanitizeTTPrograms @ pdf.worker.min.mjs:28
+checkAndRepair @ pdf.worker.min.mjs:28
+Font @ pdf.worker.min.mjs:28
+translateFont @ pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ pdf.worker.min.mjs:28
+handleSetFont @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+next @ pdf.worker.min.mjs:28
+promiseBody @ pdf.worker.min.mjs:28
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ pdf.worker.min.mjs:28
+(anonymous) @ pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ pdf.worker.min.mjs:28
+#ft @ pdf.worker.min.mjs:28
+#ot @ pdf.worker.min.mjs:28
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ client.ts:62
+TitleWarning.useEffect @ dialog.tsx:517
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ dialog.tsx:540
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ client.ts:62
+TitleWarning.useEffect @ dialog.tsx:517
+commitHookEffectListMount @ react-dom.development.js:23189
+invokePassiveEffectMountInDEV @ react-dom.development.js:25193
+invokeEffectsInDev @ react-dom.development.js:27390
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27369
+flushPassiveEffectsImpl @ react-dom.development.js:27095
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ dialog.tsx:540
+commitHookEffectListMount @ react-dom.development.js:23189
+invokePassiveEffectMountInDEV @ react-dom.development.js:25193
+invokeEffectsInDev @ react-dom.development.js:27390
+commitDoubleInvokeEffectsInDEV @ react-dom.development.js:27369
+flushPassiveEffectsImpl @ react-dom.development.js:27095
+flushPassiveEffects @ react-dom.development.js:27023
+commitRootImpl @ react-dom.development.js:26974
+commitRoot @ react-dom.development.js:26721
+performSyncWorkOnRoot @ react-dom.development.js:26156
+flushSyncCallbacks @ react-dom.development.js:12042
+(anonymous) @ react-dom.development.js:25690
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 107ms
+EbillingCheckout.tsx:109 ❌ Erreur paiement: SyntaxError: Unexpected token '<', "
+<!DOCTYPE "... is not valid JSON
+nextJsHandleConsoleError @ client.ts:62
+handlePayment @ EbillingCheckout.tsx:109
+await in handlePayment
+callCallback @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430
+[slug].tsx:823 eBilling error: SyntaxError: Unexpected token '<', "
+<!DOCTYPE "... is not valid JSON
+nextJsHandleConsoleError @ client.ts:62
+onError @ [slug].tsx:823
+handlePayment @ EbillingCheckout.tsx:118
+await in handlePayment
+callCallback @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430
