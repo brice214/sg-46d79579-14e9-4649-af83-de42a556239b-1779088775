@@ -263,27 +263,25 @@ export default async function handler(
     console.log("✅ Transaction mise à jour: pending");
 
     // ═════════════════════════════════════════════════════════
-    // ÉTAPE 7 : CONSTRUIRE URL DE REDIRECTION AVEC INVOICE
+    // ÉTAPE 7 : RETOURNER DONNÉES POUR REDIRECTION POST
     // ═════════════════════════════════════════════════════════
-    console.log("\n📋 ÉTAPE 7: Construction URL de redirection");
+    console.log("\n📋 ÉTAPE 7: Préparation redirection");
     
-    // URL selon environnement:
-    // LAB: https://test.billing-easy.net?invoice={billId}&redirect_url={encodedUrl}
-    // PROD: https://www.billing-easy.com/payment?invoice={billId}&redirect_url={encodedUrl}
-    const encodedSuccessUrl = encodeURIComponent(successUrl);
-    const paymentPath = environment === "PROD" ? "/payment" : "";
-    const paymentUrl = `${portalBaseUrl}${paymentPath}?invoice=${billId}&redirect_url=${encodedSuccessUrl}`;
+    // URL de base du portail eBilling (sans paramètres)
+    // Le frontend créera un formulaire POST avec invoice_number
+    const portalBaseUrl = environment === "PROD"
+      ? "https://www.billing-easy.com"
+      : "https://test.billing-easy.net";
     
-    console.log("URL de paiement:", paymentUrl);
-    console.log("  - Environment:", environment);
-    console.log("  - Bill ID:", billId);
-    console.log("  - Redirect URL (encodé):", encodedSuccessUrl);
+    console.log("URL portail:", portalBaseUrl);
+    console.log("Bill ID:", billId);
+    console.log("Success URL:", successUrl);
     console.log("═══════════════════════════════════════════════════════");
 
     return res.status(200).json({
       success: true,
       billId,
-      paymentUrl,
+      redirectUrl: portalBaseUrl,  // URL de base uniquement
       successUrl,
       reference,
       transactionId: transaction.id

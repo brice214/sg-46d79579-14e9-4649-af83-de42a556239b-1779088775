@@ -101,15 +101,40 @@ export function EbillingCheckout({
       console.log("✅ Checkout response:", response);
       console.log("📊 Détails complets:", JSON.stringify(response, null, 2));
 
-      // 2. Rediriger vers le portail eBilling avec le paramètre invoice
-      // URL format: https://test.billing-easy.net/payment?invoice={billId}&redirect_url={encodedUrl}
-      console.log("🔄 Redirection vers eBilling:");
-      console.log("  - URL complète:", response.paymentUrl);
+      // 2. Créer formulaire POST invisible pour redirection vers eBilling
+      console.log("📝 Création formulaire POST eBilling:");
+      console.log("  - Action:", response.redirectUrl);
       console.log("  - Bill ID:", response.billId);
       console.log("  - Success URL:", response.successUrl);
 
-      // Redirection GET simple
-      window.location.href = response.paymentUrl;
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = response.redirectUrl;
+
+      // Champ invoice_number (requis par eBilling)
+      const invoiceField = document.createElement("input");
+      invoiceField.type = "hidden";
+      invoiceField.name = "invoice_number";
+      invoiceField.value = response.billId;
+      form.appendChild(invoiceField);
+
+      // Champ merchant_redirect_url (optionnel, URL de retour après paiement)
+      const redirectField = document.createElement("input");
+      redirectField.type = "hidden";
+      redirectField.name = "merchant_redirect_url";
+      redirectField.value = response.successUrl;
+      form.appendChild(redirectField);
+
+      document.body.appendChild(form);
+      
+      console.log("🔄 Soumission formulaire vers eBilling...");
+      console.log("  Champs:", {
+        invoice_number: response.billId,
+        merchant_redirect_url: response.successUrl
+      });
+
+      // 3. Soumettre le formulaire (redirection POST automatique)
+      form.submit();
 
       if (onSuccess) onSuccess();
 
