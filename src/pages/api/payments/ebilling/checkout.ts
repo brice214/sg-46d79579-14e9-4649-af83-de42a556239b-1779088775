@@ -103,9 +103,10 @@ export default async function handler(
       ? "https://www.billing-easy.com/api/v1/merchant/e_bills"
       : "https://lab.billing-easy.net/api/v1/merchant/e_bills";
     
+    // CRITIQUE: Utiliser le MÊME domaine pour l'API et le portail
     const portalBaseUrl = environment === "PROD"
       ? "https://www.billing-easy.com"
-      : "https://test.billing-easy.net";
+      : "https://lab.billing-easy.net";
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
     const successUrl = `${origin}/paiement/success`;
