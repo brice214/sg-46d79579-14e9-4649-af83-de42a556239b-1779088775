@@ -210,17 +210,23 @@ export default async function handler(
     const ebillingData = await ebillingResponse.json();
     console.log("✅ Réponse eBilling:", JSON.stringify(ebillingData, null, 2));
 
-    const billId = ebillingData?.e_bill?.bill_id || ebillingData?.bill_id;
+    // Extraction du bill_id - eBilling peut retourner dans différents formats
+    const billId = ebillingData?.e_bill?.bill_id || 
+                   ebillingData?.bill_id || 
+                   ebillingData?.data?.bill_id ||
+                   ebillingData?.id;
 
     if (!billId) {
-      console.error("❌ Bill ID manquant");
+      console.error("❌ Bill ID manquant dans la réponse");
+      console.error("Réponse complète:", JSON.stringify(ebillingData, null, 2));
       return res.status(500).json({
         error: "Bill ID non reçu",
         response: ebillingData
       });
     }
 
-    console.log("✅ Bill ID:", billId);
+    console.log("✅ Bill ID extrait:", billId);
+    console.log("Type:", typeof billId);
 
     // ═════════════════════════════════════════════════════════
     // ÉTAPE 6 : MISE À JOUR TRANSACTION

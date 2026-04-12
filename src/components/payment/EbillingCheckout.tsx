@@ -94,12 +94,18 @@ export function EbillingCheckout({
       form.action = response.redirectUrl;
       form.style.display = "none";
 
-      // Champ invoice_number (billId)
-      const invoiceField = document.createElement("input");
-      invoiceField.type = "hidden";
-      invoiceField.name = "invoice_number";
-      invoiceField.value = response.billId;
-      form.appendChild(invoiceField);
+      // Log détaillé pour debug
+      console.log("📝 Création formulaire POST eBilling:");
+      console.log("  - Action:", response.redirectUrl);
+      console.log("  - Bill ID:", response.billId);
+      console.log("  - Success URL:", response.successUrl);
+
+      // Champ bill_id (identifiant de la facture eBilling)
+      const billIdField = document.createElement("input");
+      billIdField.type = "hidden";
+      billIdField.name = "bill_id";
+      billIdField.value = response.billId;
+      form.appendChild(billIdField);
 
       // Champ merchant_redirect_url (page de succès)
       const redirectField = document.createElement("input");
@@ -110,9 +116,9 @@ export function EbillingCheckout({
 
       document.body.appendChild(form);
       
-      console.log("🔄 Redirection POST vers eBilling:", {
-        action: response.redirectUrl,
-        invoice_number: response.billId,
+      console.log("🔄 Soumission formulaire vers eBilling...");
+      console.log("  Champs:", {
+        bill_id: response.billId,
         merchant_redirect_url: response.successUrl
       });
 
