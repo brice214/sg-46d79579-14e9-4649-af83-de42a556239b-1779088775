@@ -1,0 +1,83 @@
+ Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 64ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc:1  Failed to load resource: the server responded with a status of 400 ()
+pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6:1  Failed to load resource: the server responded with a status of 400 ()
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 53ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 2196ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 75ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 136ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 49ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 1656ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 79ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 129ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:62 ✅ Profile chargé: Object
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 127438ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 35ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 35ms
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 129551ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 937ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 128499ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 42ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 39ms
+pvjeufrrktatorurgstl.supabase.co/storage/v1/object/documents/pdfs/eb306621-cf2b-4389-b421-4b9f5f32769e/1775981887820-E-Billing%20Integration%20Guide%20v5.3.pdf:1  Failed to load resource: the server responded with a status of 400 ()
+client.ts:62 Upload error: StorageApiError: new row violates row-level security policy
+    at fetch.ts:67:18
+nextJsHandleConsoleError @ client.ts:62
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 63ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: eb306621-cf2b-4389-b421-4b9f5f32769e
+Header.tsx:62 ✅ Profile chargé: Object
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:250 [Fast Refresh] done in 127573ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 35ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 92ms

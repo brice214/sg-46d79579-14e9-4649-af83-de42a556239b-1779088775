@@ -1,0 +1,78 @@
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 112ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 37ms
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+e @ visual-editor.js:632
+X @ visual-editor.js:650
+(anonymous) @ visual-editor.js:654
+(anonymous) @ visual-editor.js:657
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 31ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 1199ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 116ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 228ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 442ee973-ee73-48f3-9101-9547a931406c
+Header.tsx:62 ✅ Profile chargé: {userId: '442ee973-ee73-48f3-9101-9547a931406c', profileId: '442ee973-ee73-48f3-9101-9547a931406c', email: 'admin@afrilitt.com', role: 'admin', isAdmin: true}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 20ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 6753ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 67ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 504ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 442ee973-ee73-48f3-9101-9547a931406c
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 442ee973-ee73-48f3-9101-9547a931406c
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 442ee973-ee73-48f3-9101-9547a931406c
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/documents?select=*%2Ccategories%28id%2Cname%2Cslug%2Cicon%2Cdescription%29%2Cprofiles%28full_name%29&is_featured=eq.true&is_published=eq.true&is_approved=eq.true&order=created_at.desc&limit=6 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/homepage_banners?select=*&is_active=eq.true&order=order_index.asc 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+then @ PostgrestBuilder.ts:125
+Header.tsx:62 ✅ Profile chargé: {userId: '442ee973-ee73-48f3-9101-9547a931406c', profileId: '442ee973-ee73-48f3-9101-9547a931406c', email: 'admin@afrilitt.com', role: 'admin', isAdmin: true}
+Header.tsx:62 ✅ Profile chargé: {userId: '442ee973-ee73-48f3-9101-9547a931406c', profileId: '442ee973-ee73-48f3-9101-9547a931406c', email: 'admin@afrilitt.com', role: 'admin', isAdmin: true}
+Header.tsx:62 ✅ Profile chargé: {userId: '442ee973-ee73-48f3-9101-9547a931406c', profileId: '442ee973-ee73-48f3-9101-9547a931406c', email: 'admin@afrilitt.com', role: 'admin', isAdmin: true}
