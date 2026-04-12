@@ -141,6 +141,8 @@ export default function Upload() {
 
     if (!currentUser) return;
 
+    console.log("🔍 DEBUG - Current User ID:", currentUser);
+
     if (!certifyRights || !acceptTerms) {
       toast({
         variant: "destructive",
@@ -162,11 +164,32 @@ export default function Upload() {
     setUploading(true);
 
     try {
+      // Vérifier la session auth avant l'upload
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log("🔍 DEBUG - Session:", { 
+        userId: session?.user?.id, 
+        hasSession: !!session,
+        sessionError 
+      });
+
+      if (!session?.user) {
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       // Upload PDF to Supabase Storage
       const pdfFileName = `${Date.now()}-${pdfFile.name}`;
+      const uploadPath = `pdfs/${currentUser}/${pdfFileName}`;
+      
+      console.log("🔍 DEBUG - Upload path:", uploadPath);
+      console.log("🔍 DEBUG - Auth UID from session:", session.user.id);
+      console.log("🔍 DEBUG - Current User:", currentUser);
+      console.log("🔍 DEBUG - Match:", session.user.id === currentUser);
+
       const { data: pdfData, error: pdfError } = await supabase.storage
         .from("documents")
-        .upload(`pdfs/${currentUser}/${pdfFileName}`, pdfFile);
+        .upload(uploadPath, pdfFile);
+
+      console.log("🔍 DEBUG - Upload result:", { pdfData, pdfError });
 
       if (pdfError) throw pdfError;
 
