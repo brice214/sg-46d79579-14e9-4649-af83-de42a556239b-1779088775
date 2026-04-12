@@ -248,10 +248,14 @@ export default async function handler(
     // ═════════════════════════════════════════════════════════
     console.log("\n📋 ÉTAPE 7: Construction URL de redirection");
     
-    // URL complète vers le portail eBilling avec le paramètre invoice
-    const paymentUrl = `${portalBaseUrl}?invoice=${billId}`;
+    // URL complète vers la page de paiement eBilling avec invoice + redirect_url
+    // Format: https://test.billing-easy.net/payment?invoice={billId}&redirect_url={encodedUrl}
+    const encodedSuccessUrl = encodeURIComponent(successUrl);
+    const paymentUrl = `${portalBaseUrl}/payment?invoice=${billId}&redirect_url=${encodedSuccessUrl}`;
     
     console.log("URL de paiement:", paymentUrl);
+    console.log("  - Bill ID:", billId);
+    console.log("  - Redirect URL (encodé):", encodedSuccessUrl);
     console.log("═══════════════════════════════════════════════════════");
 
     return res.status(200).json({
