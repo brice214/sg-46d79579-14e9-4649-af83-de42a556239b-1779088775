@@ -103,10 +103,12 @@ export default async function handler(
       ? "https://www.billing-easy.com/api/v1/merchant/e_bills"
       : "https://lab.billing-easy.net/api/v1/merchant/e_bills";
     
-    // CRITIQUE: Utiliser le MÊME domaine pour l'API et le portail
+    // Portails selon environnement
+    // LAB: test.billing-easy.net (sans /payment, juste ?invoice=...)
+    // PROD: www.billing-easy.com/payment
     const portalBaseUrl = environment === "PROD"
       ? "https://www.billing-easy.com"
-      : "https://lab.billing-easy.net";
+      : "https://test.billing-easy.net";
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
     const successUrl = `${origin}/paiement/success`;
@@ -265,12 +267,15 @@ export default async function handler(
     // ═════════════════════════════════════════════════════════
     console.log("\n📋 ÉTAPE 7: Construction URL de redirection");
     
-    // URL complète vers la page de paiement eBilling avec invoice + redirect_url
-    // Format: https://test.billing-easy.net/payment?invoice={billId}&redirect_url={encodedUrl}
+    // URL selon environnement:
+    // LAB: https://test.billing-easy.net?invoice={billId}&redirect_url={encodedUrl}
+    // PROD: https://www.billing-easy.com/payment?invoice={billId}&redirect_url={encodedUrl}
     const encodedSuccessUrl = encodeURIComponent(successUrl);
-    const paymentUrl = `${portalBaseUrl}/payment?invoice=${billId}&redirect_url=${encodedSuccessUrl}`;
+    const paymentPath = environment === "PROD" ? "/payment" : "";
+    const paymentUrl = `${portalBaseUrl}${paymentPath}?invoice=${billId}&redirect_url=${encodedSuccessUrl}`;
     
     console.log("URL de paiement:", paymentUrl);
+    console.log("  - Environment:", environment);
     console.log("  - Bill ID:", billId);
     console.log("  - Redirect URL (encodé):", encodedSuccessUrl);
     console.log("═══════════════════════════════════════════════════════");
