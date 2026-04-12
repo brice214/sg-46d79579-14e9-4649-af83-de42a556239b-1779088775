@@ -267,12 +267,6 @@ export default async function handler(
     // ═════════════════════════════════════════════════════════
     console.log("\n📋 ÉTAPE 7: Préparation redirection");
     
-    // URL de base du portail eBilling (sans paramètres)
-    // Le frontend créera un formulaire POST avec invoice_number
-    const portalBaseUrl = environment === "PROD"
-      ? "https://www.billing-easy.com"
-      : "https://test.billing-easy.net";
-    
     console.log("URL portail:", portalBaseUrl);
     console.log("Bill ID:", billId);
     console.log("Success URL:", successUrl);
@@ -281,7 +275,7 @@ export default async function handler(
     return res.status(200).json({
       success: true,
       billId,
-      redirectUrl: portalBaseUrl,  // URL de base uniquement
+      redirectUrl: portalBaseUrl,  // Utilisation de la variable déjà définie
       successUrl,
       reference,
       transactionId: transaction.id
