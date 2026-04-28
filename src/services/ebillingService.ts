@@ -11,6 +11,7 @@ import {
   EbillingCheckoutRequest, 
   EbillingCheckoutResponse 
 } from "@/types/ebilling";
+import { supabase } from "@/integrations/supabase/client";
 
 const BASE_URL = "/api/payments/ebilling";
 
@@ -32,11 +33,23 @@ export async function initiateDocumentCheckout(
   console.log("URL:", `${BASE_URL}/checkout`);
   console.log("Payload:", JSON.stringify(data, null, 2));
 
+  // Récupérer la session utilisateur
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Ajouter le token d'authentification si l'utilisateur est connecté
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+    console.log("🔑 Token d'authentification ajouté");
+  } else {
+    console.log("ℹ️ Aucune session utilisateur (paiement anonyme)");
+  }
+
   const response = await fetch(`${BASE_URL}/checkout`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify(data),
   });
 
