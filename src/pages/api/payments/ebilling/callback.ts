@@ -121,21 +121,29 @@ export default async function handler(
     if (newStatus === "processed") {
       console.log("🔄 Création de l'achat...");
 
-      // Créer l'entrée dans la table purchases
+      // Vérifier que user_id existe
+      if (!transaction.user_id) {
+        console.error("❌ Impossible de créer purchase: user_id manquant dans la transaction");
+        console.log("Transaction:", transaction);
+        return res.status(200).json({
+          success: true,
+          message: "Payment processed but no user_id",
+          status: newStatus
+        });
+      }
+
+      // Créer l'entrée dans la table purchases (colonnes existantes uniquement)
       const { error: purchaseError } = await supabase
         .from("purchases")
         .insert({
           user_id: transaction.user_id,
           document_id: transaction.document_id,
-          amount: transaction.amount,
-          payment_method: "ebilling",
-          payment_status: "completed",
-          ebilling_reference: transaction.reference,
-          ebilling_transaction_id: transactionid
+          transaction_id: null  // Pas de transaction dans la table transactions pour eBilling
         });
 
       if (purchaseError) {
         console.error("❌ Erreur création achat:", purchaseError);
+        console.error("Détails:", JSON.stringify(purchaseError, null, 2));
       } else {
         console.log("✅ Achat créé avec succès");
       }
