@@ -117,6 +117,29 @@ export default async function handler(
     console.log("URLs:", { apiUrl, portalBaseUrl, successUrl, callbackUrl });
 
     // ═════════════════════════════════════════════════════════
+    // ÉTAPE 2.5 : RÉCUPÉRER L'UTILISATEUR CONNECTÉ
+    // ═════════════════════════════════════════════════════════
+    console.log("\n📋 ÉTAPE 2.5: Récupération utilisateur");
+    
+    // Récupérer le token d'authentification depuis les headers
+    const authHeader = req.headers.authorization;
+    let userId = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+      
+      if (user && !userError) {
+        userId = user.id;
+        console.log("✅ Utilisateur connecté:", userId);
+      } else {
+        console.log("ℹ️ Aucun utilisateur connecté (paiement anonyme)");
+      }
+    } else {
+      console.log("ℹ️ Pas de token d'authentification (paiement anonyme)");
+    }
+
+    // ═════════════════════════════════════════════════════════
     // ÉTAPE 3 : GÉNÉRER RÉFÉRENCE UNIQUE
     // ═════════════════════════════════════════════════════════
     console.log("\n📋 ÉTAPE 3: Génération référence");
@@ -139,13 +162,15 @@ export default async function handler(
       client_phone,
       client_address: client_address || "Libreville, Gabon",
       short_description: short_description || `Achat: ${document_title}`,
-      user_id: null,
+      user_id: userId,  // Utilisateur connecté ou null si anonyme
       metadata: {
         document_slug,
         document_title,
         created_at: new Date().toISOString()
       }
     };
+
+    console.log("Transaction data:", { ...transactionData, user_id: userId ? "***" : null });
 
     const { data: transaction, error: createError } = await supabase
       .from("ebilling_transactions")
