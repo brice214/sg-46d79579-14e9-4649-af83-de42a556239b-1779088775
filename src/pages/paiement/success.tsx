@@ -16,17 +16,15 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     const loadPurchaseInfo = async () => {
       try {
-        // Récupérer le dernier achat de l'utilisateur (si connecté)
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          // Requête simplifiée avec (supabase as any) pour éviter l'erreur TypeScript d'inférence profonde
-          const { data: purchases } = await (supabase as any)
+          // Récupérer le dernier achat de l'utilisateur (suppression du filtre payment_method inexistant)
+          const { data: purchases } = await supabase
             .from("purchases")
             .select(`*, documents(id, slug, title, price)`)
             .eq("user_id", user.id)
-            .eq("payment_method", "ebilling")
-            .order("created_at", { ascending: false })
+            .order("access_granted_at", { ascending: false })
             .limit(1);
 
           if (purchases && purchases.length > 0) {
@@ -42,7 +40,6 @@ export default function PaymentSuccessPage() {
 
     loadPurchaseInfo();
 
-    // Afficher toast de succès
     toast({
       title: "🎉 Paiement Réussi !",
       description: "Votre achat a été confirmé. Vous pouvez maintenant accéder au document.",
@@ -90,7 +87,7 @@ export default function PaymentSuccessPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Montant payé</span>
-                  <span className="font-semibold">{documentInfo.amount?.toLocaleString()} FCFA</span>
+                  <span className="font-semibold">{documentInfo.documents?.price?.toLocaleString()} FCFA</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Méthode</span>
@@ -125,7 +122,7 @@ export default function PaymentSuccessPage() {
               className="flex-1"
             >
               <Link href="/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-4 w-4 mr-2" />
                 Mon tableau de bord
               </Link>
             </Button>

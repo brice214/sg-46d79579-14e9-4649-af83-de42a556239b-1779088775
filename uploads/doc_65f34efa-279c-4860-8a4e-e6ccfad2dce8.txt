@@ -1,0 +1,633 @@
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:86 [HMR] Invalid message: {"action":"isrManifest","data":{"/":true,"/404":true,"/paiement/success":true,"/dashboard":true}}
+TypeError: Cannot read properties of undefined (reading 'components')
+    at handleStaticIndicator (hot-reloader-client.ts:277:42)
+    at processMessage (hot-reloader-client.ts:304:7)
+    at hot-reloader-client.ts:84:7
+    at WebSocket.handleMessage (websocket.ts:67:9)
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:11952
+handleMessage @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:11604
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 32ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 7ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.min.js:43
+setInterval
+e @ visual-editor.min.js:43
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 74ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 32ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:56 getPublishedDocuments: {data: Array(2), error: null}
+documentService.ts:56 getPublishedDocuments: {data: Array(2), error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 87ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 31ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+documentService.ts:77 getDocumentBySlug: {data: {…}, error: null}
+documentService.ts:206 checkUserAccess: {data: null, error: null}
+documentService.ts:206 checkUserAccess: {data: null, error: null}
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 44ms
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:11286
+TitleWarning.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_%40radix-ui_517bc862._.js:6846
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_%40radix-ui_517bc862._.js:6864
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+client.ts:62 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+nextJsHandleConsoleError @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:11286
+TitleWarning.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_%40radix-ui_517bc862._.js:6846
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+invokePassiveEffectMountInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21266
+invokeEffectsInDev @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23039
+commitDoubleInvokeEffectsInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23022
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22797
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+dialog.tsx:540 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+DescriptionWarning.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_%40radix-ui_517bc862._.js:6864
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+invokePassiveEffectMountInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21266
+invokeEffectsInDev @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23039
+commitDoubleInvokeEffectsInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23022
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22797
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:25
+checkInvalidFunctions @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+sanitizeTTPrograms @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+checkAndRepair @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Font @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+translateFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+handleSetFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+next @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+next @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+getOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+#ft @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+#ot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Worker.postMessage
+start @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:9388
+sendWithStream @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:9378
+_pumpOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:15890
+render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:15669
+PDFViewer.useEffect.renderPage @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:104
+await in PDFViewer.useEffect.renderPage
+PDFViewer.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:115
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22570
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+dispatchSetState @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:14292
+PDFViewer.useEffect.loadPDF @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:56
+await in PDFViewer.useEffect.loadPDF
+PDFViewer.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:65
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+invokePassiveEffectMountInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21266
+invokeEffectsInDev @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23039
+commitDoubleInvokeEffectsInDEV @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23022
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22797
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+PendingScript
+doLoadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:1567
+loadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:1470
+loadChunkByUrl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:456
+loadChunkPath @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:479
+loadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:400
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_3b7c71a1._.js:12
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_3b7c71a1._.js:12
+push.[project]/src/pages/documents/[slug].tsx [client] (ecmascript).PDFViewer.loadableGenerated.modules @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:3916
+load @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22279
+retry @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22385
+LoadableSubscription @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22449
+init @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22309
+useLoadableModule @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22338
+LoadableComponent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22347
+renderWithHooks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:13260
+updateForwardRef @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:16460
+beginWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:18412
+beginWork$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23101
+performUnitOfWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22402
+workLoopSync @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22331
+renderRootSync @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22308
+performConcurrentWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21732
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+dispatchSetState @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:14292
+loadDocument @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:4033
+await in loadDocument
+DocumentPage.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:3971
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22005
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22718
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+finishConcurrentRender @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21929
+performConcurrentWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21793
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+updateContainer @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:24273
+push.[project]/node_modules/react-dom/cjs/react-dom.development.js [client] (ecmascript).ReactDOMHydrationRoot.render.ReactDOMRoot.render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:24632
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20868
+startTransition @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react_1cad9b0b._.js:1990
+renderReactElement @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20867
+doRender @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20967
+render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20989
+subscription @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:21109
+set @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:8202
+change @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:7895
+await in change
+push @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:7390
+instance.<computed> @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:8733
+navigate @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:21894
+linkClicked @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:21905
+onClick @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:22140
+callCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3802
+invokeGuardedCallbackDev @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3840
+invokeGuardedCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3893
+invokeGuardedCallbackAndCatchFirstError @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3905
+executeDispatch @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7896
+processDispatchQueueItemsInOrder @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7916
+processDispatchQueue @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7925
+dispatchEventsForPlugins @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7933
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:8089
+batchedUpdates$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22057
+batchedUpdates @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3659
+dispatchEventForPluginEventSystem @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:8088
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5655
+dispatchEvent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5649
+dispatchDiscreteEvent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5626
+pdf.worker.min.mjs:25 Warning: TT: undefined function: 32
+warn @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:25
+checkInvalidFunctions @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+sanitizeTTPrograms @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+checkAndRepair @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Font @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+translateFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+await in translateFont
+loadFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+handleSetFont @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+next @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+next @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+promiseBody @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+getOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+getOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Promise.then
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+#ft @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+#ot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/pdf.worker.min.mjs:28
+Worker.postMessage
+start @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:9388
+sendWithStream @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:9378
+_pumpOperatorList @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:15890
+render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_0d01f038._.js:15669
+PDFViewer.useEffect.renderPage @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:104
+await in PDFViewer.useEffect.renderPage
+PDFViewer.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:115
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22570
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+dispatchSetState @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:14292
+PDFViewer.useEffect.loadPDF @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:56
+await in PDFViewer.useEffect.loadPDF
+PDFViewer.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_7638a4b7._.js:65
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22701
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22038
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21666
+PendingScript
+doLoadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:1567
+loadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:1470
+loadChunkByUrl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:456
+loadChunkPath @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:479
+loadChunk @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_pages__app_ddee421c._.js:400
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_3b7c71a1._.js:12
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/src_components_PDFViewer_tsx_3b7c71a1._.js:12
+push.[project]/src/pages/documents/[slug].tsx [client] (ecmascript).PDFViewer.loadableGenerated.modules @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:3916
+load @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22279
+retry @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22385
+LoadableSubscription @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22449
+init @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22309
+useLoadableModule @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22338
+LoadableComponent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_3761c5af._.js:22347
+renderWithHooks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:13260
+updateForwardRef @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:16460
+beginWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:18412
+beginWork$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23101
+performUnitOfWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22402
+workLoopSync @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22331
+renderRootSync @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22308
+performConcurrentWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21732
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+dispatchSetState @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:14292
+loadDocument @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:4033
+await in loadDocument
+DocumentPage.useEffect @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/%5Broot%20of%20the%20server%5D__916b2a24._.js:3971
+commitHookEffectListMount @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:19629
+commitPassiveMountOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21073
+commitPassiveMountEffects_complete @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21045
+commitPassiveMountEffects_begin @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21035
+commitPassiveMountEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21025
+flushPassiveEffectsImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22784
+flushPassiveEffects @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22739
+performSyncWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22005
+flushSyncCallbacks @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:10480
+commitRootImpl @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22718
+commitRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22501
+finishConcurrentRender @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21929
+performConcurrentWorkOnRoot @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21793
+workLoop @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:267
+flushWork @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:246
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:474
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+performWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:479
+postMessage
+schedulePerformWorkUntilDeadline @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:512
+requestHostCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:524
+unstable_scheduleCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_7bcccb88._.js:407
+scheduleCallback$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:23188
+ensureRootIsScheduled @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21691
+scheduleUpdateOnFiber @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:21566
+updateContainer @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:24273
+push.[project]/node_modules/react-dom/cjs/react-dom.development.js [client] (ecmascript).ReactDOMHydrationRoot.render.ReactDOMRoot.render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:24632
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20868
+startTransition @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react_1cad9b0b._.js:1990
+renderReactElement @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20867
+doRender @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20967
+render @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:20989
+subscription @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:21109
+set @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:8202
+change @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:7895
+await in change
+push @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:7390
+instance.<computed> @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_dist_eb81a647._.js:8733
+navigate @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:21894
+linkClicked @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:21905
+onClick @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_next_fae83b26._.js:22140
+callCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3802
+invokeGuardedCallbackDev @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3840
+invokeGuardedCallback @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3893
+invokeGuardedCallbackAndCatchFirstError @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3905
+executeDispatch @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7896
+processDispatchQueueItemsInOrder @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7916
+processDispatchQueue @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7925
+dispatchEventsForPlugins @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:7933
+(anonymous) @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:8089
+batchedUpdates$1 @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:22057
+batchedUpdates @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:3659
+dispatchEventForPluginEventSystem @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:8088
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5655
+dispatchEvent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5649
+dispatchDiscreteEvent @ 3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/_next/static/chunks/node_modules_react-dom_cjs_react-dom_development_ab7e073c.js:5626
+EbillingCheckout.tsx:76 📤 Envoi requête checkout à l'API...
+EbillingCheckout.tsx:77 Données envoyées: {document_id: 'd9e9db38-64b0-4762-8a7a-d19e23475d14', amount: 20000, short_description: "Achat du document: Guide d'implémentaion mobile Ebilling", client_name: 'Ange Victorien MAMBELO', client_email: 'goodchoice.gabon@gmail.com', …}
+ebillingService.ts:32 🌐 Appel API /checkout...
+ebillingService.ts:33 URL: /api/payments/ebilling/checkout
+ebillingService.ts:34 Payload: {
+  "document_id": "d9e9db38-64b0-4762-8a7a-d19e23475d14",
+  "amount": 20000,
+  "short_description": "Achat du document: Guide d'implémentaion mobile Ebilling",
+  "client_name": "Ange Victorien MAMBELO",
+  "client_email": "goodchoice.gabon@gmail.com",
+  "client_phone": "074544525",
+  "client_address": "Libreville, Gabon",
+  "document_slug": "guide-d-impl-mentaion-mobile-ebilling-1775985329846",
+  "document_title": "Guide d'implémentaion mobile Ebilling"
+}
+ebillingService.ts:45 🔑 Token d'authentification ajouté
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 50ms
+ebillingService.ts:56 📥 Réponse API reçue:
+ebillingService.ts:57   - Status: 200
+ebillingService.ts:58   - Status Text: 
+ebillingService.ts:59   - Headers: {access-control-allow-credentials: 'true, true', access-control-allow-headers: '*', access-control-allow-methods: 'GET, POST, PUT, DELETE, OPTIONS', access-control-allow-origin: 'https://softgen.ai https://staging.softgen.ai http…-46d79579-14e9-4649-af83-de42a556239b.softgen.dev', alt-svc: 'h3=":443"; ma=86400', …}
+ebillingService.ts:63   - Body (raw): {"success":true,"billId":"5550059123","redirectUrl":"https://test.billing-easy.net","successUrl":"https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success","reference":"REF-1777407116884-697","transactionId":"c287e48a-38cf-4f5e-ba9f-7928f6a0a636"}
+ebillingService.ts:88 ✅ Response parsed: {success: true, billId: '5550059123', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1777407116884-697', …}
+EbillingCheckout.tsx:101 ✅ Checkout response: {success: true, billId: '5550059123', redirectUrl: 'https://test.billing-easy.net', successUrl: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success', reference: 'REF-1777407116884-697', …}
+EbillingCheckout.tsx:102 📊 Détails complets: {
+  "success": true,
+  "billId": "5550059123",
+  "redirectUrl": "https://test.billing-easy.net",
+  "successUrl": "https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success",
+  "reference": "REF-1777407116884-697",
+  "transactionId": "c287e48a-38cf-4f5e-ba9f-7928f6a0a636"
+}
+EbillingCheckout.tsx:105 📝 Création formulaire POST eBilling:
+EbillingCheckout.tsx:106   - Action: https://test.billing-easy.net
+EbillingCheckout.tsx:107   - Bill ID: 5550059123
+EbillingCheckout.tsx:108   - Success URL: https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success
+EbillingCheckout.tsx:130 🔄 Soumission formulaire vers eBilling...
+EbillingCheckout.tsx:131   Champs: {invoice_number: '5550059123', merchant_redirect_url: 'https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success'}
+Navigated to https://test.billing-easy.net/payment?invoice=5550059123&redirect_url=https%3A%2F%2F3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev%2Fpaiement%2Fsuccess
+Navigated to https://test.billing-easy.net/success?invoice=5550059123
+Navigated to https://3000-46d79579-14e9-4649-af83-de42a556239b.softgen.dev/paiement/success
+script.js:815 Softgen Script.js Monitoring started
+react-dom.development.js:29895 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+websocket.ts:32 [HMR] connected
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 4ms
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/purchases?select=*%2Cdocuments%28id%2Cslug%2Ctitle%2Cprice%29&user_id=eq.553d475d-ef5c-41c4-a5d8-004df94b8d39&payment_method=eq.ebilling&order=created_at.desc&limit=1 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+(anonymous) @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+fetch.ts:7  GET https://pvjeufrrktatorurgstl.supabase.co/rest/v1/purchases?select=*%2Cdocuments%28id%2Cslug%2Ctitle%2Cprice%29&user_id=eq.553d475d-ef5c-41c4-a5d8-004df94b8d39&payment_method=eq.ebilling&order=created_at.desc&limit=1 400 (Bad Request)
+(anonymous) @ fetch.ts:7
+(anonymous) @ fetch.ts:34
+await in (anonymous)
+(anonymous) @ PostgrestBuilder.ts:318
+then @ PostgrestBuilder.ts:364
+visual-editor.js:637 [Visual Editor] Platform not responding after 15s. Giving up retry.
+(anonymous) @ visual-editor.js:637
+setInterval
+(anonymous) @ visual-editor.js:632
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 45ms
+hot-reloader-client.ts:311 [Fast Refresh] rebuilding
+hot-reloader-client.ts:250 [Fast Refresh] done in 41ms
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:53 🔍 LOADING PROFILE FOR USER ID: 553d475d-ef5c-41c4-a5d8-004df94b8d39
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
+Header.tsx:62 ✅ Profile chargé: {userId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', profileId: '553d475d-ef5c-41c4-a5d8-004df94b8d39', email: 'goodchoice.gabon@gmail.com', role: 'visitor', isAdmin: false}
