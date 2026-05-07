@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { initiateDocumentCheckout } from "@/services/ebillingService";
-import { Loader2, Smartphone, ShieldCheck } from "lucide-react";
+import { Loader2, Smartphone, ShieldCheck, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EbillingCheckoutProps {
   documentId: string;
@@ -36,6 +38,9 @@ export function EbillingCheckout({
 }: EbillingCheckoutProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: clientInfo?.name || "",
     email: clientInfo?.email || "",
@@ -43,11 +48,56 @@ export function EbillingCheckout({
     address: "Libreville, Gabon"
   });
 
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  const checkAuthentication = async () => {
+    try {
+      console.log("🔐 Vérification authentification...");
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      console.log("Session:", {
+        exists: !!session,
+        user_id: session?.user?.id || "NULL",
+        email: session?.user?.email || "NULL",
+        error: error?.message || "NONE"
+      });
+
+      if (session?.user) {
+        setIsAuthenticated(true);
+        setCurrentUser(session.user);
+        
+        // Pré-remplir avec les données utilisateur
+        setFormData({
+          name: session.user.user_metadata?.full_name || clientInfo?.name || "",
+          email: session.user.email || clientInfo?.email || "",
+          phone: session.user.user_metadata?.phone || clientInfo?.phone || "",
+          address: "Libreville, Gabon"
+        });
+        
+        console.log("✅ Utilisateur authentifié:", session.user.id);
+      } else {
+        setIsAuthenticated(false);
+        console.log("❌ Aucune session active");
+      }
+    } catch (error) {
+      console.error("Erreur vérification auth:", error);
+      setIsAuthenticated(false);
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handlePayment = async () => {
+    console.log("\n═══════════════════════════════════════");
+    console.log("🚀 DÉBUT PROCESSUS PAIEMENT");
+    console.log("═══════════════════════════════════════");
+
     // Validation
     if (!formData.name || !formData.email || !formData.phone) {
       toast({
@@ -69,23 +119,40 @@ export function EbillingCheckout({
       return;
     }
 
+    // Double vérification de l'authentification
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    console.log("📊 ÉTAT AUTHENTIFICATION:");
+    console.log("  - Session active:", !!session);
+    console.log("  - User ID:", session?.user?.id || "NULL");
+    console.log("  - Email:", session?.user?.email || "NULL");
+    console.log("  - Token présent:", !!session?.access_token);
+
+    if (!session?.user) {
+      console.error("❌ ALERTE: Pas de session lors du paiement!");
+      toast({
+        title: "Session expirée",
+        description: "Veuillez vous reconnecter avant d'effectuer un achat.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 1. Appel API checkout - retourne JSON avec billId et redirectUrl
-      console.log("📤 Envoi requête checkout à l'API...");
-      console.log("Données envoyées:", {
+      console.log("📤 Données envoyées à l'API:");
+      console.log({
         document_id: documentId,
         amount,
-        short_description: description || `Achat: ${documentTitle}`,
         client_name: formData.name,
         client_email: formData.email,
         client_phone: formData.phone,
-        client_address: formData.address,
-        document_slug: documentSlug,
-        document_title: documentTitle
+        user_authenticated: true,
+        user_id: session.user.id
       });
 
+      // Appel API checkout
       const response = await initiateDocumentCheckout({
         document_id: documentId,
         amount,
@@ -99,26 +166,18 @@ export function EbillingCheckout({
       });
 
       console.log("✅ Checkout response:", response);
-      console.log("📊 Détails complets:", JSON.stringify(response, null, 2));
 
-      // 2. Créer formulaire POST invisible pour redirection vers eBilling
-      console.log("📝 Création formulaire POST eBilling:");
-      console.log("  - Action:", response.redirectUrl);
-      console.log("  - Bill ID:", response.billId);
-      console.log("  - Success URL:", response.successUrl);
-
+      // Créer formulaire POST pour redirection vers eBilling
       const form = document.createElement("form");
       form.method = "POST";
       form.action = response.redirectUrl;
 
-      // Champ invoice_number (requis par eBilling)
       const invoiceField = document.createElement("input");
       invoiceField.type = "hidden";
       invoiceField.name = "invoice_number";
       invoiceField.value = response.billId;
       form.appendChild(invoiceField);
 
-      // Champ merchant_redirect_url (URL de retour après paiement)
       const redirectField = document.createElement("input");
       redirectField.type = "hidden";
       redirectField.name = "merchant_redirect_url";
@@ -127,23 +186,13 @@ export function EbillingCheckout({
 
       document.body.appendChild(form);
       
-      console.log("🔄 Soumission formulaire vers eBilling...");
-      console.log("  Champs:", {
-        invoice_number: response.billId,
-        merchant_redirect_url: response.successUrl
-      });
-
-      // 3. Soumettre le formulaire (redirection POST automatique)
+      console.log("🔄 Redirection vers eBilling...");
       form.submit();
 
       if (onSuccess) onSuccess();
 
     } catch (error: any) {
-      console.error("❌❌❌ ERREUR COMPLÈTE ❌❌❌");
-      console.error("Type:", error.constructor.name);
-      console.error("Message:", error.message);
-      console.error("Stack:", error.stack);
-      console.error("Error object:", error);
+      console.error("❌ ERREUR PAIEMENT:", error);
       
       toast({
         title: "Erreur de paiement",
@@ -155,6 +204,39 @@ export function EbillingCheckout({
       if (onError) onError(error);
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="py-12 text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-blue-600" />
+          <p className="text-sm text-slate-600">Vérification de l'authentification...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="py-8">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Session expirée</strong>
+              <p className="mt-2">Veuillez vous reconnecter pour effectuer un achat.</p>
+            </AlertDescription>
+          </Alert>
+          <Button 
+            className="w-full mt-4" 
+            onClick={() => window.location.href = "/auth/connexion"}
+          >
+            Se connecter
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -169,6 +251,14 @@ export function EbillingCheckout({
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* User Info */}
+        <Alert className="bg-green-50 border-green-200">
+          <ShieldCheck className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            Connecté en tant que <strong>{currentUser?.email}</strong>
+          </AlertDescription>
+        </Alert>
+
         {/* Document Info */}
         <div className="bg-slate-50 p-4 rounded-lg space-y-2">
           <div className="text-sm text-slate-600">Document</div>
