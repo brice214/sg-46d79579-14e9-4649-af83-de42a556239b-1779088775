@@ -120,17 +120,31 @@ export default async function handler(
     // ═════════════════════════════════════════════════════════
     if (newStatus === "processed") {
       console.log("🔄 Création de l'achat...");
+      console.log("🔍 DIAGNOSTIC PURCHASE:");
+      console.log("  - Transaction ID:", transaction.id);
+      console.log("  - Transaction user_id:", transaction.user_id || "NULL");
+      console.log("  - Transaction document_id:", transaction.document_id);
+      console.log("  - Transaction amount:", transaction.amount);
+      console.log("  - Transaction reference:", transaction.reference);
+      console.log("  - Transaction metadata:", JSON.stringify(transaction.metadata, null, 2));
 
       // Vérifier que user_id existe
       if (!transaction.user_id) {
+        console.error("❌❌❌ PROBLÈME CRITIQUE ❌❌❌");
         console.error("❌ Impossible de créer purchase: user_id manquant dans la transaction");
-        console.log("Transaction:", transaction);
+        console.log("Transaction complète:", JSON.stringify(transaction, null, 2));
+        console.error("⚠️ Le client a PAYÉ mais ne recevra PAS son document!");
+        console.error("⚠️ Action requise: Investigation manuelle nécessaire");
         return res.status(200).json({
           success: true,
-          message: "Payment processed but no user_id",
-          status: newStatus
+          message: "Payment processed but no user_id - MANUAL INTERVENTION REQUIRED",
+          status: newStatus,
+          transactionId: transaction.id,
+          reference: transaction.reference
         });
       }
+
+      console.log("✅ user_id présent, création du purchase...");
 
       // Créer l'entrée dans la table purchases (colonnes existantes uniquement)
       const { error: purchaseError } = await supabase
@@ -142,10 +156,14 @@ export default async function handler(
         });
 
       if (purchaseError) {
+        console.error("❌❌❌ ERREUR CRÉATION PURCHASE ❌❌❌");
         console.error("❌ Erreur création achat:", purchaseError);
         console.error("Détails:", JSON.stringify(purchaseError, null, 2));
+        console.error("⚠️ Le client a PAYÉ mais ne peut PAS accéder au document!");
       } else {
-        console.log("✅ Achat créé avec succès");
+        console.log("✅✅✅ ACHAT CRÉÉ AVEC SUCCÈS ✅✅✅");
+        console.log("  - user_id:", transaction.user_id);
+        console.log("  - document_id:", transaction.document_id);
       }
 
       // Récupérer les infos du document pour le log

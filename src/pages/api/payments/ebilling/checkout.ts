@@ -125,19 +125,34 @@ export default async function handler(
     const authHeader = req.headers.authorization;
     let userId = null;
 
+    console.log("🔍 AUTH DIAGNOSTIC:");
+    console.log("  - Authorization Header présent?", !!authHeader);
+    console.log("  - Authorization Header value:", authHeader ? `${authHeader.substring(0, 20)}...` : "NONE");
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
+      console.log("  - Token extrait (30 premiers chars):", token.substring(0, 30));
+      
       const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+      
+      console.log("  - Supabase.auth.getUser() result:");
+      console.log("    • User ID:", user?.id || "NULL");
+      console.log("    • User Email:", user?.email || "NULL");
+      console.log("    • Error:", userError?.message || "NONE");
       
       if (user && !userError) {
         userId = user.id;
         console.log("✅ Utilisateur connecté:", userId);
       } else {
-        console.log("ℹ️ Aucun utilisateur connecté (paiement anonyme)");
+        console.log("❌ Échec authentification:");
+        console.log("  - Error:", JSON.stringify(userError, null, 2));
       }
     } else {
       console.log("ℹ️ Pas de token d'authentification (paiement anonyme)");
+      console.log("  - Headers disponibles:", Object.keys(req.headers));
     }
+
+    console.log("🎯 RÉSULTAT FINAL: user_id =", userId || "NULL");
 
     // ═════════════════════════════════════════════════════════
     // ÉTAPE 3 : GÉNÉRER RÉFÉRENCE UNIQUE
