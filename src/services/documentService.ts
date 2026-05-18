@@ -84,6 +84,27 @@ export const documentService = {
     return data;
   },
 
+  async getDocumentById(id: string) {
+    const { data, error } = await supabase
+      .from("documents")
+      .select(`
+        *,
+        profiles!documents_author_id_fkey(id, full_name, avatar_url, bio),
+        categories(id, name, slug, icon)
+      `)
+      .eq("id", id)
+      .single();
+
+    console.log("getDocumentById:", { data, error });
+
+    if (error) {
+      console.error("Error fetching document:", error);
+      throw error;
+    }
+
+    return data;
+  },
+
   async getAuthorDocuments(authorId: string) {
     const { data, error } = await supabase
       .from("documents")

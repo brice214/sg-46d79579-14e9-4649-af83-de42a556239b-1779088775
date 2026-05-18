@@ -27,6 +27,8 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null);
 
   // Word counter helper function
   const countWords = (text: string): number => {
@@ -57,6 +59,14 @@ export default function Upload() {
     checkAuth();
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    // Détecter le mode édition et charger le document
+    const editId = router.query.edit as string;
+    if (editId && currentUser) {
+      loadDocumentForEdit(editId);
+    }
+  }, [router.query.edit, currentUser]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -96,6 +106,55 @@ export default function Upload() {
       setCategories(cats);
     } catch (error) {
       console.error("Error loading categories:", error);
+    }
+  };
+
+  const loadDocumentForEdit = async (documentId: string) => {
+    try {
+      setLoading(true);
+      const doc = await documentService.getDocumentById(documentId);
+      
+      // Vérifier que l'utilisateur est bien l'auteur
+      if (doc.author_id !== currentUser) {
+        toast({
+          variant: "destructive",
+          title: "Accès refusé",
+          description: "Vous ne pouvez éditer que vos propres documents"
+        });
+        router.push("/dashboard");
+        return;
+      }
+
+      // Pré-remplir le formulaire
+      setEditMode(true);
+      setEditingDocumentId(documentId);
+      setTitle(doc.title);
+      setDescription(doc.description);
+      setDescriptionWordCount(countWords(doc.description));
+      setCategoryId(doc.category_id || "");
+      setKeywords(Array.isArray(doc.keywords) ? doc.keywords.join(", ") : "");
+      setDocumentType(doc.document_type || "");
+      setPrice(doc.price.toString());
+      setPromoPrice(doc.promo_price ? doc.promo_price.toString() : "");
+      setPageCount(doc.page_count ? doc.page_count.toString() : "");
+      
+      // Les fichiers existants ne sont pas modifiables directement
+      // mais on peut en uploader de nouveaux
+      
+      toast({
+        title: "Mode édition",
+        description: "Vous pouvez maintenant modifier votre document"
+      });
+    } catch (error: any) {
+      console.error("Error loading document:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de charger le document"
+      });
+      router.push("/dashboard");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -153,7 +212,8 @@ export default function Upload() {
       return;
     }
 
-    if (!pdfFile) {
+    // En mode édition, le PDF n'est pas obligatoire (on garde l'ancien)
+    if (!editMode && !pdfFile) {
       toast({
         variant: "destructive",
         title: "Fichier requis",
@@ -177,29 +237,32 @@ export default function Upload() {
         throw new Error("Session expirée. Veuillez vous reconnecter.");
       }
 
-      // Upload PDF to Supabase Storage
-      const pdfFileName = `${Date.now()}-${pdfFile.name}`;
-      const uploadPath = `pdfs/${currentUser}/${pdfFileName}`;
-      
-      console.log("🔍 DEBUG - Upload path:", uploadPath);
-      console.log("🔍 DEBUG - Auth UID from session:", session.user.id);
-      console.log("🔍 DEBUG - Current User:", currentUser);
-      console.log("🔍 DEBUG - Match:", session.user.id === currentUser);
-
-      const { data: pdfData, error: pdfError } = await supabase.storage
-        .from("documents")
-        .upload(uploadPath, pdfFile);
-
-      console.log("🔍 DEBUG - Upload result:", { pdfData, pdfError });
-
-      if (pdfError) throw pdfError;
-
-      const { data: { publicUrl: pdfUrl } } = supabase.storage
-        .from("documents")
-        .getPublicUrl(pdfData.path);
-
-      // Upload cover image if provided
+      let pdfUrl = null;
       let coverUrl = null;
+
+      // Upload PDF si un nouveau fichier est fourni
+      if (pdfFile) {
+        const pdfFileName = `${Date.now()}-${pdfFile.name}`;
+        const uploadPath = `pdfs/${currentUser}/${pdfFileName}`;
+        
+        console.log("🔍 DEBUG - Upload path:", uploadPath);
+
+        const { data: pdfData, error: pdfError } = await supabase.storage
+          .from("documents")
+          .upload(uploadPath, pdfFile);
+
+        console.log("🔍 DEBUG - Upload result:", { pdfData, pdfError });
+
+        if (pdfError) throw pdfError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("documents")
+          .getPublicUrl(pdfData.path);
+        
+        pdfUrl = publicUrl;
+      }
+
+      // Upload cover image si fournie
       if (coverImage) {
         const coverFileName = `${Date.now()}-${coverImage.name}`;
         const { data: coverData, error: coverError } = await supabase.storage
@@ -214,41 +277,72 @@ export default function Upload() {
         }
       }
 
-      // Create document record
-      const slug = title.toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+      if (editMode && editingDocumentId) {
+        // MODE ÉDITION - Mettre à jour le document existant
+        const updates: any = {
+          title,
+          description,
+          category_id: categoryId || null,
+          keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
+          document_type: documentType as any,
+          price: parseFloat(price),
+          promo_price: promoPrice ? parseFloat(promoPrice) : null,
+          page_count: pageCount ? parseInt(pageCount) : null,
+          updated_at: new Date().toISOString()
+        };
 
-      await documentService.createDocument({
-        title,
-        slug: `${slug}-${Date.now()}`,
-        description,
-        author_id: currentUser,
-        category_id: categoryId || null,
-        keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
-        document_type: documentType as any,
-        price: parseFloat(price),
-        promo_price: promoPrice ? parseFloat(promoPrice) : null,
-        currency: "XAF",
-        page_count: pageCount ? parseInt(pageCount) : null,
-        file_url: pdfUrl,
-        cover_image_url: coverUrl,
-        file_size_bytes: pdfFile.size,
-        is_published: true,
-        is_approved: false // Nécessite approbation admin
-      });
+        // Ajouter les nouveaux fichiers seulement s'ils ont été uploadés
+        if (pdfUrl) {
+          updates.file_url = pdfUrl;
+          updates.file_size_bytes = pdfFile!.size;
+        }
+        if (coverUrl) {
+          updates.cover_image_url = coverUrl;
+        }
 
-      toast({
-        title: "Document publié !",
-        description: "Votre document est en attente de validation par l'équipe AfriLitt"
-      });
+        await documentService.updateDocument(editingDocumentId, updates);
+
+        toast({
+          title: "Document mis à jour !",
+          description: "Vos modifications ont été enregistrées avec succès"
+        });
+      } else {
+        // MODE CRÉATION - Créer un nouveau document
+        const slug = title.toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+        await documentService.createDocument({
+          title,
+          slug: `${slug}-${Date.now()}`,
+          description,
+          author_id: currentUser,
+          category_id: categoryId || null,
+          keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
+          document_type: documentType as any,
+          price: parseFloat(price),
+          promo_price: promoPrice ? parseFloat(promoPrice) : null,
+          currency: "XAF",
+          page_count: pageCount ? parseInt(pageCount) : null,
+          file_url: pdfUrl!,
+          cover_image_url: coverUrl,
+          file_size_bytes: pdfFile!.size,
+          is_published: true,
+          is_approved: false
+        });
+
+        toast({
+          title: "Document publié !",
+          description: "Votre document est en attente de validation par l'équipe AfriLitt"
+        });
+      }
 
       router.push("/dashboard");
     } catch (error: any) {
       console.error("Upload error:", error);
       toast({
         variant: "destructive",
-        title: "Erreur d'upload",
+        title: "Erreur",
         description: error.message || "Une erreur est survenue"
       });
     } finally {
@@ -269,10 +363,13 @@ export default function Upload() {
         </div>
         <div className="container max-w-4xl relative z-10 text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-4">
-            Publier un document
+            {editMode ? "Modifier le document" : "Publier un document"}
           </h1>
           <p className="text-lg text-gold/90 drop-shadow-md max-w-2xl mx-auto">
-            Partagez votre savoir avec la communauté AfriLitt. Contribuez à l'enrichissement de la bibliothèque numérique africaine.
+            {editMode 
+              ? "Mettez à jour les informations de votre document"
+              : "Partagez votre savoir avec la communauté AfriLitt. Contribuez à l'enrichissement de la bibliothèque numérique africaine."
+            }
           </p>
         </div>
       </div>
@@ -283,7 +380,7 @@ export default function Upload() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UploadIcon className="h-5 w-5" />
-                Informations du document
+                {editMode ? "Modifier les informations" : "Informations du document"}
               </CardTitle>
               <CardDescription>
                 Tous les champs marqués d'un astérisque (*) sont obligatoires
@@ -446,7 +543,9 @@ export default function Upload() {
 
                 {/* Upload PDF */}
                 <div className="space-y-2">
-                  <Label htmlFor="pdf">Fichier PDF *</Label>
+                  <Label htmlFor="pdf">
+                    Fichier PDF {editMode ? "(optionnel - garder l'actuel si vide)" : "*"}
+                  </Label>
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                     <Input
                       id="pdf"
@@ -454,7 +553,7 @@ export default function Upload() {
                       accept="application/pdf"
                       onChange={handlePdfChange}
                       className="hidden"
-                      required
+                      required={!editMode}
                     />
                     <label htmlFor="pdf" className="cursor-pointer">
                       <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
@@ -463,7 +562,10 @@ export default function Upload() {
                       ) : (
                         <>
                           <p className="text-sm font-medium mb-1">
-                            Cliquez pour sélectionner un PDF
+                            {editMode 
+                              ? "Cliquez pour remplacer le PDF (optionnel)"
+                              : "Cliquez pour sélectionner un PDF"
+                            }
                           </p>
                           <p className="text-xs text-muted-foreground">
                             Maximum 50 MB
@@ -476,7 +578,9 @@ export default function Upload() {
 
                 {/* Upload Cover Image */}
                 <div className="space-y-2">
-                  <Label htmlFor="cover">Image de couverture (optionnel)</Label>
+                  <Label htmlFor="cover">
+                    Image de couverture {editMode ? "(optionnel - garder l'actuelle si vide)" : "(optionnel)"}
+                  </Label>
                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                     <Input
                       id="cover"
@@ -491,7 +595,10 @@ export default function Upload() {
                       ) : (
                         <>
                           <p className="text-sm font-medium mb-1">
-                            Cliquez pour ajouter une couverture
+                            {editMode
+                              ? "Cliquez pour remplacer la couverture (optionnel)"
+                              : "Cliquez pour ajouter une couverture"
+                            }
                           </p>
                           <p className="text-xs text-muted-foreground">
                             JPG, PNG ou WebP
@@ -567,7 +674,7 @@ export default function Upload() {
                       descriptionWordCount > MAX_WORDS ||
                       !categoryId || 
                       !documentType || 
-                      !pdfFile ||
+                      (!editMode && !pdfFile) ||
                       !certifyRights ||
                       !acceptTerms
                     }
@@ -576,12 +683,12 @@ export default function Upload() {
                     {uploading ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-noir mr-2" />
-                        Publication en cours...
+                        {editMode ? "Mise à jour..." : "Publication en cours..."}
                       </>
                     ) : (
                       <>
                         <UploadIcon className="mr-2 h-5 w-5" />
-                        Publier le document
+                        {editMode ? "Enregistrer les modifications" : "Publier le document"}
                       </>
                     )}
                   </Button>
