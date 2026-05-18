@@ -44,6 +44,7 @@ type Document = {
   keywords: string[];
   document_type: string;
   price: number;
+  promo_price?: number | null;
   currency: string;
   page_count: number | null;
   file_url: string;
