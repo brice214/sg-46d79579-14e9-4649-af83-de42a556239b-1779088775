@@ -24,6 +24,11 @@ const getURL = () => {
     url = 'http://localhost:3000';
   }
   
+  // Force www.afrilitt.com en production
+  if (url.includes('afrilitt.com') && !url.includes('www.')) {
+    url = url.replace('afrilitt.com', 'www.afrilitt.com');
+  }
+  
   // Ensure url has protocol
   url = url.startsWith('http') ? url : `https://${url}`
   

@@ -111,8 +111,14 @@ export default async function handler(
       : "https://test.billing-easy.net";
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
-    const successUrl = `${origin}/paiement/success`;
-    const callbackUrl = `${origin}/api/payments/ebilling/callback`;
+    
+    // Force www.afrilitt.com en production
+    const productionOrigin = origin.includes('afrilitt.com') && !origin.includes('www.') 
+      ? origin.replace('afrilitt.com', 'www.afrilitt.com')
+      : origin;
+    
+    const successUrl = `${productionOrigin}/paiement/success`;
+    const callbackUrl = `${productionOrigin}/api/payments/ebilling/callback`;
 
     console.log("URLs:", { apiUrl, portalBaseUrl, successUrl, callbackUrl });
 
