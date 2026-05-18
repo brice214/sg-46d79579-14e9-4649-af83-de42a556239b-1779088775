@@ -6,7 +6,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.afrilitt.com";
+    // Always use production URL for sitemap, never dev URL
+    const baseUrl = "https://www.afrilitt.com";
     const currentDate = new Date().toISOString();
 
     // Fetch published documents
