@@ -20,6 +20,7 @@ import { reportService } from "@/services/reportService";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Download, Eye, AlertTriangle, ShoppingCart, FileText, Tag, Calendar, User, DollarSign, Shield, Sparkles, CheckCircle, XCircle, Check } from "lucide-react";
 import { EbillingCheckout } from "@/components/payment/EbillingCheckout";
+import { SocialShare } from "@/components/SocialShare";
 
 // Import PDFViewer dynamically to avoid SSR issues
 const PDFViewer = dynamic(
@@ -689,6 +690,17 @@ export default function DocumentPage() {
                     </div>
                   </>
                 )}
+                <Separator />
+                <div>
+                  <p className="text-sm font-medium text-noir mb-2">Partager ce document</p>
+                  <SocialShare
+                    url={`/documents/${document.slug}`}
+                    title={document.title}
+                    description={document.description}
+                    variant="default"
+                    className="w-full bg-gold hover:bg-gold/90 text-noir"
+                  />
+                </div>
               </CardContent>
             </Card>
 

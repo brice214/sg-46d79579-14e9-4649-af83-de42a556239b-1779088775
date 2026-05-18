@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   BookOpen, DollarSign, Upload, Eye, Download, FileText, Settings, User,
   TrendingUp, Clock, CheckCircle, XCircle, Edit, Wallet, BarChart3,
-  AlertCircle, ArrowUpRight, ChevronRight, ShoppingCart, Lock, Check
+  AlertCircle, ArrowUpRight, ChevronRight, ShoppingCart, Lock, Check, Share2
 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -25,6 +25,7 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Autoplay from "embla-carousel-autoplay";
+import { SocialShare } from "@/components/SocialShare";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Document = Database["public"]["Tables"]["documents"]["Row"];
@@ -1116,6 +1117,35 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Social Share for Author Catalog - Add after profile info grid */}
+              {isAuthor && profile && (
+                <Card className="border-gold/20 bg-gradient-to-br from-gold/5 to-amber-50">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Share2 className="h-5 w-5 text-gold" />
+                      Partager mon catalogue
+                    </CardTitle>
+                    <CardDescription>
+                      Partagez votre catalogue personnel avec votre audience
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        Lien: <span className="font-mono text-xs">/catalogue?author={profile.id}</span>
+                      </p>
+                      <SocialShare
+                        url={`/catalogue?author=${profile.id}`}
+                        title={`Catalogue de ${profile.full_name || "l'auteur"} sur AFRILITT`}
+                        description={`Découvrez tous les documents de ${profile.full_name || "cet auteur"} sur AFRILITT`}
+                        variant="default"
+                        className="bg-gold hover:bg-gold/90 text-noir"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
           </Tabs>
