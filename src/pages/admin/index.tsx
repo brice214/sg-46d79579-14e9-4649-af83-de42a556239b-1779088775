@@ -57,6 +57,8 @@ import { TopAuthorsChart } from "@/components/admin/TopAuthorsChart";
 import { ConversionMetrics } from "@/components/admin/ConversionMetrics";
 import { WithdrawalSettings } from "@/components/admin/WithdrawalSettings";
 import { WithdrawalRequests } from "@/components/admin/WithdrawalRequests";
+import { PaymentEvolutionChart } from "@/components/admin/PaymentEvolutionChart";
+import { WithdrawalEvolutionChart } from "@/components/admin/WithdrawalEvolutionChart";
 
 // Types
 interface DashboardStats {
