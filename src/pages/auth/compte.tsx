@@ -49,7 +49,7 @@ export default function Register() {
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès.",
       });
-      router.push("/dashboard");
+      router.push("/auth/connexion?verify=true");
     } catch (error: any) {
       toast({
         variant: "destructive",

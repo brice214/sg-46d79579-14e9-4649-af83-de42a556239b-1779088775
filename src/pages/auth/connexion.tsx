@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/authService";
+import { Mail } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+  const { verify } = router.query;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +89,15 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
+            {verify === "true" && (
+              <Alert className="mb-6 border-gold/30 bg-gold/5">
+                <Mail className="h-4 w-4 text-gold" />
+                <AlertTitle className="text-gold font-semibold">Vérifiez votre boîte de réception</AlertTitle>
+                <AlertDescription className="text-sm text-muted-foreground">
+                  Un email de bienvenue vous a été envoyé. Cliquez sur le bouton d'activation pour activer votre compte avant de vous connecter.
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email</Label>
