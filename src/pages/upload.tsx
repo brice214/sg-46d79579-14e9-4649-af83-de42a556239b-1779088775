@@ -46,6 +46,7 @@ export default function Upload() {
   const [keywords, setKeywords] = useState("");
   const [documentType, setDocumentType] = useState("");
   const [price, setPrice] = useState("0");
+  const [promoPrice, setPromoPrice] = useState("");
   const [pageCount, setPageCount] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -227,6 +228,7 @@ export default function Upload() {
         keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
         document_type: documentType as any,
         price: parseFloat(price),
+        promo_price: promoPrice ? parseFloat(promoPrice) : null,
         currency: "XAF",
         page_count: pageCount ? parseInt(pageCount) : null,
         file_url: pdfUrl,
@@ -411,6 +413,24 @@ export default function Upload() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="promoPrice">Prix promo (XAF)</Label>
+                    <Input
+                      id="promoPrice"
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="Prix promotionnel (facultatif)"
+                      value={promoPrice}
+                      onChange={(e) => setPromoPrice(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Si défini, c'est ce prix qui sera utilisé
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="pageCount">Nombre de pages</Label>
                     <Input

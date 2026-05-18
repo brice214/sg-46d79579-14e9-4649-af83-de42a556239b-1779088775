@@ -547,7 +547,21 @@ export default function DocumentPage() {
                 <>
                   <div className="text-3xl font-bold text-terre flex items-center gap-2">
                     <DollarSign className="h-8 w-8" />
-                    {document.price === 0 ? "Gratuit" : `${document.price} XAF`}
+                    <div className="flex flex-col">
+                      {document.promo_price ? (
+                        <>
+                          <span className="text-lg line-through text-muted-foreground">
+                            {document.price} XAF
+                          </span>
+                          <span>{document.promo_price} XAF</span>
+                          <Badge className="bg-red-500 text-white text-xs w-fit">
+                            -{Math.round((1 - document.promo_price / document.price) * 100)}%
+                          </Badge>
+                        </>
+                      ) : (
+                        <span>{document.price === 0 ? "Gratuit" : `${document.price} XAF`}</span>
+                      )}
+                    </div>
                   </div>
                   {hasAccess ? (
                     <Badge className="bg-green-500 text-white text-lg px-4 py-2">
@@ -567,7 +581,12 @@ export default function DocumentPage() {
                           <AlertDialogTitle className="text-2xl text-noir">Confirmer l'achat</AlertDialogTitle>
                           <AlertDialogDescription className="text-noir/70">
                             Vous êtes sur le point d'acheter <strong className="text-noir">{document.title}</strong> pour{" "}
-                            <strong className="text-or">{document.price.toLocaleString()} {document.currency}</strong>.
+                            <strong className="text-or">{(document.promo_price || document.price).toLocaleString()} {document.currency}</strong>
+                            {document.promo_price && (
+                              <span className="block mt-1 text-green-600 font-semibold">
+                                Prix promo ! Économisez {(document.price - document.promo_price).toLocaleString()} XAF
+                              </span>
+                            )}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

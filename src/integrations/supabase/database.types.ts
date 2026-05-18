@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 export type Json =
   | string
   | number
@@ -68,6 +68,7 @@ export type Database = {
           page_count: number | null
           preview_url: string | null
           price: number
+          promo_price: number | null
           published_at: string | null
           slug: string
           title: string
@@ -93,6 +94,7 @@ export type Database = {
           page_count?: number | null
           preview_url?: string | null
           price?: number
+          promo_price?: number | null
           published_at?: string | null
           slug: string
           title: string
@@ -118,6 +120,7 @@ export type Database = {
           page_count?: number | null
           preview_url?: string | null
           price?: number
+          promo_price?: number | null
           published_at?: string | null
           slug?: string
           title?: string
