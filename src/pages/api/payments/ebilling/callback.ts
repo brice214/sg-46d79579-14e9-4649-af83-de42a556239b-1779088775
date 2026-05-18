@@ -209,7 +209,7 @@ export default async function handler(
       // Récupérer les infos du document (prix et auteur)
       const { data: document, error: docError } = await supabase
         .from("documents")
-        .select("title, price, author_id")
+        .select("title, price, promo_price, author_id")
         .eq("id", transaction.document_id)
         .single();
 
@@ -217,6 +217,9 @@ export default async function handler(
         console.error("❌ Impossible de récupérer le document:", docError);
       } else {
         console.log("📄 Document:", document.title, "- Prix:", document.price, "XAF");
+        if (document.promo_price) {
+          console.log("🎁 Prix promo actif:", document.promo_price, "XAF");
+        }
 
         // Récupérer le taux de commission depuis la config (défaut 15%)
         const { data: commissionData } = await supabase
@@ -226,12 +229,13 @@ export default async function handler(
           .single();
 
         const commissionRate = commissionData?.value || 15;
-        const amount = Number(document.price);
+        // IMPORTANT: Utiliser le prix promo s'il existe, sinon le prix normal
+        const amount = Number(document.promo_price || document.price);
         const platformFee = Math.round((amount * commissionRate) / 100);
         const authorEarnings = amount - platformFee;
 
         console.log("💵 Calcul financier:");
-        console.log("  - Montant:", amount, "XAF");
+        console.log("  - Montant payé:", amount, "XAF", document.promo_price ? "(prix promo)" : "(prix normal)");
         console.log("  - Commission plateforme (" + commissionRate + "%):", platformFee, "XAF");
         console.log("  - Revenus auteur:", authorEarnings, "XAF");
 
