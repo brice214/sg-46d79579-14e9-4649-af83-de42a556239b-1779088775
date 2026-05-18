@@ -739,9 +739,11 @@ export default function Dashboard() {
                                   Voir
                                 </Link>
                               </Button>
-                              <Button variant="outline" size="sm" className="flex-1 lg:flex-none">
-                                <Edit className="h-4 w-4 mr-2" />
-                                Éditer
+                              <Button variant="outline" size="sm" asChild className="flex-1 lg:flex-none">
+                                <Link href={`/upload?edit=${doc.id}`}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Éditer
+                                </Link>
                               </Button>
                             </div>
                           </div>
