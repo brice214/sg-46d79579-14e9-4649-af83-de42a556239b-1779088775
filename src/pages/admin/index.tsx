@@ -240,6 +240,17 @@ export default function AdminDashboard() {
     banner: null,
   });
 
+  // Maintenance Cleanup States
+  const [cleanupDialog, setCleanupDialog] = useState<{
+    open: boolean;
+    action: "visitors" | "authors" | "documents" | "transactions" | "withdrawals" | "all" | null;
+    confirmText: string;
+  }>({
+    open: false,
+    action: null,
+    confirmText: "",
+  });
+
   // Category Form States
   const [categoryForm, setCategoryForm] = useState({
     name: "",
@@ -271,6 +282,7 @@ export default function AdminDashboard() {
     | "analytics"
     | "settings"
     | "withdrawals"
+    | "maintenance"
   >("overview");
   
   const [withdrawalSubTab, setWithdrawalSubTab] = useState<"settings" | "requests">("settings");
@@ -692,6 +704,168 @@ export default function AdminDashboard() {
     loadReports();
     loadDocuments();
     loadStats();
+  };
+
+  // Database Cleanup Functions
+  const handleCleanupVisitors = async () => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("role", "visitor");
+
+      if (error) throw error;
+
+      toast({
+        title: "Nettoyage terminé",
+        description: "Tous les comptes visiteurs ont été supprimés.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error cleaning visitors:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
+  };
+
+  const handleCleanupAuthors = async () => {
+    try {
+      // Delete authors' documents first (cascade should handle this, but being explicit)
+      const { data: authors } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("role", "author");
+
+      if (authors) {
+        for (const author of authors) {
+          await supabase.from("documents").delete().eq("author_id", author.id);
+        }
+      }
+
+      // Delete author profiles
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("role", "author");
+
+      if (error) throw error;
+
+      toast({
+        title: "Nettoyage terminé",
+        description: "Tous les comptes auteurs et leurs documents ont été supprimés.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error cleaning authors:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
+  };
+
+  const handleCleanupDocuments = async () => {
+    try {
+      const { error } = await supabase.from("documents").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (error) throw error;
+
+      toast({
+        title: "Nettoyage terminé",
+        description: "Tous les documents ont été supprimés.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error cleaning documents:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
+  };
+
+  const handleCleanupTransactions = async () => {
+    try {
+      const { error } = await supabase.from("transactions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (error) throw error;
+
+      toast({
+        title: "Nettoyage terminé",
+        description: "Toutes les transactions ont été supprimées.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error cleaning transactions:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
+  };
+
+  const handleCleanupWithdrawals = async () => {
+    try {
+      const { error } = await supabase.from("withdrawal_requests").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (error) throw error;
+
+      toast({
+        title: "Nettoyage terminé",
+        description: "Toutes les demandes de retrait ont été supprimées.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error cleaning withdrawals:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
+  };
+
+  const handleCleanupAll = async () => {
+    try {
+      // Order matters: delete in reverse dependency order
+      await supabase.from("withdrawal_requests").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("transactions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("reports").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("documents").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("profiles").delete().eq("role", "author");
+      await supabase.from("profiles").delete().eq("role", "visitor");
+
+      toast({
+        title: "Nettoyage complet terminé",
+        description: "Toutes les données utilisateurs ont été supprimées.",
+      });
+      
+      await loadAllData();
+    } catch (error) {
+      console.error("Error in full cleanup:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du nettoyage complet.",
+        variant: "destructive",
+      });
+    }
+    setCleanupDialog({ open: false, action: null, confirmText: "" });
   };
 
   // Renderers
@@ -2067,6 +2241,211 @@ export default function AdminDashboard() {
     );
   };
 
+  const renderMaintenance = () => {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <Card className="border-red-500/30 shadow-lg bg-red-500/5">
+          <CardHeader className="border-b border-red-500/20 pb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-red-500/10">
+                <AlertTriangle className="h-8 w-8 text-red-500" />
+              </div>
+              <div>
+                <CardTitle className="font-serif text-2xl text-red-600">
+                  ⚠️ Zone de Maintenance Critique
+                </CardTitle>
+                <CardDescription className="text-base mt-1">
+                  Actions irréversibles de nettoyage de la base de données
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-500/30 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-red-600 mb-2 flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5" />
+                AVERTISSEMENT DE SÉCURITÉ
+              </h3>
+              <ul className="space-y-2 text-sm text-red-700 dark:text-red-300">
+                <li>• Les suppressions sont <strong>DÉFINITIVES et IRRÉVERSIBLES</strong></li>
+                <li>• Aucune sauvegarde automatique n'est créée</li>
+                <li>• Toutes les données associées seront perdues</li>
+                <li>• Une confirmation textuelle est requise pour chaque action</li>
+              </ul>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Cleanup Visitors */}
+              <Card className="border-orange-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="h-5 w-5 text-orange-500" />
+                    Nettoyer les Visiteurs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Supprime tous les comptes avec le rôle "visitor" (clients/lecteurs).
+                  </p>
+                  <div className="p-3 bg-muted rounded-md text-sm mb-4">
+                    <strong>Impact :</strong> {stats?.totalVisitors || 0} comptes visiteurs
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-orange-600 hover:bg-orange-700"
+                    onClick={() => setCleanupDialog({ open: true, action: "visitors", confirmText: "" })}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer tous les Visiteurs
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cleanup Authors */}
+              <Card className="border-purple-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <PenTool className="h-5 w-5 text-purple-500" />
+                    Nettoyer les Auteurs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Supprime tous les auteurs ET leurs documents associés.
+                  </p>
+                  <div className="p-3 bg-muted rounded-md text-sm mb-4">
+                    <strong>Impact :</strong> {stats?.totalAuthors || 0} auteurs + {stats?.totalDocuments || 0} documents
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    onClick={() => setCleanupDialog({ open: true, action: "authors", confirmText: "" })}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer tous les Auteurs
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cleanup Documents */}
+              <Card className="border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-blue-500" />
+                    Nettoyer les Documents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Supprime tous les documents (les auteurs sont conservés).
+                  </p>
+                  <div className="p-3 bg-muted rounded-md text-sm mb-4">
+                    <strong>Impact :</strong> {stats?.totalDocuments || 0} documents
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setCleanupDialog({ open: true, action: "documents", confirmText: "" })}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer tous les Documents
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cleanup Transactions */}
+              <Card className="border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-500" />
+                    Nettoyer les Transactions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Supprime toutes les transactions de paiement.
+                  </p>
+                  <div className="p-3 bg-muted rounded-md text-sm mb-4">
+                    <strong>Impact :</strong> {stats?.totalTransactions || 0} transactions
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={() => setCleanupDialog({ open: true, action: "transactions", confirmText: "" })}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer toutes les Transactions
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cleanup Withdrawals */}
+              <Card className="border-yellow-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-yellow-500" />
+                    Nettoyer les Retraits
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Supprime toutes les demandes de retrait.
+                  </p>
+                  <div className="p-3 bg-muted rounded-md text-sm mb-4">
+                    <strong>Impact :</strong> Toutes les demandes de retrait
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-yellow-600 hover:bg-yellow-700"
+                    onClick={() => setCleanupDialog({ open: true, action: "withdrawals", confirmText: "" })}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Supprimer tous les Retraits
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Cleanup All */}
+              <Card className="border-red-500/50 bg-red-500/10 md:col-span-2">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2 text-red-600">
+                    <AlertTriangle className="h-5 w-5" />
+                    NETTOYAGE COMPLET (DANGER MAXIMUM)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    <strong className="text-red-600">Action nucléaire :</strong> Supprime TOUT (visiteurs, auteurs, documents, transactions, retraits). 
+                    Ne conserve que les admins et la configuration.
+                  </p>
+                  <div className="p-4 bg-red-100 dark:bg-red-950/50 rounded-md text-sm mb-4 border-2 border-red-500/50">
+                    <strong className="text-red-700 dark:text-red-300">Impact total :</strong>
+                    <ul className="mt-2 space-y-1 text-red-600 dark:text-red-400">
+                      <li>• {stats?.totalVisitors || 0} visiteurs</li>
+                      <li>• {stats?.totalAuthors || 0} auteurs</li>
+                      <li>• {stats?.totalDocuments || 0} documents</li>
+                      <li>• {stats?.totalTransactions || 0} transactions</li>
+                      <li>• Toutes les demandes de retrait</li>
+                      <li>• Tous les signalements</li>
+                    </ul>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full bg-red-700 hover:bg-red-800 text-lg font-bold h-12"
+                    onClick={() => setCleanupDialog({ open: true, action: "all", confirmText: "" })}
+                  >
+                    <AlertTriangle className="h-5 w-5 mr-2" />
+                    SUPPRIMER TOUTES LES DONNÉES
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   const navItems = [
     { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
     { id: "visitors", label: "Utilisateurs", icon: Users },
@@ -2077,6 +2456,7 @@ export default function AdminDashboard() {
     { id: "categories", label: "Catégories", icon: FolderTree },
     { id: "withdrawals", label: "Retraits", icon: Wallet },
     { id: "settings", label: "Configuration", icon: Settings },
+    { id: "maintenance", label: "Maintenance", icon: AlertTriangle, badgeColor: "bg-red-600" },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "banners", label: "Bannières", icon: Image },
   ];
@@ -2177,6 +2557,7 @@ export default function AdminDashboard() {
           {activeTab === "analytics" && renderAnalytics()}
           {activeTab === "withdrawals" && renderWithdrawals()}
           {activeTab === "settings" && renderSettings()}
+          {activeTab === "maintenance" && renderMaintenance()}
         </main>
       </div>
 
@@ -2372,6 +2753,102 @@ export default function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cleanup Confirmation Dialog */}
+      <AlertDialog open={cleanupDialog.open} onOpenChange={(open) => !open && setCleanupDialog({ open: false, action: null, confirmText: "" })}>
+        <AlertDialogContent className="border-red-500/30 max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600 text-xl">
+              <AlertTriangle className="h-6 w-6" />
+              CONFIRMATION DE SUPPRESSION DÉFINITIVE
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base mt-4 space-y-3">
+              <div className="bg-red-50 dark:bg-red-950/30 border-2 border-red-500/30 rounded-lg p-4">
+                <p className="font-bold text-red-700 dark:text-red-300 mb-2">
+                  ⚠️ CETTE ACTION EST IRRÉVERSIBLE
+                </p>
+                <p className="text-red-600 dark:text-red-400">
+                  Vous êtes sur le point de supprimer définitivement :
+                </p>
+                <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 rounded-md">
+                  {cleanupDialog.action === "visitors" && (
+                    <p className="font-semibold text-red-700 dark:text-red-200">
+                      Tous les comptes VISITEURS ({stats?.totalVisitors || 0} comptes)
+                    </p>
+                  )}
+                  {cleanupDialog.action === "authors" && (
+                    <p className="font-semibold text-red-700 dark:text-red-200">
+                      Tous les AUTEURS ({stats?.totalAuthors || 0}) et leurs DOCUMENTS ({stats?.totalDocuments || 0})
+                    </p>
+                  )}
+                  {cleanupDialog.action === "documents" && (
+                    <p className="font-semibold text-red-700 dark:text-red-200">
+                      Tous les DOCUMENTS ({stats?.totalDocuments || 0} documents)
+                    </p>
+                  )}
+                  {cleanupDialog.action === "transactions" && (
+                    <p className="font-semibold text-red-700 dark:text-red-200">
+                      Toutes les TRANSACTIONS ({stats?.totalTransactions || 0} paiements)
+                    </p>
+                  )}
+                  {cleanupDialog.action === "withdrawals" && (
+                    <p className="font-semibold text-red-700 dark:text-red-200">
+                      Toutes les DEMANDES DE RETRAIT
+                    </p>
+                  )}
+                  {cleanupDialog.action === "all" && (
+                    <div className="space-y-1">
+                      <p className="font-bold text-red-800 dark:text-red-100 mb-2">NETTOYAGE COMPLET :</p>
+                      <ul className="text-sm text-red-700 dark:text-red-200 space-y-1">
+                        <li>• {stats?.totalVisitors || 0} comptes visiteurs</li>
+                        <li>• {stats?.totalAuthors || 0} comptes auteurs</li>
+                        <li>• {stats?.totalDocuments || 0} documents</li>
+                        <li>• {stats?.totalTransactions || 0} transactions</li>
+                        <li>• Toutes les demandes de retrait</li>
+                        <li>• Tous les signalements</li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3 mt-4">
+                <p className="font-medium text-foreground">
+                  Pour confirmer, tapez exactement : <code className="px-2 py-1 bg-muted rounded font-mono text-red-600">SUPPRIMER</code>
+                </p>
+                <Input
+                  placeholder="Tapez SUPPRIMER en MAJUSCULES"
+                  value={cleanupDialog.confirmText}
+                  onChange={(e) => setCleanupDialog({ ...cleanupDialog, confirmText: e.target.value })}
+                  className="border-red-500/30 focus:border-red-500"
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel onClick={() => setCleanupDialog({ open: false, action: null, confirmText: "" })}>
+              Annuler (Recommandé)
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={cleanupDialog.confirmText !== "SUPPRIMER"}
+              onClick={() => {
+                if (cleanupDialog.confirmText === "SUPPRIMER") {
+                  if (cleanupDialog.action === "visitors") handleCleanupVisitors();
+                  else if (cleanupDialog.action === "authors") handleCleanupAuthors();
+                  else if (cleanupDialog.action === "documents") handleCleanupDocuments();
+                  else if (cleanupDialog.action === "transactions") handleCleanupTransactions();
+                  else if (cleanupDialog.action === "withdrawals") handleCleanupWithdrawals();
+                  else if (cleanupDialog.action === "all") handleCleanupAll();
+                }
+              }}
+              className="bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Confirmer la suppression
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
