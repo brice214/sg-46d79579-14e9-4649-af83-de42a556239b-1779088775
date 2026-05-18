@@ -39,7 +39,10 @@ export default function Register() {
       if (error) throw error;
 
       if (data.user) {
-        await supabase.from("profiles").update({ role: role }).eq("id", data.user.id);
+        await supabase.from("profiles").update({ 
+          role: role,
+          full_name: fullName 
+        }).eq("id", data.user.id);
       }
 
       toast({
