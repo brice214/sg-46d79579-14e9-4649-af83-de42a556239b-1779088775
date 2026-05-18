@@ -751,51 +751,47 @@ export default function DocumentPage() {
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-noir">Choisir un moyen de paiement</DialogTitle>
               <DialogDescription className="text-noir/60">
-                Sélectionnez votre méthode de paiement préférée pour acheter ce document
+                Payez en toute sécurité avec Mobile Money
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-6">
-              {/* Mobile Money */}
+              {/* Mobile Money avec logos */}
               <button
                 onClick={() => handlePaymentMethodSelect("mobile_money")}
-                className="w-full p-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
+                className="w-full p-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-green-400 hover:border-green-300"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <ShoppingCart className="h-6 w-6" />
-                  <span className="text-xl font-bold">Mobile Money</span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/20 p-2 rounded-lg">
+                      <ShoppingCart className="h-6 w-6" />
+                    </div>
+                    <span className="text-2xl font-bold">Mobile Money</span>
+                  </div>
                 </div>
-                <p className="text-sm text-white/90 ml-9">
-                  Airtel Money, Moov Money via eBilling
-                </p>
-              </button>
-
-              {/* Stripe */}
-              <button
-                onClick={() => handlePaymentMethodSelect("stripe")}
-                className="w-full p-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <ShoppingCart className="h-6 w-6" />
-                  <span className="text-xl font-bold">Stripe (Link)</span>
+                
+                {/* Logos des opérateurs */}
+                <div className="flex items-center justify-center gap-6 mb-4 bg-white/10 rounded-lg p-4 backdrop-blur">
+                  <div className="bg-white rounded-lg p-3 shadow-md">
+                    <img 
+                      src="/airtel-money-logo.png" 
+                      alt="Airtel Money" 
+                      className="h-10 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-md">
+                    <img 
+                      src="/moov-money-logo.png" 
+                      alt="Moov Money" 
+                      className="h-10 w-auto object-contain"
+                    />
+                  </div>
                 </div>
-                <p className="text-sm text-white/90 ml-9">
-                  Carte bancaire, Apple Pay, Google Pay
-                </p>
-              </button>
-
-              {/* PayPal */}
-              <button
-                onClick={() => handlePaymentMethodSelect("paypal")}
-                className="w-full p-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-left"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <ShoppingCart className="h-6 w-6" />
-                  <span className="text-xl font-bold">PayPal</span>
+                
+                <div className="flex items-center justify-center gap-2 text-sm text-white/90">
+                  <Check className="h-4 w-4" />
+                  <span>Paiement via eBilling • Rapide et sécurisé</span>
                 </div>
-                <p className="text-sm text-white/90 ml-9">
-                  Compte PayPal ou carte bancaire
-                </p>
               </button>
             </div>
 
