@@ -1775,6 +1775,76 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
+              {/* Sitemap Section */}
+              <div className="space-y-4 pt-6 border-t">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">🗺️ Sitemap XML</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Sitemap généré automatiquement pour les moteurs de recherche
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-4 bg-muted rounded-lg border">
+                    <Label className="text-xs text-muted-foreground mb-2 block">URL du Sitemap</Label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 px-3 py-2 bg-background rounded border text-sm font-mono">
+                        {typeof window !== "undefined" ? `${window.location.origin}/api/sitemap.xml` : "/api/sitemap.xml"}
+                      </code>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const url = typeof window !== "undefined" ? `${window.location.origin}/api/sitemap.xml` : "/api/sitemap.xml";
+                          navigator.clipboard.writeText(url);
+                          toast({ title: "Copié !", description: "URL du sitemap copiée" });
+                        }}
+                      >
+                        Copier
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => {
+                          const url = typeof window !== "undefined" ? `${window.location.origin}/api/sitemap.xml` : "/api/sitemap.xml";
+                          window.open(url, "_blank");
+                        }}
+                      >
+                        Ouvrir
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Soumettre à Google Search Console
+                    </h4>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mb-3">
+                      Pour améliorer le référencement, soumettez ce sitemap à Google Search Console
+                    </p>
+                    <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-decimal list-inside">
+                      <li>Accédez à <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" className="underline font-medium">Google Search Console</a></li>
+                      <li>Sélectionnez votre propriété (www.afrilitt.com)</li>
+                      <li>Allez dans "Sitemaps" dans le menu de gauche</li>
+                      <li>Collez l'URL du sitemap ci-dessus et cliquez sur "Envoyer"</li>
+                    </ol>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>✅ Le sitemap inclut automatiquement :</p>
+                    <ul className="list-disc list-inside pl-4 space-y-0.5">
+                      <li>Toutes les pages principales (accueil, catalogue, à propos, contact)</li>
+                      <li>Toutes les catégories actives</li>
+                      <li>Tous les documents publiés et approuvés</li>
+                    </ul>
+                    <p className="mt-2">🔄 Le sitemap se met à jour automatiquement quand vous publiez du contenu</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex justify-end pt-4 border-t">
                 <Button onClick={handleSavePlatformSettings} size="lg">
                   <Save className="h-4 w-4 mr-2" />
