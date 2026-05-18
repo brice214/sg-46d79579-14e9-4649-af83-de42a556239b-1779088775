@@ -62,6 +62,8 @@ export const withdrawalService = {
         updates.push({
           key: "withdrawal_minimum_amount",
           value: { amount: settings.minimum_amount, currency: settings.currency || "XAF" },
+          description: "Montant minimum pour demander un retrait",
+          category: "withdrawal"
         });
       }
 
@@ -69,6 +71,8 @@ export const withdrawalService = {
         updates.push({
           key: "withdrawal_transaction_fee",
           value: settings.transaction_fee,
+          description: "Frais de transaction pour les retraits",
+          category: "withdrawal"
         });
       }
 
@@ -76,14 +80,23 @@ export const withdrawalService = {
         updates.push({
           key: "withdrawal_methods",
           value: settings.methods,
+          description: "Méthodes de retrait disponibles",
+          category: "withdrawal"
         });
       }
 
       for (const update of updates) {
         const { error } = await supabase
           .from("platform_settings")
-          .update({ value: update.value, updated_at: new Date().toISOString() })
-          .eq("key", update.key);
+          .upsert({
+            key: update.key,
+            value: update.value,
+            description: update.description,
+            category: update.category,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'key'
+          });
 
         if (error) {
           console.error(`Error updating ${update.key}:`, error);

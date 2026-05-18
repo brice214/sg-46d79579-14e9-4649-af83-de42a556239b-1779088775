@@ -94,10 +94,29 @@ export default function Dashboard() {
   const [pendingBalance, setPendingBalance] = useState(0);
   const [salesThisMonth, setSalesThisMonth] = useState(0);
   const [approvalRate, setApprovalRate] = useState(0);
+  const [minimumWithdrawal, setMinimumWithdrawal] = useState(50000);
 
   useEffect(() => {
     loadDashboardData();
+    loadWithdrawalSettings();
   }, []);
+
+  const loadWithdrawalSettings = async () => {
+    try {
+      const { data } = await supabase
+        .from("platform_settings")
+        .select("value")
+        .eq("key", "withdrawal_minimum_amount")
+        .single();
+      
+      if (data?.value) {
+        const settings = data.value as any;
+        setMinimumWithdrawal(settings.amount || 50000);
+      }
+    } catch (error) {
+      console.error("Error loading withdrawal settings:", error);
+    }
+  };
 
   const loadDashboardData = async () => {
     setLoading(true);
@@ -270,11 +289,11 @@ export default function Dashboard() {
   };
 
   const handleRequestWithdrawal = async () => {
-    if (availableBalance < 50000) {
+    if (availableBalance < minimumWithdrawal) {
       toast({
         variant: "destructive",
         title: "Solde insuffisant",
-        description: "Le montant minimum de retrait est de 50000 XAF."
+        description: `Le montant minimum de retrait est de ${minimumWithdrawal.toLocaleString()} XAF.`
       });
       return;
     }
@@ -553,9 +572,9 @@ export default function Dashboard() {
               </div>
 
               {/* Alertes rapides */}
-              {(availableBalance >= 50000 || myDocuments.some(d => !d.is_approved && d.is_published)) && (
+              {(availableBalance >= minimumWithdrawal || myDocuments.some(d => !d.is_approved && d.is_published)) && (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {availableBalance >= 50000 && (
+                  {availableBalance >= minimumWithdrawal && (
                     <Card className="border-green-500/30 bg-green-500/5">
                       <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3">
@@ -741,7 +760,7 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle>Demander un retrait</CardTitle>
                       <CardDescription>
-                        Minimum de retrait: 50000 XAF
+                        Minimum de retrait: {minimumWithdrawal.toLocaleString()} XAF
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -765,15 +784,15 @@ export default function Dashboard() {
                       <Button 
                         className="w-full" 
                         onClick={handleRequestWithdrawal}
-                        disabled={availableBalance < 50000}
+                        disabled={availableBalance < minimumWithdrawal}
                       >
                         <Wallet className="h-4 w-4 mr-2" />
                         Demander un retrait
                       </Button>
 
-                      {availableBalance < 50000 && (
+                      {availableBalance < minimumWithdrawal && (
                         <p className="text-sm text-muted-foreground text-center">
-                          Vous devez avoir au moins 50000 XAF pour demander un retrait.
+                          Vous devez avoir au moins {minimumWithdrawal.toLocaleString()} XAF pour demander un retrait.
                         </p>
                       )}
                     </CardContent>
