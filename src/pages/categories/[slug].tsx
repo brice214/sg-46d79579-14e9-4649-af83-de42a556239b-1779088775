@@ -296,13 +296,23 @@ export default function CategoryPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                           
                           {/* Badge prix */}
-                          <div className="absolute top-3 right-3">
+                          <div className="absolute top-4 right-4">
                             {Number(doc.price) === 0 ? (
-                              <Badge className="bg-forest/90 text-white backdrop-blur-sm shadow-lg">
+                              <Badge className="bg-forest text-white backdrop-blur-sm shadow-lg border-none px-3 py-1.5 font-semibold">
                                 Gratuit
                               </Badge>
+                            ) : doc.promo_price ? (
+                              <div className="flex flex-col items-end gap-1">
+                                <Badge className="bg-red-500 text-white backdrop-blur-sm shadow-lg border-none px-2 py-1 text-xs font-semibold">
+                                  -{Math.round((1 - Number(doc.promo_price) / Number(doc.price)) * 100)}%
+                                </Badge>
+                                <Badge className="bg-gradient-to-r from-gold to-amber-500 text-black backdrop-blur-sm shadow-lg border-none px-3 py-1.5 font-semibold">
+                                  <span className="line-through text-xs opacity-70 mr-1">{Number(doc.price).toLocaleString()}</span>
+                                  {Number(doc.promo_price).toLocaleString()} {doc.currency}
+                                </Badge>
+                              </div>
                             ) : (
-                              <Badge className="bg-gold/90 text-white backdrop-blur-sm shadow-lg">
+                              <Badge className="bg-gradient-to-r from-gold to-amber-500 text-black backdrop-blur-sm shadow-lg border-none px-3 py-1.5 font-semibold">
                                 {Number(doc.price).toLocaleString()} {doc.currency}
                               </Badge>
                             )}
