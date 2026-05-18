@@ -201,15 +201,68 @@ export default async function handler(
         console.log("  - document_id:", transaction.document_id);
       }
 
-      // Récupérer les infos du document pour le log
-      const { data: document } = await supabase
+      // ═════════════════════════════════════════════════════════
+      // ÉTAPE 8 : CRÉER LA TRANSACTION FINANCIÈRE
+      // ═════════════════════════════════════════════════════════
+      console.log("💰 Création de la transaction financière...");
+
+      // Récupérer les infos du document (prix et auteur)
+      const { data: document, error: docError } = await supabase
         .from("documents")
-        .select("title")
+        .select("title, price, author_id")
         .eq("id", transaction.document_id)
         .single();
 
-      if (document) {
-        console.log("📄 Document acheté:", document.title);
+      if (docError || !document) {
+        console.error("❌ Impossible de récupérer le document:", docError);
+      } else {
+        console.log("📄 Document:", document.title, "- Prix:", document.price, "XAF");
+
+        // Récupérer le taux de commission depuis la config (défaut 15%)
+        const { data: commissionData } = await supabase
+          .from("platform_settings")
+          .select("value")
+          .eq("key", "commission_rate")
+          .single();
+
+        const commissionRate = commissionData?.value || 15;
+        const amount = Number(document.price);
+        const platformFee = Math.round((amount * commissionRate) / 100);
+        const authorEarnings = amount - platformFee;
+
+        console.log("💵 Calcul financier:");
+        console.log("  - Montant:", amount, "XAF");
+        console.log("  - Commission plateforme (" + commissionRate + "%):", platformFee, "XAF");
+        console.log("  - Revenus auteur:", authorEarnings, "XAF");
+
+        // Créer la transaction dans la table transactions
+        const { error: txError } = await supabase
+          .from("transactions")
+          .insert({
+            document_id: transaction.document_id,
+            buyer_id: purchaseUserId,
+            author_id: document.author_id,
+            amount: amount,
+            currency: "XOF",
+            platform_fee: platformFee,
+            author_earnings: authorEarnings,
+            payment_method: "mobile_money",
+            payment_provider: "eBilling",
+            transaction_reference: transaction.reference,
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            commission_amount: platformFee
+          });
+
+        if (txError) {
+          console.error("❌ Erreur création transaction financière:", txError);
+          console.error("  - Code:", txError.code);
+          console.error("  - Message:", txError.message);
+          console.error("  - Details:", txError.details);
+        } else {
+          console.log("✅✅✅ TRANSACTION FINANCIÈRE CRÉÉE ✅✅✅");
+          console.log("  - Visible dans l'admin et le dashboard vendeur");
+        }
       }
     }
 
