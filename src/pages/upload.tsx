@@ -30,6 +30,23 @@ export default function Upload() {
   const [editMode, setEditMode] = useState(false);
   const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null);
 
+  // Sanitize filename helper - remove accents, special chars, limit length
+  const sanitizeFileName = (fileName: string): string => {
+    const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+    const extension = fileName.substring(fileName.lastIndexOf('.'));
+    
+    // Remove accents and special characters
+    const sanitized = nameWithoutExt
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-zA-Z0-9-_]/g, '-') // Replace special chars with dash
+      .replace(/-+/g, '-') // Replace multiple dashes with single
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing dashes
+      .substring(0, 50); // Limit to 50 chars
+    
+    return `${sanitized}${extension}`;
+  };
+
   // Word counter helper function
   const countWords = (text: string): number => {
     if (!text.trim()) return 0;
@@ -242,7 +259,8 @@ export default function Upload() {
 
       // Upload PDF si un nouveau fichier est fourni
       if (pdfFile) {
-        const pdfFileName = `${Date.now()}-${pdfFile.name}`;
+        const sanitizedName = sanitizeFileName(pdfFile.name);
+        const pdfFileName = `${Date.now()}-${sanitizedName}`;
         const uploadPath = `pdfs/${currentUser}/${pdfFileName}`;
         
         console.log("🔍 DEBUG - Upload path:", uploadPath);
@@ -264,7 +282,8 @@ export default function Upload() {
 
       // Upload cover image si fournie
       if (coverImage) {
-        const coverFileName = `${Date.now()}-${coverImage.name}`;
+        const sanitizedName = sanitizeFileName(coverImage.name);
+        const coverFileName = `${Date.now()}-${sanitizedName}`;
         const { data: coverData, error: coverError } = await supabase.storage
           .from("documents")
           .upload(`covers/${currentUser}/${coverFileName}`, coverImage);
