@@ -567,7 +567,9 @@ export default function Upload() {
                       descriptionWordCount > MAX_WORDS ||
                       !categoryId || 
                       !documentType || 
-                      !pdfFile
+                      !pdfFile ||
+                      !certifyRights ||
+                      !acceptTerms
                     }
                     className="w-full bg-gradient-to-r from-gold via-amber-500 to-gold hover:from-gold/90 hover:via-amber-600 hover:to-gold/90 text-noir font-bold shadow-lg"
                   >
