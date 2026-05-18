@@ -709,16 +709,16 @@ export default function AdminDashboard() {
   // Database Cleanup Functions
   const handleCleanupVisitors = async () => {
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("role", "visitor");
+      // Use admin function to delete both auth users and profiles
+      const { data, error } = await supabase.rpc('admin_delete_users_by_role', {
+        user_role: 'visitor'
+      });
 
       if (error) throw error;
 
       toast({
         title: "Nettoyage terminé",
-        description: "Tous les comptes visiteurs ont été supprimés.",
+        description: `${data || 0} comptes visiteurs supprimés (profils + authentification).`,
       });
       
       await loadAllData();
@@ -735,29 +735,16 @@ export default function AdminDashboard() {
 
   const handleCleanupAuthors = async () => {
     try {
-      // Delete authors' documents first (cascade should handle this, but being explicit)
-      const { data: authors } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("role", "author");
-
-      if (authors) {
-        for (const author of authors) {
-          await supabase.from("documents").delete().eq("author_id", author.id);
-        }
-      }
-
-      // Delete author profiles
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("role", "author");
+      // Use admin function to delete both auth users and profiles
+      const { data, error } = await supabase.rpc('admin_delete_users_by_role', {
+        user_role: 'author'
+      });
 
       if (error) throw error;
 
       toast({
         title: "Nettoyage terminé",
-        description: "Tous les comptes auteurs et leurs documents ont été supprimés.",
+        description: `${data || 0} comptes auteurs supprimés (profils + documents + authentification).`,
       });
       
       await loadAllData();
@@ -843,17 +830,23 @@ export default function AdminDashboard() {
 
   const handleCleanupAll = async () => {
     try {
-      // Order matters: delete in reverse dependency order
+      // First delete all non-user data
       await supabase.from("withdrawal_requests").delete().neq("id", "00000000-0000-0000-0000-000000000000");
       await supabase.from("transactions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
       await supabase.from("reports").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await supabase.from("documents").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await supabase.from("profiles").delete().eq("role", "author");
-      await supabase.from("profiles").delete().eq("role", "visitor");
+      
+      // Use admin function to delete all non-admin users (visitors + authors)
+      const { data, error } = await supabase.rpc('admin_delete_all_non_admin_users');
+
+      if (error) throw error;
+
+      const result = data && data[0];
+      const visitorsDeleted = result?.visitors_deleted || 0;
+      const authorsDeleted = result?.authors_deleted || 0;
 
       toast({
         title: "Nettoyage complet terminé",
-        description: "Toutes les données utilisateurs ont été supprimées.",
+        description: `${visitorsDeleted} visiteurs et ${authorsDeleted} auteurs supprimés (profils + authentification + données associées).`,
       });
       
       await loadAllData();

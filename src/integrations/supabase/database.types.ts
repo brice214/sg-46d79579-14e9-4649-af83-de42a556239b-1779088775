@@ -567,6 +567,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_all_non_admin_users: {
+        Args: never
+        Returns: {
+          authors_deleted: number
+          visitors_deleted: number
+        }[]
+      }
+      admin_delete_users_by_role: {
+        Args: { user_role: string }
+        Returns: number
+      }
       increment_download_count: {
         Args: { document_id: string }
         Returns: undefined
