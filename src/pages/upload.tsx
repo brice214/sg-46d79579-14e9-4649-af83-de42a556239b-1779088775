@@ -269,11 +269,22 @@ export default function Upload() {
           .from("documents")
           .upload(`covers/${currentUser}/${coverFileName}`, coverImage);
 
-        if (!coverError) {
+        console.log("🔍 DEBUG - Cover upload result:", { coverData, coverError });
+
+        if (coverError) {
+          console.error("Cover upload error:", coverError);
+          toast({
+            variant: "destructive",
+            title: "Erreur upload couverture",
+            description: `L'image de couverture n'a pas pu être uploadée: ${coverError.message}`
+          });
+          // Ne pas bloquer la mise à jour du document pour cette erreur
+        } else {
           const { data: { publicUrl } } = supabase.storage
             .from("documents")
             .getPublicUrl(coverData.path);
           coverUrl = publicUrl;
+          console.log("🔍 DEBUG - Cover URL:", coverUrl);
         }
       }
 
