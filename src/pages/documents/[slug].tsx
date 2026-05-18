@@ -820,7 +820,7 @@ export default function DocumentPage() {
         <Dialog open={showEbillingCheckout} onOpenChange={setShowEbillingCheckout}>
           <DialogContent className="sm:max-w-lg">
             <EbillingCheckout
-              amount={document.price}
+              amount={document.promo_price || document.price}
               description={`Achat du document: ${document.title}`}
               documentId={document.id}
               documentSlug={document.slug}
