@@ -658,17 +658,6 @@ export default function DocumentPage() {
                   </div>
                 )}
               </CardContent>
-              <CardFooter>
-                <Button 
-                  onClick={handleDownload}
-                  disabled={document.price > 0 && !hasAccess && !isAdmin}
-                  className="w-full bg-foret hover:bg-foret/90 text-white font-bold shadow-lg"
-                  size="lg"
-                >
-                  <Download className="h-5 w-5 mr-2" />
-                  {document.price > 0 && !hasAccess && !isAdmin ? "Acheter pour télécharger" : "Télécharger le PDF"}
-                </Button>
-              </CardFooter>
             </Card>
           </div>
 
