@@ -249,7 +249,7 @@ export function PDFViewer({ fileUrl, hasAccess = false, onPurchase, documentTitl
         <div className="flex justify-center">
           <Button
             onClick={handleFullscreen}
-            className="bg-gradient-to-r from-terre to-foret hover:from-terre/90 hover:to-foret/90 text-white font-bold shadow-lg"
+            className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-noir font-bold shadow-xl"
             size="lg"
           >
             <Download className="h-5 w-5 mr-2" />
