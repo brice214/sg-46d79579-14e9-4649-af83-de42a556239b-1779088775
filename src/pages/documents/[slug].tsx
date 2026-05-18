@@ -547,7 +547,6 @@ export default function DocumentPage() {
               {document.price > 0 ? (
                 <>
                   <div className="text-3xl font-bold text-terre flex items-center gap-2">
-                    <DollarSign className="h-8 w-8" />
                     <div className="flex flex-col">
                       {document.promo_price ? (
                         <>
