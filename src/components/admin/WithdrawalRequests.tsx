@@ -290,6 +290,13 @@ export function WithdrawalRequests() {
                           </div>
                         </div>
 
+                        {request.payment_details?.phone_number && (
+                          <div className="mb-2 p-2 bg-blue-500/5 border border-blue-500/20 rounded">
+                            <p className="text-xs text-muted-foreground mb-1">Numéro de téléphone:</p>
+                            <p className="font-semibold text-blue-600">{request.payment_details.phone_number}</p>
+                          </div>
+                        )}
+
                         <p className="text-xs text-muted-foreground">
                           Demandé le {new Date(request.created_at).toLocaleDateString("fr-FR", {
                             day: "numeric",

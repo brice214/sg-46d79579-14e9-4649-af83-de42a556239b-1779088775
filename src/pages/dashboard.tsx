@@ -270,11 +270,11 @@ export default function Dashboard() {
   };
 
   const handleRequestWithdrawal = async () => {
-    if (availableBalance < 5000) {
+    if (availableBalance < 50000) {
       toast({
         variant: "destructive",
         title: "Solde insuffisant",
-        description: "Le montant minimum de retrait est de 5000 XAF."
+        description: "Le montant minimum de retrait est de 50000 XAF."
       });
       return;
     }
@@ -553,9 +553,9 @@ export default function Dashboard() {
               </div>
 
               {/* Alertes rapides */}
-              {(availableBalance >= 5000 || myDocuments.some(d => !d.is_approved && d.is_published)) && (
+              {(availableBalance >= 50000 || myDocuments.some(d => !d.is_approved && d.is_published)) && (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {availableBalance >= 5000 && (
+                  {availableBalance >= 50000 && (
                     <Card className="border-green-500/30 bg-green-500/5">
                       <CardContent className="flex items-center justify-between p-4">
                         <div className="flex items-center gap-3">
@@ -741,7 +741,7 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle>Demander un retrait</CardTitle>
                       <CardDescription>
-                        Minimum de retrait: 5000 XAF
+                        Minimum de retrait: 50000 XAF
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -765,15 +765,15 @@ export default function Dashboard() {
                       <Button 
                         className="w-full" 
                         onClick={handleRequestWithdrawal}
-                        disabled={availableBalance < 5000}
+                        disabled={availableBalance < 50000}
                       >
                         <Wallet className="h-4 w-4 mr-2" />
                         Demander un retrait
                       </Button>
 
-                      {availableBalance < 5000 && (
+                      {availableBalance < 50000 && (
                         <p className="text-sm text-muted-foreground text-center">
-                          Vous devez avoir au moins 5000 XAF pour demander un retrait.
+                          Vous devez avoir au moins 50000 XAF pour demander un retrait.
                         </p>
                       )}
                     </CardContent>
