@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Search, Filter, BookOpen, User, Tag, Eye, Download } from "lucide-react";
+import { Search, Filter, BookOpen, User, Tag, Eye, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { documentService } from "@/services/documentService";
 import { categoryService } from "@/services/categoryService";
 import type { Database } from "@/integrations/supabase/types";
@@ -26,10 +26,16 @@ export default function Catalogue() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceFilter, setPriceFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const DOCUMENTS_PER_PAGE = 9;
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, priceFilter, typeFilter]);
 
   const loadData = async () => {
     setLoading(true);
@@ -58,6 +64,16 @@ export default function Catalogue() {
     
     return matchesSearch && matchesCategory && matchesPrice && matchesType;
   });
+
+  const totalPages = Math.ceil(filteredDocuments.length / DOCUMENTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * DOCUMENTS_PER_PAGE;
+  const endIndex = startIndex + DOCUMENTS_PER_PAGE;
+  const currentDocuments = filteredDocuments.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-earth/5 via-background to-gold/5">
@@ -215,8 +231,8 @@ export default function Catalogue() {
                   </Button>
                 </Card>
               ) : (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {filteredDocuments.map((doc) => (
+                <div className="grid md:grid-cols-3 gap-6">
+                  {currentDocuments.map((doc) => (
                     <Link key={doc.id} href={`/documents/${doc.slug}`}>
                       <Card className="group relative overflow-hidden border-2 border-gold/20 bg-gradient-to-br from-card via-card to-card/80 hover:border-gold/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-gold/20">
                         {/* Background gradient on hover */}
@@ -326,6 +342,59 @@ export default function Catalogue() {
                       </Card>
                     </Link>
                   ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {!loading && filteredDocuments.length > 0 && totalPages > 1 && (
+                <div className="mt-12 flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="border-gold/30 hover:bg-gold/10 disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Précédent
+                  </Button>
+
+                  <div className="flex gap-2">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <Button
+                            key={page}
+                            variant={page === currentPage ? "default" : "outline"}
+                            onClick={() => handlePageChange(page)}
+                            className={
+                              page === currentPage
+                                ? "bg-gradient-to-r from-earth to-gold hover:opacity-90"
+                                : "border-gold/30 hover:bg-gold/10"
+                            }
+                          >
+                            {page}
+                          </Button>
+                        );
+                      } else if (page === currentPage - 2 || page === currentPage + 2) {
+                        return <span key={page} className="px-2 flex items-center text-muted-foreground">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="border-gold/30 hover:bg-gold/10 disabled:opacity-50"
+                  >
+                    Suivant
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
                 </div>
               )}
             </div>
