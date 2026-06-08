@@ -98,16 +98,16 @@ export default async function handler(
     }
     console.log("✅ Configuration OK");
 
-    // URLs selon environnement
+    // URLs selon environnement - PROD utilise les URLs de STAGING eBilling
     const apiUrl = environment === "PROD"
-      ? "https://www.billing-easy.com/api/v1/merchant/e_bills"
+      ? "https://stg.billing-easy.com/api/v1/merchant/e_bills"
       : "https://lab.billing-easy.net/api/v1/merchant/e_bills";
     
     // Portails selon environnement
-    // LAB: test.billing-easy.net (sans /payment, juste ?invoice=...)
-    // PROD: www.billing-easy.com/payment
+    // LAB: test.billing-easy.net
+    // PROD: staging.billing-easy.net (environnement de staging eBilling)
     const portalBaseUrl = environment === "PROD"
-      ? "https://www.billing-easy.com"
+      ? "https://staging.billing-easy.net"
       : "https://test.billing-easy.net";
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
