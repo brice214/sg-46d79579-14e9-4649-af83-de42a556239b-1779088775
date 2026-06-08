@@ -122,117 +122,83 @@ export default async function handler(
       console.log("🔄 Création de l'achat...");
       console.log("🔍 DIAGNOSTIC PURCHASE:");
       console.log("  - Transaction ID:", transaction.id);
-      console.log("  - Transaction user_id (initial):", transaction.user_id || "NULL");
+      console.log("  - Transaction user_id:", transaction.user_id || "NULL");
       console.log("  - Transaction document_id:", transaction.document_id);
       console.log("  - Transaction amount:", transaction.amount);
       console.log("  - Transaction reference:", transaction.reference);
       console.log("  - Transaction client_email:", transaction.client_email);
+      console.log("  - Transaction metadata:", JSON.stringify(transaction.metadata, null, 2));
 
       let purchaseUserId = transaction.user_id;
 
       // ═════════════════════════════════════════════════════════
-      // STRATÉGIE DE RÉSOLUTION user_id (OBLIGATOIRE)
+      // FALLBACK : Si user_id manquant, chercher via email
       // ═════════════════════════════════════════════════════════
-      if (!purchaseUserId) {
-        console.log("⚠️⚠️⚠️ user_id MANQUANT - ACTIVATION FALLBACK ⚠️⚠️⚠️");
-        
-        if (transaction.client_email) {
-          console.log("🔍 Tentative 1: Recherche via email:", transaction.client_email);
+      if (!purchaseUserId && transaction.client_email) {
+        console.log("⚠️ user_id manquant, tentative de récupération via email...");
+        console.log("  - Email recherché:", transaction.client_email);
 
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("id, email, full_name")
-            .eq("email", transaction.client_email)
-            .single();
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", transaction.client_email)
+          .single();
 
-          if (profile && !profileError) {
-            purchaseUserId = profile.id;
-            console.log("✅ user_id retrouvé via email:", purchaseUserId);
-            console.log("✅ Profil:", profile.full_name, "-", profile.email);
-            
-            // Mettre à jour la transaction avec le user_id retrouvé
-            const { error: updateTxError } = await supabase
-              .from("ebilling_transactions")
-              .update({ user_id: purchaseUserId, updated_at: new Date().toISOString() })
-              .eq("id", transaction.id);
-            
-            if (updateTxError) {
-              console.error("⚠️ Impossible de mettre à jour transaction:", updateTxError);
-            } else {
-              console.log("✅ Transaction mise à jour avec user_id");
-            }
-          } else {
-            console.error("❌ Tentative 1 ÉCHOUÉE - Utilisateur introuvable");
-            console.error("  - Email recherché:", transaction.client_email);
-            console.error("  - Erreur:", profileError?.message || "NONE");
-          }
+        if (profile && !profileError) {
+          purchaseUserId = profile.id;
+          console.log("✅ user_id retrouvé via email:", purchaseUserId);
+          
+          // Mettre à jour la transaction avec le user_id retrouvé
+          await supabase
+            .from("ebilling_transactions")
+            .update({ user_id: purchaseUserId })
+            .eq("id", transaction.id);
+          
+          console.log("✅ Transaction mise à jour avec user_id");
         } else {
-          console.error("❌ Impossible de chercher user_id: client_email manquant");
+          console.error("❌ Impossible de trouver l'utilisateur via email");
+          console.error("  - Error:", profileError?.message || "NONE");
         }
-      } else {
-        console.log("✅ user_id présent dans transaction:", purchaseUserId);
       }
 
-      // ═════════════════════════════════════════════════════════
-      // VÉRIFICATION FINALE + CRÉATION PURCHASE
-      // ═════════════════════════════════════════════════════════
+      // Vérifier que user_id existe (original ou retrouvé)
       if (!purchaseUserId) {
-        console.error("❌❌❌ ÉCHEC CRITIQUE ❌❌❌");
-        console.error("❌ Impossible de créer purchase: user_id INTROUVABLE après tous les fallbacks");
-        console.error("Transaction complète:", JSON.stringify(transaction, null, 2));
+        console.error("❌❌❌ PROBLÈME CRITIQUE ❌❌❌");
+        console.error("❌ Impossible de créer purchase: user_id introuvable");
+        console.log("Transaction complète:", JSON.stringify(transaction, null, 2));
         console.error("⚠️ Le client a PAYÉ mais ne recevra PAS son document!");
-        console.error("⚠️ Action requise: Investigation manuelle + remboursement ou attribution manuelle");
+        console.error("⚠️ Action requise: Investigation manuelle nécessaire");
         
+        // Envoyer email d'alerte admin (TODO: implémenter)
         return res.status(200).json({
           success: true,
           message: "Payment processed but no user_id - MANUAL INTERVENTION REQUIRED",
           status: newStatus,
           transactionId: transaction.id,
-          reference: transaction.reference,
-          email: transaction.client_email
+          reference: transaction.reference
         });
       }
 
-      console.log("✅ user_id confirmé, création du purchase...");
-      console.log("  - user_id:", purchaseUserId);
-      console.log("  - document_id:", transaction.document_id);
+      console.log("✅ user_id présent, création du purchase...");
 
-      // Vérifier si le purchase existe déjà (idempotence)
-      const { data: existingPurchase } = await supabase
+      // Créer l'entrée dans la table purchases
+      const { error: purchaseError } = await supabase
         .from("purchases")
-        .select("id")
-        .eq("user_id", purchaseUserId)
-        .eq("document_id", transaction.document_id)
-        .single();
+        .insert({
+          user_id: purchaseUserId,
+          document_id: transaction.document_id,
+          transaction_id: null  // Pas de transaction dans la table transactions pour eBilling
+        });
 
-      if (existingPurchase) {
-        console.log("ℹ️ Purchase déjà existant:", existingPurchase.id);
+      if (purchaseError) {
+        console.error("❌❌❌ ERREUR CRÉATION PURCHASE ❌❌❌");
+        console.error("❌ Erreur création achat:", purchaseError);
+        console.error("Détails:", JSON.stringify(purchaseError, null, 2));
+        console.error("⚠️ Le client a PAYÉ mais ne peut PAS accéder au document!");
       } else {
-        // Créer l'entrée dans la table purchases
-        const { data: newPurchase, error: purchaseError } = await supabase
-          .from("purchases")
-          .insert({
-            user_id: purchaseUserId,
-            document_id: transaction.document_id,
-            transaction_id: null  // Pas de transaction dans la table transactions pour eBilling (pour l'instant)
-          })
-          .select()
-          .single();
-
-        if (purchaseError) {
-          console.error("❌❌❌ ERREUR CRÉATION PURCHASE ❌❌❌");
-          console.error("❌ Erreur:", purchaseError.message);
-          console.error("❌ Code:", purchaseError.code);
-          console.error("❌ Détails:", JSON.stringify(purchaseError, null, 2));
-          console.error("⚠️ Le client a PAYÉ mais ne peut PAS accéder au document!");
-          console.error("Données tentées:", { user_id: purchaseUserId, document_id: transaction.document_id });
-        } else {
-          console.log("✅✅✅ PURCHASE CRÉÉ AVEC SUCCÈS ✅✅✅");
-          console.log("  - Purchase ID:", newPurchase.id);
-          console.log("  - user_id:", purchaseUserId);
-          console.log("  - document_id:", transaction.document_id);
-          console.log("  - Le lecteur peut maintenant accéder au document!");
-        }
+        console.log("✅✅✅ ACHAT CRÉÉ AVEC SUCCÈS ✅✅✅");
+        console.log("  - user_id:", purchaseUserId);
+        console.log("  - document_id:", transaction.document_id);
       }
 
       // ═════════════════════════════════════════════════════════
@@ -240,17 +206,20 @@ export default async function handler(
       // ═════════════════════════════════════════════════════════
       console.log("💰 Création de la transaction financière...");
 
-      // Récupérer les infos du document (titre et auteur uniquement)
+      // Récupérer les infos du document (prix et auteur)
       const { data: document, error: docError } = await supabase
         .from("documents")
-        .select("title, author_id")
+        .select("title, price, promo_price, author_id")
         .eq("id", transaction.document_id)
         .single();
 
       if (docError || !document) {
         console.error("❌ Impossible de récupérer le document:", docError);
       } else {
-        console.log("📄 Document:", document.title);
+        console.log("📄 Document:", document.title, "- Prix:", document.price, "XAF");
+        if (document.promo_price) {
+          console.log("🎁 Prix promo actif:", document.promo_price, "XAF");
+        }
 
         // Récupérer le taux de commission depuis la config (défaut 15%)
         const { data: commissionData } = await supabase
@@ -260,62 +229,43 @@ export default async function handler(
           .single();
 
         const commissionRate = commissionData?.value || 15;
-        
-        // IMPORTANT: Utiliser transaction.amount (montant validé lors du checkout)
-        // Ne PAS recalculer depuis le document car le prix peut avoir changé
-        const transactionAmount = Number(transaction.amount);
-        const platformFee = Math.round((transactionAmount * commissionRate) / 100);
-        const authorEarnings = transactionAmount - platformFee;
+        // IMPORTANT: Utiliser le prix promo s'il existe, sinon le prix normal
+        const amount = Number(document.promo_price || document.price);
+        const platformFee = Math.round((amount * commissionRate) / 100);
+        const authorEarnings = amount - platformFee;
 
         console.log("💵 Calcul financier:");
-        console.log("  - Montant payé:", transactionAmount, "XAF");
+        console.log("  - Montant payé:", amount, "XAF", document.promo_price ? "(prix promo)" : "(prix normal)");
         console.log("  - Commission plateforme (" + commissionRate + "%):", platformFee, "XAF");
         console.log("  - Revenus auteur:", authorEarnings, "XAF");
 
-        // Vérifier si la transaction financière existe déjà (idempotence)
-        const { data: existingTransaction } = await supabase
+        // Créer la transaction dans la table transactions
+        const { error: txError } = await supabase
           .from("transactions")
-          .select("id")
-          .eq("transaction_reference", transaction.reference)
-          .single();
+          .insert({
+            document_id: transaction.document_id,
+            buyer_id: purchaseUserId,
+            author_id: document.author_id,
+            amount: amount,
+            currency: "XOF",
+            platform_fee: platformFee,
+            author_earnings: authorEarnings,
+            payment_method: "mobile_money",
+            payment_provider: "eBilling",
+            transaction_reference: transaction.reference,
+            status: "completed",
+            completed_at: new Date().toISOString(),
+            commission_amount: platformFee
+          });
 
-        if (existingTransaction) {
-          console.log("ℹ️ Transaction financière déjà existante:", existingTransaction.id);
+        if (txError) {
+          console.error("❌ Erreur création transaction financière:", txError);
+          console.error("  - Code:", txError.code);
+          console.error("  - Message:", txError.message);
+          console.error("  - Details:", txError.details);
         } else {
-          // Créer la transaction dans la table transactions
-          const { data: newTransaction, error: txError } = await supabase
-            .from("transactions")
-            .insert({
-              document_id: transaction.document_id,
-              buyer_id: purchaseUserId,
-              author_id: document.author_id,
-              amount: transactionAmount,
-              currency: "XOF",
-              platform_fee: platformFee,
-              author_earnings: authorEarnings,
-              payment_method: "mobile_money",
-              payment_provider: "eBilling",
-              transaction_reference: transaction.reference,
-              status: "completed",
-              completed_at: new Date().toISOString(),
-              commission_amount: platformFee
-            })
-            .select()
-            .single();
-
-          if (txError) {
-            console.error("❌ Erreur création transaction financière:", txError);
-            console.error("  - Code:", txError.code);
-            console.error("  - Message:", txError.message);
-            console.error("  - Details:", txError.details);
-          } else {
-            console.log("✅✅✅ TRANSACTION FINANCIÈRE CRÉÉE ✅✅✅");
-            console.log("  - Transaction ID:", newTransaction.id);
-            console.log("  - Montant:", transactionAmount, "XAF");
-            console.log("  - Commission:", platformFee, "XAF");
-            console.log("  - Revenus auteur:", authorEarnings, "XAF");
-            console.log("  - Visible dans l'admin et le dashboard vendeur");
-          }
+          console.log("✅✅✅ TRANSACTION FINANCIÈRE CRÉÉE ✅✅✅");
+          console.log("  - Visible dans l'admin et le dashboard vendeur");
         }
       }
     }

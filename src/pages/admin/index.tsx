@@ -2201,14 +2201,14 @@ export default function AdminDashboard() {
                       </p>
                       <div className="flex items-center gap-2 p-2 bg-white dark:bg-blue-900 rounded border border-blue-300 dark:border-blue-700">
                         <code className="text-sm font-mono text-blue-800 dark:text-blue-200 flex-1">
-                          {typeof window !== "undefined" ? `${window.location.origin}/api/payments/ebilling/callback` : "/api/payments/ebilling/callback"}
+                          {typeof window !== "undefined" ? `${window.location.origin}/api/webhooks/ebilling` : "/api/webhooks/ebilling"}
                         </code>
                         <Button
                           size="sm"
                           variant="outline"
                           className="h-7 text-xs"
                           onClick={() => {
-                            const url = typeof window !== "undefined" ? `${window.location.origin}/api/payments/ebilling/callback` : "/api/payments/ebilling/callback";
+                            const url = typeof window !== "undefined" ? `${window.location.origin}/api/webhooks/ebilling` : "/api/webhooks/ebilling";
                             navigator.clipboard.writeText(url);
                             toast({ title: "Copié !", description: "URL de callback copiée dans le presse-papier" });
                           }}

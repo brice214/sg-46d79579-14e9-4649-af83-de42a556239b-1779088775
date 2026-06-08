@@ -100,7 +100,7 @@ export async function initiateDocumentCheckout(
 export function getEbillingPortalUrl(env: "LAB" | "PROD"): string {
   return env === "LAB"
     ? "https://test.billing-easy.net"
-    : "https://staging.billing-easy.net";  // PROD utilise l'environnement de staging eBilling
+    : "https://www.billing-easy.com";
 }
 
 /**
