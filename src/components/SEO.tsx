@@ -9,7 +9,7 @@ interface SEOProps {
 
 // SEO elements that can be used in _document.tsx (returns JSX without Head wrapper)
 export function SEOElements({
-  title = "AFRILITT",
+  title = "AFRILITT - Publiez. Partagez. Monétisez votre savoir",
   description = "AfriLitt est la première plateforme africaine dédiée à la publication et la vente de documents numériques par des auteurs, chercheurs et penseurs africains.",
   image = "/og-image.png",
   url,
