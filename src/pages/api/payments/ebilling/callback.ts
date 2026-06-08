@@ -122,83 +122,117 @@ export default async function handler(
       console.log("🔄 Création de l'achat...");
       console.log("🔍 DIAGNOSTIC PURCHASE:");
       console.log("  - Transaction ID:", transaction.id);
-      console.log("  - Transaction user_id:", transaction.user_id || "NULL");
+      console.log("  - Transaction user_id (initial):", transaction.user_id || "NULL");
       console.log("  - Transaction document_id:", transaction.document_id);
       console.log("  - Transaction amount:", transaction.amount);
       console.log("  - Transaction reference:", transaction.reference);
       console.log("  - Transaction client_email:", transaction.client_email);
-      console.log("  - Transaction metadata:", JSON.stringify(transaction.metadata, null, 2));
 
       let purchaseUserId = transaction.user_id;
 
       // ═════════════════════════════════════════════════════════
-      // FALLBACK : Si user_id manquant, chercher via email
+      // STRATÉGIE DE RÉSOLUTION user_id (OBLIGATOIRE)
       // ═════════════════════════════════════════════════════════
-      if (!purchaseUserId && transaction.client_email) {
-        console.log("⚠️ user_id manquant, tentative de récupération via email...");
-        console.log("  - Email recherché:", transaction.client_email);
+      if (!purchaseUserId) {
+        console.log("⚠️⚠️⚠️ user_id MANQUANT - ACTIVATION FALLBACK ⚠️⚠️⚠️");
+        
+        if (transaction.client_email) {
+          console.log("🔍 Tentative 1: Recherche via email:", transaction.client_email);
 
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("email", transaction.client_email)
-          .single();
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("id, email, full_name")
+            .eq("email", transaction.client_email)
+            .single();
 
-        if (profile && !profileError) {
-          purchaseUserId = profile.id;
-          console.log("✅ user_id retrouvé via email:", purchaseUserId);
-          
-          // Mettre à jour la transaction avec le user_id retrouvé
-          await supabase
-            .from("ebilling_transactions")
-            .update({ user_id: purchaseUserId })
-            .eq("id", transaction.id);
-          
-          console.log("✅ Transaction mise à jour avec user_id");
+          if (profile && !profileError) {
+            purchaseUserId = profile.id;
+            console.log("✅ user_id retrouvé via email:", purchaseUserId);
+            console.log("✅ Profil:", profile.full_name, "-", profile.email);
+            
+            // Mettre à jour la transaction avec le user_id retrouvé
+            const { error: updateTxError } = await supabase
+              .from("ebilling_transactions")
+              .update({ user_id: purchaseUserId, updated_at: new Date().toISOString() })
+              .eq("id", transaction.id);
+            
+            if (updateTxError) {
+              console.error("⚠️ Impossible de mettre à jour transaction:", updateTxError);
+            } else {
+              console.log("✅ Transaction mise à jour avec user_id");
+            }
+          } else {
+            console.error("❌ Tentative 1 ÉCHOUÉE - Utilisateur introuvable");
+            console.error("  - Email recherché:", transaction.client_email);
+            console.error("  - Erreur:", profileError?.message || "NONE");
+          }
         } else {
-          console.error("❌ Impossible de trouver l'utilisateur via email");
-          console.error("  - Error:", profileError?.message || "NONE");
+          console.error("❌ Impossible de chercher user_id: client_email manquant");
         }
+      } else {
+        console.log("✅ user_id présent dans transaction:", purchaseUserId);
       }
 
-      // Vérifier que user_id existe (original ou retrouvé)
+      // ═════════════════════════════════════════════════════════
+      // VÉRIFICATION FINALE + CRÉATION PURCHASE
+      // ═════════════════════════════════════════════════════════
       if (!purchaseUserId) {
-        console.error("❌❌❌ PROBLÈME CRITIQUE ❌❌❌");
-        console.error("❌ Impossible de créer purchase: user_id introuvable");
-        console.log("Transaction complète:", JSON.stringify(transaction, null, 2));
+        console.error("❌❌❌ ÉCHEC CRITIQUE ❌❌❌");
+        console.error("❌ Impossible de créer purchase: user_id INTROUVABLE après tous les fallbacks");
+        console.error("Transaction complète:", JSON.stringify(transaction, null, 2));
         console.error("⚠️ Le client a PAYÉ mais ne recevra PAS son document!");
-        console.error("⚠️ Action requise: Investigation manuelle nécessaire");
+        console.error("⚠️ Action requise: Investigation manuelle + remboursement ou attribution manuelle");
         
-        // Envoyer email d'alerte admin (TODO: implémenter)
         return res.status(200).json({
           success: true,
           message: "Payment processed but no user_id - MANUAL INTERVENTION REQUIRED",
           status: newStatus,
           transactionId: transaction.id,
-          reference: transaction.reference
+          reference: transaction.reference,
+          email: transaction.client_email
         });
       }
 
-      console.log("✅ user_id présent, création du purchase...");
+      console.log("✅ user_id confirmé, création du purchase...");
+      console.log("  - user_id:", purchaseUserId);
+      console.log("  - document_id:", transaction.document_id);
 
-      // Créer l'entrée dans la table purchases
-      const { error: purchaseError } = await supabase
+      // Vérifier si le purchase existe déjà (idempotence)
+      const { data: existingPurchase } = await supabase
         .from("purchases")
-        .insert({
-          user_id: purchaseUserId,
-          document_id: transaction.document_id,
-          transaction_id: null  // Pas de transaction dans la table transactions pour eBilling
-        });
+        .select("id")
+        .eq("user_id", purchaseUserId)
+        .eq("document_id", transaction.document_id)
+        .single();
 
-      if (purchaseError) {
-        console.error("❌❌❌ ERREUR CRÉATION PURCHASE ❌❌❌");
-        console.error("❌ Erreur création achat:", purchaseError);
-        console.error("Détails:", JSON.stringify(purchaseError, null, 2));
-        console.error("⚠️ Le client a PAYÉ mais ne peut PAS accéder au document!");
+      if (existingPurchase) {
+        console.log("ℹ️ Purchase déjà existant:", existingPurchase.id);
       } else {
-        console.log("✅✅✅ ACHAT CRÉÉ AVEC SUCCÈS ✅✅✅");
-        console.log("  - user_id:", purchaseUserId);
-        console.log("  - document_id:", transaction.document_id);
+        // Créer l'entrée dans la table purchases
+        const { data: newPurchase, error: purchaseError } = await supabase
+          .from("purchases")
+          .insert({
+            user_id: purchaseUserId,
+            document_id: transaction.document_id,
+            transaction_id: null  // Pas de transaction dans la table transactions pour eBilling (pour l'instant)
+          })
+          .select()
+          .single();
+
+        if (purchaseError) {
+          console.error("❌❌❌ ERREUR CRÉATION PURCHASE ❌❌❌");
+          console.error("❌ Erreur:", purchaseError.message);
+          console.error("❌ Code:", purchaseError.code);
+          console.error("❌ Détails:", JSON.stringify(purchaseError, null, 2));
+          console.error("⚠️ Le client a PAYÉ mais ne peut PAS accéder au document!");
+          console.error("Données tentées:", { user_id: purchaseUserId, document_id: transaction.document_id });
+        } else {
+          console.log("✅✅✅ PURCHASE CRÉÉ AVEC SUCCÈS ✅✅✅");
+          console.log("  - Purchase ID:", newPurchase.id);
+          console.log("  - user_id:", purchaseUserId);
+          console.log("  - document_id:", transaction.document_id);
+          console.log("  - Le lecteur peut maintenant accéder au document!");
+        }
       }
 
       // ═════════════════════════════════════════════════════════
